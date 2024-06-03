@@ -3,19 +3,28 @@ module.exports = {
   base: '/mysite/',
   description: 'Just playing around.',
   themeConfig: {
+    outline: {
+      level: [2, 6]
+    },
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Example', link: '/张养浩' }
-    ],
-    sidebar: [
+      { text: '主页', link: '/' },
       {
-        text: 'Example',
+        text: '笔记',
         items: [
-          { text: 'Markdown Example', link: '/markdown-examples' },
-          { text: 'Runtime API Example', link: '/api-example' }
+          { text: 'vue', link: '/vuedocs' }
         ]
       }
     ],
+    sidebar: {
+      '/vuedocs/': {
+        text: 'vue',
+        items: [
+          { text: 'vue', link: '/vuedocs/' },
+          { text: '响应系统', link: '/vuedocs/reactivesystem' },
+          { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' }
+        ]
+      }
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
@@ -36,9 +45,9 @@ module.exports = {
       }
     },
 
-    carbonAds: {
-      code: 'your-carbon-code',
-      placement: 'your-carbon-placement'
-    }
+    // carbonAds: {
+    //   code: 'your-carbon-code',
+    //   placement: 'your-carbon-placement'
+    // }
   }
 }

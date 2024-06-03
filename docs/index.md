@@ -14,12 +14,10 @@ hero:
       link: https://github.com/vuejs/vitepress
 
 features:
-  - icon: ⚡️
+  - icon: w
     title: Vite, The DX that can't be beat
     details: Lorem ipsum...
-  - icon: 🖖
-    title: Power of Vue meets Markdown
-    details: Lorem ipsum...
+    link: /张养浩
   - icon: 🛠️
     title: Simple and minimal, always
     details: Lorem ipsum...
