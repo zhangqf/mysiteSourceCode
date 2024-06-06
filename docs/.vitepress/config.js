@@ -21,7 +21,8 @@ module.exports = {
         items: [
           { text: 'vue', link: '/vuedocs/' },
           { text: '响应系统', link: '/vuedocs/reactivesystem' },
-          { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' }
+          { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' },
+          { text: '原始值的响应式方案', link: '/vuedocs/AresponsivesofPrimiteValue' }
         ]
       }
     },
