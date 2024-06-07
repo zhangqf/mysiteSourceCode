@@ -11,15 +11,25 @@ module.exports = {
       {
         text: '笔记',
         items: [
-          { text: 'vue', link: '/vuedocs' }
+          { text: 'vue响应式系统', link: '/vuedocs' },
+          { text: 'vue渲染器', link: '/vueRender' }
         ]
       }
     ],
     sidebar: {
       '/vuedocs/': {
-        text: 'vue',
+        text: 'vue的设计',
         items: [
-          { text: 'vue', link: '/vuedocs/' },
+          { text: 'vue的设计', link: '/vuedocs/' },
+          { text: '响应系统', link: '/vuedocs/reactivesystem' },
+          { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' },
+          { text: '原始值的响应式方案', link: '/vuedocs/AresponsivesofPrimiteValue' }
+        ]
+      },
+      '/vueRender/': {
+        text: '渲染器的设计',
+        items: [
+          { text: '渲染器的设计', link: '/vueRender/' },
           { text: '响应系统', link: '/vuedocs/reactivesystem' },
           { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' },
           { text: '原始值的响应式方案', link: '/vuedocs/AresponsivesofPrimiteValue' }
