@@ -30,8 +30,8 @@ module.exports = {
         text: '渲染器的设计',
         items: [
           { text: '渲染器的设计', link: '/vueRender/' },
-          { text: '响应系统', link: '/vuedocs/reactivesystem' },
-          { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' },
+          { text: '挂载与更新', link: '/vueRender/mountedandupdated' },
+          { text: '简单Diff算法', link: '/vueRender/simpleDiffAlgorithm' },
           { text: '原始值的响应式方案', link: '/vuedocs/AresponsivesofPrimiteValue' }
         ]
       }
