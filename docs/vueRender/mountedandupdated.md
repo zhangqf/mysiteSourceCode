@@ -1,3 +1,6 @@
+---
+editLink: false
+---
 # 挂载与更新
 
 ## 挂载子节点和元素的属性
@@ -261,13 +264,14 @@ vue中设置类名的几种方式
   ```
 - 指定class为一个对象值
 
-
   ```html
   <p :class='cls'></p>
   ```
+
   ```js
   const cls = {foo: true, bar: false}
   ```
+
   ```js
   //对应的vnode
   const vnode = {
@@ -282,6 +286,7 @@ vue中设置类名的几种方式
   ```html
   <p :class='arr'></p>
   ```
+
   ```js
   const arr = [
     'foo bar',
@@ -290,6 +295,7 @@ vue中设置类名的几种方式
     }
   ]
   ```
+
   ```js
   // 对应的vnode
   const vnode ={
@@ -305,12 +311,11 @@ vue中设置类名的几种方式
 
 class的值可以是多种类型，必须在设置元素的class之前将值归一化为统一的字符串形式，再把该字符串作为元素的class值去设置。
 
-
 在浏览器中设置class的三种方式
+
 - setAttribute 性能最差
 - el.className 性能最优
 - el.classList 性能中等
-
 
 ```js
 // 创建一个渲染器
@@ -354,293 +359,302 @@ renderer.render(newVnode, document.querySelector('#app'))
 
 更新的几种情况：
 
- - 首次挂载完成后，后续调用render函数渲染空内容
- ```js
- renderer.render(vnode, document.querySelector('#app'))
+- 首次挂载完成后，后续调用render函数渲染空内容
+
+```js
+renderer.render(vnode, document.querySelector('#app'))
 // 新vnode内容为null， 意味着卸载之前渲染的内容
- renderer.render(null, document.querySelector('#app'))
- ```
- 
- ```js
+renderer.render(null, document.querySelector('#app'))
+```
+
+```js
+ function render(vnode, container) {
+   if (vnode) {
+     patch(container._vnode, vnode, container)
+   } else {
+     if (container._vnode) {
+       container.innerHTML = ''
+     }
+   }
+   container._vnode = vnode
+ }
+```
+
+当内容为空时，通过container.innerHTMl 清空容器。不严谨
+
+- 容器的内容可能是由某个或多个组件渲染的，当卸载操作发生时，应该正确地调用这些组件的 `beforeUnmount` 、`unmounted`等生命周期函数
+- 即使内容不是由组件渲染的，有的元素存在自定义指令，我们应该在卸载操作发生时正确的执行对应的指令钩子函数
+- 使用innerHTML清空容器元素内容的另一个缺陷，它不会移除绑定的DOM元素上的事件处理函数
+
+正确的卸载方式是，根据`vnode`对象获取与其相关联的真实`DOM`元素，然后使用原生`DOM`操作方法将该`DOM`元素移除。
+
+```js
+function mountElement(vnode, container) {
+   // 创建DOM元素
+   const el = createElement(vnode.type) // [!code --]
+   const el = vnode.el = createElement(vnode.type) // [!code ++]
+   // 处理子节点，如果子节点是字符串，代表元素具有文本节点
+   if (typeof vnode.children === 'string') {
+     setElementText(el, vnode.children)
+   } else if (Array.isArray(vnode.children)) {
+     // 如果childern是数组，则遍历每一个子节点，并调用patch函数挂载它们
+     vnode.children.forEach(child => {
+       patch(null, child, el)
+     })
+   }
+
+   if (vnode.props) {
+     for (const key in vnode.props) {
+       patchProps(el, key, null, vnode.props[key])
+     }
+   }
+   // 将元素添加到容器中
+   insert(el, container)
+ }
+
   function render(vnode, container) {
-    if (vnode) {
-      patch(container._vnode, vnode, container)
-    } else {
-      if (container._vnode) {
-        container.innerHTML = ''
-      }
-    }
-    container._vnode = vnode
-  }
- ```
+   if (vnode) {
+     patch(container._vnode, vnode, container)
+   } else {
+     if (container._vnode) {
+       container.innerHTML = '' // [!code --]
+        // 根据vnode获取要卸载的真实DOM元素 // [!code ++]
+       const el = container._vnode.el // [!code ++]
+       // 获取el的父元素 // [!code ++]
+       const parent = el.parentNode // [!code ++]
+       // 调用removeChild移除元素 // [!code ++]
+       if(parent) { // [!code ++]
+         parent.removeChild(el) // [!code ++]
+       } // [!code ++]
+     }
+   }
+   container._vnode = vnode
+ }
+```
 
- 当内容为空时，通过container.innerHTMl 清空容器。不严谨
+将移除操起提取到 `unmount` 中
 
- - 容器的内容可能是由某个或多个组件渲染的，当卸载操作发生时，应该正确地调用这些组件的 `beforeUnmount` 、`unmounted`等生命周期函数
- - 即使内容不是由组件渲染的，有的元素存在自定义指令，我们应该在卸载操作发生时正确的执行对应的指令钩子函数
- - 使用innerHTML清空容器元素内容的另一个缺陷，它不会移除绑定的DOM元素上的事件处理函数
-
- 正确的卸载方式是，根据`vnode`对象获取与其相关联的真实`DOM`元素，然后使用原生`DOM`操作方法将该`DOM`元素移除。
-
- ```js
- function mountElement(vnode, container) {
-    // 创建DOM元素
-    const el = createElement(vnode.type) // [!code --]
-    const el = vnode.el = createElement(vnode.type) // [!code ++]
-    // 处理子节点，如果子节点是字符串，代表元素具有文本节点
-    if (typeof vnode.children === 'string') {
-      setElementText(el, vnode.children)
-    } else if (Array.isArray(vnode.children)) {
-      // 如果childern是数组，则遍历每一个子节点，并调用patch函数挂载它们
-      vnode.children.forEach(child => {
-        patch(null, child, el)
-      })
-    }
-
-    if (vnode.props) {
-      for (const key in vnode.props) {
-        patchProps(el, key, null, vnode.props[key])
-      }
-    }
-    // 将元素添加到容器中
-    insert(el, container)
-  }
-
-   function render(vnode, container) {
-    if (vnode) {
-      patch(container._vnode, vnode, container)
-    } else {
-      if (container._vnode) {
-        container.innerHTML = '' // [!code --]
-         // 根据vnode获取要卸载的真实DOM元素 // [!code ++]
-        const el = container._vnode.el // [!code ++]
-        // 获取el的父元素 // [!code ++]
-        const parent = el.parentNode // [!code ++]
-        // 调用removeChild移除元素 // [!code ++]
-        if(parent) { // [!code ++]
-          parent.removeChild(el) // [!code ++]
-        } // [!code ++]
-      }
-    }
-    container._vnode = vnode
-  }
- ```
- 将移除操起提取到 `unmount` 中
- ```js
- function createRenderer(options) {
-  const {
-    createElement,
-    insert,
-    setElementText,
-    patchProps
-  } = options
-  function patch(n1, n2, container) {
-    // 如果 n1 不存在，意味着挂载，则调用mountElement 函数完成挂载
-    // n1 代表旧的vnode， n2 代表新的vnode，当n1不存在时，意味着没有旧的vnode，
-    // 这时只需要挂载
-    if (!n1) {
-      mountElement(n2, container)
-    } else {
-      // n1 存在，意味着打补丁，
-    }
-  }
-
-  function unmount(vnode) { // [!code ++]
-    const parent = vnode.el.parentNode // [!code ++]
-    if(parent) { // [!code ++]
-      parent.removeChild(vnode.el) // [!code ++]
-    } // [!code ++]
-  } // [!code ++]
- 
-  function render(vnode, container) {
-    if (vnode) {
-      patch(container._vnode, vnode, container)
-    } else {
-      if (container._vnode) {
-        unmount(vnode) // [!code ++]
-        // 根据vnode获取要卸载的真实DOM元素 // [!code --]
-        const el = container._vnode.el // [!code --]
-        // 获取el的父元素 // [!code --]
-        const parent = el.parentNode // [!code --]
-        // 调用removeChild移除元素 // [!code --]
-        if(parent) { // [!code --]
-          parent.removeChild(el) // [!code --]
-        } // [!code --]
-      }
-    }
-    container._vnode = vnode
-  }
-
-  function mountElement(vnode, container) {
-    // 创建DOM元素
-    const el = vnode.el = createElement(vnode.type)
-    // 处理子节点，如果子节点是字符串，代表元素具有文本节点
-    if (typeof vnode.children === 'string') {
-      setElementText(el, vnode.children)
-    } else if (Array.isArray(vnode.children)) {
-      // 如果childern是数组，则遍历每一个子节点，并调用patch函数挂载它们
-      vnode.children.forEach(child => {
-        patch(null, child, el)
-      })
-    }
-
-    if (vnode.props) {
-      for (const key in vnode.props) {
-        patchProps(el, key, null, vnode.props[key])
-      }
-    }
-    // 将元素添加到容器中
-    insert(el, container)
-  }
-
-  return {
-    render
-  }
-}
-
- ```
-
- ### 区分vnode的类型
-
- ```js
+```js
+function createRenderer(options) {
+ const {
+   createElement,
+   insert,
+   setElementText,
+   patchProps
+ } = options
  function patch(n1, n2, container) {
-    // 如果n1存在，则对比n1和n2的类型 // [!code ++]
-    if(n1 && n1.type !== n2.type) { // [!code ++]
-      // 如果新旧vnode的类型不同，则直接将旧的vnode卸载 // [!code ++]
-      unmount(n1) // [!code ++]
-      n1 = null // [!code ++]
-    } // [!code ++]
-    // 如果 n1 不存在，意味着挂载，则调用mountElement 函数完成挂载 // [!code --]
-    // n1 代表旧的vnode， n2 代表新的vnode，当n1不存在时，意味着没有旧的vnode， // [!code --]
-    // 这时只需要挂载 // [!code --]
-    if (!n1) { // [!code --]
-      mountElement(n2, container) // [!code --]
-    } else { // [!code ++]
-      // n1 存在，意味着打补丁， // [!code --]
-    } // [!code --]
-     const { type } = n2 // [!code ++]
-    if (typeof type === 'string') { // [!code ++] 
-      // 如果 n1 不存在，意味着挂载，则调用mountElement 函数完成挂载 // [!code ++]
-      // n1 代表旧的vnode， n2 代表新的vnode，当n1不存在时，意味着没有旧的vnode，  // [!code ++]
-      // 这时只需要挂载 // [!code ++]
-      if (!n1) { // [!code ++]
-        mountElement(n2, container) // [!code ++]
-      } else { // [!code ++]
-        // n1 存在，意味着打补丁， // [!code ++]
-        patch(n1, n2) // [!code ++]
-      } // [!code ++]
-    } else if (typeof type === 'object') { // [!code ++]
-      // 组件 // [!code ++]
-    } else if (type === 'xxx') { // [!code ++]
-      // 其他类型的vnode // [!code ++]
-    } // [!code ++]
-  }
- ```
- ### 事件的处理
+   // 如果 n1 不存在，意味着挂载，则调用mountElement 函数完成挂载
+   // n1 代表旧的vnode， n2 代表新的vnode，当n1不存在时，意味着没有旧的vnode，
+   // 这时只需要挂载
+   if (!n1) {
+     mountElement(n2, container)
+   } else {
+     // n1 存在，意味着打补丁，
+   }
+ }
 
- ```js
-  patchProps(el, key, preValue, nextValue) {
-    // 匹配以on开头的属性，视其为事件 // [!code ++]
-    if(/^on/.test(key)) {  // [!code ++]
-      const name = key.slice(2).toLowerCase() // [!code ++]
-       // 移除上一次绑定 的事件处理函数 // [!code ++]
-      preValue && el.removeEventListener(name, preValue) // [!code ++]
-      // 绑定新的事件处理函数 // [!code ++]
-      el.addEventListener(name, nextValue) // [!code ++]
-    } else if (key === 'class') {
-      el.className = nextValue || ''
-    } else if (shouldSetAsProps(el, key, nextValue)) {
-      const type = typeof el[key]
-      if (type === 'boolean' && nextValue === '') {
-        el[key] = true
-      } else {
-        el[key] = nextValue
-      }
-    } else {
-      el.setAttribute(key, nextValue)
-    }
-  }
- ```
+ function unmount(vnode) { // [!code ++]
+   const parent = vnode.el.parentNode // [!code ++]
+   if(parent) { // [!code ++]
+     parent.removeChild(vnode.el) // [!code ++]
+   } // [!code ++]
+ } // [!code ++]
 
- #### 优化
- 伪造一个事件处理函数 `invoker`, 把真正的事件处理函数设置为`invoker.value`属性的值。这样，当更新事件的时候，将不在需要调用`removeEventListener`函数来移除上一次绑定的事件，只需更新`invoker.value`的值即可
- ```js
+ function render(vnode, container) {
+   if (vnode) {
+     patch(container._vnode, vnode, container)
+   } else {
+     if (container._vnode) {
+       unmount(vnode) // [!code ++]
+       // 根据vnode获取要卸载的真实DOM元素 // [!code --]
+       const el = container._vnode.el // [!code --]
+       // 获取el的父元素 // [!code --]
+       const parent = el.parentNode // [!code --]
+       // 调用removeChild移除元素 // [!code --]
+       if(parent) { // [!code --]
+         parent.removeChild(el) // [!code --]
+       } // [!code --]
+     }
+   }
+   container._vnode = vnode
+ }
+
+ function mountElement(vnode, container) {
+   // 创建DOM元素
+   const el = vnode.el = createElement(vnode.type)
+   // 处理子节点，如果子节点是字符串，代表元素具有文本节点
+   if (typeof vnode.children === 'string') {
+     setElementText(el, vnode.children)
+   } else if (Array.isArray(vnode.children)) {
+     // 如果childern是数组，则遍历每一个子节点，并调用patch函数挂载它们
+     vnode.children.forEach(child => {
+       patch(null, child, el)
+     })
+   }
+
+   if (vnode.props) {
+     for (const key in vnode.props) {
+       patchProps(el, key, null, vnode.props[key])
+     }
+   }
+   // 将元素添加到容器中
+   insert(el, container)
+ }
+
+ return {
+   render
+ }
+}
+
+```
+
+### 区分vnode的类型
+
+```js
+function patch(n1, n2, container) {
+   // 如果n1存在，则对比n1和n2的类型 // [!code ++]
+   if(n1 && n1.type !== n2.type) { // [!code ++]
+     // 如果新旧vnode的类型不同，则直接将旧的vnode卸载 // [!code ++]
+     unmount(n1) // [!code ++]
+     n1 = null // [!code ++]
+   } // [!code ++]
+   // 如果 n1 不存在，意味着挂载，则调用mountElement 函数完成挂载 // [!code --]
+   // n1 代表旧的vnode， n2 代表新的vnode，当n1不存在时，意味着没有旧的vnode， // [!code --]
+   // 这时只需要挂载 // [!code --]
+   if (!n1) { // [!code --]
+     mountElement(n2, container) // [!code --]
+   } else { // [!code ++]
+     // n1 存在，意味着打补丁， // [!code --]
+   } // [!code --]
+    const { type } = n2 // [!code ++]
+   if (typeof type === 'string') { // [!code ++] 
+     // 如果 n1 不存在，意味着挂载，则调用mountElement 函数完成挂载 // [!code ++]
+     // n1 代表旧的vnode， n2 代表新的vnode，当n1不存在时，意味着没有旧的vnode，  // [!code ++]
+     // 这时只需要挂载 // [!code ++]
+     if (!n1) { // [!code ++]
+       mountElement(n2, container) // [!code ++]
+     } else { // [!code ++]
+       // n1 存在，意味着打补丁， // [!code ++]
+       patch(n1, n2) // [!code ++]
+     } // [!code ++]
+   } else if (typeof type === 'object') { // [!code ++]
+     // 组件 // [!code ++]
+   } else if (type === 'xxx') { // [!code ++]
+     // 其他类型的vnode // [!code ++]
+   } // [!code ++]
+ }
+```
+
+### 事件的处理
+
+```js
  patchProps(el, key, preValue, nextValue) {
-    // 匹配以on开头的属性，视其为事件
-    if(/^on/.test(key)) {
-      // 获取为该元素伪造的事件处理函数 invoker
-      let invoker = el._vei // [!code ++]
-      const name = key.slice(2).toLowerCase()
-      if(!invoker) { // [!code ++]
-        // 如果没有invoker，则将一个伪造的invoker缓存到el._vei中 // [!code ++]
-        // vei是vue event invoker的首字母缩写 // [!code ++]
-        invoker = el._vei = (e) => { // [!code ++]
-          // 当伪造的事件处理函数执行时，会执行真正的事件处理函数 // [!code ++]
-          invoker.value(e) // [!code ++]
-        } // [!code ++]
-        // 将真正的事件处理函数赋值给invoker.value // [!code ++]
-        invoker.value = nextValue // [!code ++]
-        // 绑定invoker作为事件处理函数 // [!code ++]
-        el.addEventListener(name, invoker) // [!code ++]
-      } // [!code ++]
-      // 移除上一次绑定 的事件处理函数 // [!code --]
-      preValue && el.removeEventListener(name, preValue) // [!code --]
-      // 绑定新的事件处理函数 // [!code --]
-      el.addEventListener(name, nextValue) // [!code --]
-    } else if (key === 'class') {
-      el.className = nextValue || ''
-    } else if (shouldSetAsProps(el, key, nextValue)) {
-      const type = typeof el[key]
-      if (type === 'boolean' && nextValue === '') {
-        el[key] = true
-      } else {
-        el[key] = nextValue
-      }
-    } else {
-      el.setAttribute(key, nextValue)
-    }
-  }
+   // 匹配以on开头的属性，视其为事件 // [!code ++]
+   if(/^on/.test(key)) {  // [!code ++]
+     const name = key.slice(2).toLowerCase() // [!code ++]
+      // 移除上一次绑定 的事件处理函数 // [!code ++]
+     preValue && el.removeEventListener(name, preValue) // [!code ++]
+     // 绑定新的事件处理函数 // [!code ++]
+     el.addEventListener(name, nextValue) // [!code ++]
+   } else if (key === 'class') {
+     el.className = nextValue || ''
+   } else if (shouldSetAsProps(el, key, nextValue)) {
+     const type = typeof el[key]
+     if (type === 'boolean' && nextValue === '') {
+       el[key] = true
+     } else {
+       el[key] = nextValue
+     }
+   } else {
+     el.setAttribute(key, nextValue)
+   }
+ }
+```
+
+#### 优化
+
+伪造一个事件处理函数 `invoker`, 把真正的事件处理函数设置为`invoker.value`属性的值。这样，当更新事件的时候，将不在需要调用`removeEventListener`函数来移除上一次绑定的事件，只需更新`invoker.value`的值即可
+
+```js
+patchProps(el, key, preValue, nextValue) {
+   // 匹配以on开头的属性，视其为事件
+   if(/^on/.test(key)) {
+     // 获取为该元素伪造的事件处理函数 invoker
+     let invoker = el._vei // [!code ++]
+     const name = key.slice(2).toLowerCase()
+     if(!invoker) { // [!code ++]
+       // 如果没有invoker，则将一个伪造的invoker缓存到el._vei中 // [!code ++]
+       // vei是vue event invoker的首字母缩写 // [!code ++]
+       invoker = el._vei = (e) => { // [!code ++]
+         // 当伪造的事件处理函数执行时，会执行真正的事件处理函数 // [!code ++]
+         invoker.value(e) // [!code ++]
+       } // [!code ++]
+       // 将真正的事件处理函数赋值给invoker.value // [!code ++]
+       invoker.value = nextValue // [!code ++]
+       // 绑定invoker作为事件处理函数 // [!code ++]
+       el.addEventListener(name, invoker) // [!code ++]
+     } // [!code ++]
+     // 移除上一次绑定 的事件处理函数 // [!code --]
+     preValue && el.removeEventListener(name, preValue) // [!code --]
+     // 绑定新的事件处理函数 // [!code --]
+     el.addEventListener(name, nextValue) // [!code --]
+   } else if (key === 'class') {
+     el.className = nextValue || ''
+   } else if (shouldSetAsProps(el, key, nextValue)) {
+     const type = typeof el[key]
+     if (type === 'boolean' && nextValue === '') {
+       el[key] = true
+     } else {
+       el[key] = nextValue
+     }
+   } else {
+     el.setAttribute(key, nextValue)
+   }
+ }
 
 
 const vnode1 = {
-  type: 'div',
-  props: {
-    id: foo,
-    onClick: () => {
-      alert('clicked')
-    }
-  },
-  children: [
-    {
-      type: 'p',
-      children: 'hello'
-    }
-  ]
+ type: 'div',
+ props: {
+   id: foo,
+   onClick: () => {
+     alert('clicked')
+   }
+ },
+ children: [
+   {
+     type: 'p',
+     children: 'hello'
+   }
+ ]
 }
- ```
+```
 
- #### 改进2
- 当一个元素同时绑定多种事件时，将会出现事件覆盖。同一类型的事件，还可以绑定多个事件处理函数。
- ```js
+#### 改进2
+
+当一个元素同时绑定多种事件时，将会出现事件覆盖。同一类型的事件，还可以绑定多个事件处理函数。
+
+```js
 const vnode1 = {
-  type: 'div',
-  props: {
-    id: foo,
-    onClick: () => {
-      alert('clicked')
-    },
-    onContextmenu: () => { // [!code ++]
-      alert('contextmenu') // [!code ++]
-    } // [!code ++]
-  },
-  children: [
-    {
-      type: 'p',
-      children: 'hello'
-    }
-  ]
+ type: 'div',
+ props: {
+   id: foo,
+   onClick: () => {
+     alert('clicked')
+   },
+   onContextmenu: () => { // [!code ++]
+     alert('contextmenu') // [!code ++]
+   } // [!code ++]
+ },
+ children: [
+   {
+     type: 'p',
+     children: 'hello'
+   }
+ ]
 }
- ```
+```
+
 需要重新设计`el._vei`的数据结构。 将`el._vei`设计为一个对象，它的键是事件名称，值则是对应的事件处理函数。
 
 ```js
@@ -688,10 +702,13 @@ patchProps(el, key, preValue, nextValue) {
     }
   }
 ```
+
 ### 事件冒泡与更新时机的问题
+
 **绑定事件处理函数发生在事件冒泡之前**
 
 事件触发的时间要早于事件处理函数被绑定的时间。当一个事件触发时，目标元素上还没有绑定相关的事件处理函数，可以根据这个特点来解决问题：**屏蔽所有绑定时间晚于事件触发时间的事件处理函数的执行**。
+
 ```js
 patchProps(el, key, preValue, nextValue) {
     // 匹配以on开头的属性，视其为事件
@@ -743,6 +760,7 @@ patchProps(el, key, preValue, nextValue) {
 ### 更新子节点
 
 新旧节点分别有一下三种类型
+
 - 没有子节点
 - 文本子节点
 - 一组子节点
@@ -810,9 +828,11 @@ function patchChildren(n1, n2, container) {
 ### 文本节点和注释节点
 
 如何用虚拟DOM描述更多类型的真实DOM。
+
 ```html
 <div><!-- 注释节点 --> 我是文本节点</div>
 ```
+
 注释节点和文本节点不同于普通标签节点，它们不惧有标签名称，所以需要人为创造一些唯一的标识，并将其作为注释节点和文本节点的type属性值。
 
 ```js
@@ -1039,8 +1059,8 @@ const vnode = {
   ]
 }
 ```
-片段也没有所谓的标签名称，所以也需要为片段创建唯一的标识，即Fragment。对于Fragment类型的vnode来说，它的children存储的内容就是模版中所有跟节点。
 
+片段也没有所谓的标签名称，所以也需要为片段创建唯一的标识，即Fragment。对于Fragment类型的vnode来说，它的children存储的内容就是模版中所有跟节点。
 
 ```js
 function patch(n1, n2, container) {

@@ -1,3 +1,6 @@
+---
+editLink: false
+---
 # Diff算法
 
 当新旧`vnode`的子节点都是一组节点时，为了以最小的性能开销完成更新操作，需要比较两组子节点，用于比较大算法就叫作`Diff`算法。操作`DOM`的性能开销通常比较大，而渲染器的核心`Diff`算法就是为了解决这个问题而诞生的。
@@ -871,3 +874,809 @@ function patchKeyedChildren(n1, n2, container) {
 ```
 
 ### 非理想状况的处理方式
+
+双端diff算法的每一轮比较大过程都分为四个步骤。每一轮比较都会命中四个步骤中的一个，这是理想情况。
+当四个步骤的比较过程，都无法找到可复用的节点时，只能通过增加额外的处理步骤来处理这种非理想情况。
+
+既然两个头部和两个尾部的四个节点中都没有可复用的节点，那么就尝试看看非头部、非尾部的节点能否复用。
+具体做法：拿新的一组子节点中的头部节点去旧的一组子节点中寻找。
+
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    let oldStartIdx = 0
+    let odlEnIdx = oldChildren.length - 1
+    let newStartIdx = 0
+    let newEndIdx = newChildren.length - 1
+
+    // 四个索引指向的vnode节点
+    let oldStartVNode = oldChildren[oldStartIdx]
+    let oldEndVNode = oldChildren[odlEnIdx]
+    let newStartVNode = newChildren[newStartIdx]
+    let newEndVNode = newChildren[newEndIdx]
+
+    while (oldStartIdx <= odlEnIdx && newStartIdx <= newEndIdx) {
+       // 增加两个判断分支，如果头尾部节点为undefined，则说明该节点已经被处理过了，直接跳到下一个位置 // [!code ++]
+      if(!oldStartVNode) { // [!code ++]
+        oldStartVNode = oldChildren[++oldStartIdx] // [!code ++]
+      } else if(!oldEndVNode) { // [!code ++]
+        oldEndVNode = newChildren[--oldEndIdx] // [!code ++]
+      }else if (oldStartVNode.key === newStartVNode.key) { // [!code ++]
+        // 第一步 oldStartVNode和newStartVNode比较
+        // 调用patch函数在oldStartVNode与newStartVNode之间打补丁
+        patch(oldStartVNode, newStartVNode, container)
+        // 更新相关索引，指向下一个位置
+        oldStartVNode = oldChildren[++oldStartIdx]
+        newStartVNode = newChildren[++newStartIdx]
+      } else if (oldEndVNode.key === newEndVNode.key) {
+        // 第二步 oldEndVNode 和 newEndVNode比较
+        // 由于两者对处于尾部，因此不需要对真实DOM进行移动操作，只需要打补丁即可
+        patch(oldEndVNode, newEndVNode, container)
+        // 更新索引和头尾部节点变量
+        oldEndVNode = oldChildren[--oldEndIdx]
+        newEndVNode = newChildren[--newEndVNode]
+      } else if (oldStartVNode.key === newEndVNode.key) {
+        // 第三步 oldStartVNode 和 newEndVnode 比较
+        // 调用patch函数在oldstartVNode和newEndVNode之间打补丁
+        patch(oldStartVNode, newEndVNode, container)
+        // 将旧的一组子节点的头部节点对应的真实DOM节点oldStartVNode.el移动到旧的一组子节点的尾部节点对应的真实DOM节点后面
+        insert(oldStartVNode.el, container, oldEndVNode.el.nextSibling)
+        // 更新相关索引到下一个位置
+        oldStartVNode = oldChildren[++oldStartIdx]
+        newEndVNode = newChildren[--newEndIdx]
+
+      } else if (oldEndVNode.key === newStartVNode.key) {
+        // 第四步 oldEndVNode 和 newStartVNode 比较
+        // 仍然需要调用patch函数进行打补丁
+        patch(oldEndVNode, newStartVNode, container)
+        // 移动DOM操作
+        // oldEndVNode.el 移动到 oldStartVNode.el 前面
+        insert(oldEndVNode.el, container, oldStartVNode.el)
+
+        // 移动DOM完成后，更新索引值，并指向下一个位置
+        oldEndVNode = oldChildren[--odlEnIdx]
+        newStartVNode = newChildren[++newStartIdx]
+
+      } else { // [!code ++]
+        // 遍历旧的一组子节点，试图寻找与newstartVNode拥有相同key值的节点 // [!code ++]
+        // idxInOld就是新的一组子节点的头部节点在旧的一组子节点中的索引 // [!code ++]
+        const idxInOld = oldChildren.findIndex( // [!code ++]
+          node => node.key === newStartVNode.key // [!code ++]
+        ) // [!code ++]
+        // 如果idxInOld 大于0， 说明找到了可复用的节点，并且需要将其对应的真实DOM // [!code ++]
+        // 移动到头部 // [!code ++]
+        if (idxInOld > 0) { // [!code ++]
+          // idxInOld 位置对应的vnode就是需要移动的节点 // [!code ++]
+          const vnodeToMove = oldChildren[idxInOld] // [!code ++]
+          // 移动之前需要先打补丁 // [!code ++]
+          patch(vnodeToMove, newStartVNode, container) // [!code ++]
+          // 将vnodeToMove.el 移动到头部节点oldStartVNode.el之前，因此使用后者作为锚点 // [!code ++]
+          insert(vnodeToMove.el, container, oldStartVNode.el) // [!code ++]
+          // 由于位置idxInOld处的节点所对应的真实DOM已经移动到了别处，因此将其设置为undefined // [!code ++]
+          oldChildren[idxInOld] = undefined // [!code ++]
+          // 最后更新newStartIdx 到下一个位置 // [!code ++]
+          newStartVNode = newChildren[++newStartIdx] // [!code ++]
+
+        } // [!code ++]
+      }
+    }
+  }
+```
+
+### 添加新元素
+
+使用双端算法比较新旧节点的元素，正常情况下没有查找到可复用的节点，非理想情况也没有查找到可复用的节点，此时这个节点，为新增节点。 新增节点需要挂载，拿挂载到哪里呢？
+
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    let oldStartIdx = 0
+    let odlEnIdx = oldChildren.length - 1
+    let newStartIdx = 0
+    let newEndIdx = newChildren.length - 1
+
+    // 四个索引指向的vnode节点
+    let oldStartVNode = oldChildren[oldStartIdx]
+    let oldEndVNode = oldChildren[odlEnIdx]
+    let newStartVNode = newChildren[newStartIdx]
+    let newEndVNode = newChildren[newEndIdx]
+
+    while (oldStartIdx <= odlEnIdx && newStartIdx <= newEndIdx) {
+      // 增加两个判断分支，如果头尾部节点为undefined，则说明该节点已经被处理过了，直接跳到下一个位置
+      if (!oldStartVNode) {
+        oldStartVNode = oldChildren[++oldStartIdx]
+      } else if (!oldEndVNode) {
+        oldEndVNode = newChildren[--oldEndIdx]
+      } else if (oldStartVNode.key === newStartVNode.key) {
+        // 第一步 oldStartVNode和newStartVNode比较
+        // 调用patch函数在oldStartVNode与newStartVNode之间打补丁
+        patch(oldStartVNode, newStartVNode, container)
+        // 更新相关索引，指向下一个位置
+        oldStartVNode = oldChildren[++oldStartIdx]
+        newStartVNode = newChildren[++newStartIdx]
+      } else if (oldEndVNode.key === newEndVNode.key) {
+        // 第二步 oldEndVNode 和 newEndVNode比较
+        // 由于两者对处于尾部，因此不需要对真实DOM进行移动操作，只需要打补丁即可
+        patch(oldEndVNode, newEndVNode, container)
+        // 更新索引和头尾部节点变量
+        oldEndVNode = oldChildren[--oldEndIdx]
+        newEndVNode = newChildren[--newEndVNode]
+      } else if (oldStartVNode.key === newEndVNode.key) {
+        // 第三步 oldStartVNode 和 newEndVnode 比较
+        // 调用patch函数在oldstartVNode和newEndVNode之间打补丁
+        patch(oldStartVNode, newEndVNode, container)
+        // 将旧的一组子节点的头部节点对应的真实DOM节点oldStartVNode.el移动到旧的一组子节点的尾部节点对应的真实DOM节点后面
+        insert(oldStartVNode.el, container, oldEndVNode.el.nextSibling)
+        // 更新相关索引到下一个位置
+        oldStartVNode = oldChildren[++oldStartIdx]
+        newEndVNode = newChildren[--newEndIdx]
+
+      } else if (oldEndVNode.key === newStartVNode.key) {
+        // 第四步 oldEndVNode 和 newStartVNode 比较
+        // 仍然需要调用patch函数进行打补丁
+        patch(oldEndVNode, newStartVNode, container)
+        // 移动DOM操作
+        // oldEndVNode.el 移动到 oldStartVNode.el 前面
+        insert(oldEndVNode.el, container, oldStartVNode.el)
+
+        // 移动DOM完成后，更新索引值，并指向下一个位置
+        oldEndVNode = oldChildren[--odlEnIdx]
+        newStartVNode = newChildren[++newStartIdx]
+
+      } else {
+        // 遍历旧的一组子节点，试图寻找与newstartVNode拥有相同key值的节点
+        // idxInOld就是新的一组子节点的头部节点在旧的一组子节点中的索引
+        const idxInOld = oldChildren.findIndex(
+          node => node.key === newStartVNode.key
+        )
+        // 如果idxInOld 大于0， 说明找到了可复用的节点，并且需要将其对应的真实DOM
+        // 移动到头部
+        if (idxInOld > 0) {
+          // idxInOld 位置对应的vnode就是需要移动的节点
+          const vnodeToMove = oldChildren[idxInOld]
+          // 移动之前需要先打补丁
+          patch(vnodeToMove, newStartVNode, container)
+          // 将vnodeToMove.el 移动到头部节点oldStartVNode.el之前，因此使用后者作为锚点
+          insert(vnodeToMove.el, container, oldStartVNode.el)
+          // 由于位置idxInOld处的节点所对应的真实DOM已经移动到了别处，因此将其设置为undefined
+          oldChildren[idxInOld] = undefined
+          // 最后更新newStartIdx 到下一个位置
+          newStartVNode = newChildren[++newStartIdx] // [!code --]
+        } else { // [!code ++]
+          // 将newStartVNode作为新节点挂载到头部，使用当前头部节点oldStartVNode.el作为锚点 // [!code ++]
+          patch(null, newStartVNode, container, oldStartVNode.el) // [!code ++]
+        } // [!code ++]
+        newStartVNode = newChildren[++newStartIdx] // [!code ++]
+      }
+    }
+
+    // 循环结束后检查索引值的情况 // [!code ++]
+    if (oldEndIdx < oldStartIdx && newStartIdx <= newEndIdx) { // [!code ++]
+      // 如果满足条件，则说明有新的节点遗留，需要挂载它们 // [!code ++]
+      for (let i = newStartIdx; i < newEndIdx; i++) { // [!code ++]
+        patch(null, newChildren[i], container, oldStartVNode.el) // [!code ++]
+      } // [!code ++]
+    } // [!code ++]
+  }
+```
+
+### 移除不存在的元素
+
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    let oldStartIdx = 0
+    let odlEnIdx = oldChildren.length - 1
+    let newStartIdx = 0
+    let newEndIdx = newChildren.length - 1
+
+    // 四个索引指向的vnode节点
+    let oldStartVNode = oldChildren[oldStartIdx]
+    let oldEndVNode = oldChildren[odlEnIdx]
+    let newStartVNode = newChildren[newStartIdx]
+    let newEndVNode = newChildren[newEndIdx]
+
+    while (oldStartIdx <= odlEnIdx && newStartIdx <= newEndIdx) {
+      // 增加两个判断分支，如果头尾部节点为undefined，则说明该节点已经被处理过了，直接跳到下一个位置
+      if (!oldStartVNode) {
+        oldStartVNode = oldChildren[++oldStartIdx]
+      } else if (!oldEndVNode) {
+        oldEndVNode = newChildren[--oldEndIdx]
+      } else if (oldStartVNode.key === newStartVNode.key) {
+        // 第一步 oldStartVNode和newStartVNode比较
+        // 调用patch函数在oldStartVNode与newStartVNode之间打补丁
+        patch(oldStartVNode, newStartVNode, container)
+        // 更新相关索引，指向下一个位置
+        oldStartVNode = oldChildren[++oldStartIdx]
+        newStartVNode = newChildren[++newStartIdx]
+      } else if (oldEndVNode.key === newEndVNode.key) {
+        // 第二步 oldEndVNode 和 newEndVNode比较
+        // 由于两者对处于尾部，因此不需要对真实DOM进行移动操作，只需要打补丁即可
+        patch(oldEndVNode, newEndVNode, container)
+        // 更新索引和头尾部节点变量
+        oldEndVNode = oldChildren[--oldEndIdx]
+        newEndVNode = newChildren[--newEndVNode]
+      } else if (oldStartVNode.key === newEndVNode.key) {
+        // 第三步 oldStartVNode 和 newEndVnode 比较
+        // 调用patch函数在oldstartVNode和newEndVNode之间打补丁
+        patch(oldStartVNode, newEndVNode, container)
+        // 将旧的一组子节点的头部节点对应的真实DOM节点oldStartVNode.el移动到旧的一组子节点的尾部节点对应的真实DOM节点后面
+        insert(oldStartVNode.el, container, oldEndVNode.el.nextSibling)
+        // 更新相关索引到下一个位置
+        oldStartVNode = oldChildren[++oldStartIdx]
+        newEndVNode = newChildren[--newEndIdx]
+
+      } else if (oldEndVNode.key === newStartVNode.key) {
+        // 第四步 oldEndVNode 和 newStartVNode 比较
+        // 仍然需要调用patch函数进行打补丁
+        patch(oldEndVNode, newStartVNode, container)
+        // 移动DOM操作
+        // oldEndVNode.el 移动到 oldStartVNode.el 前面
+        insert(oldEndVNode.el, container, oldStartVNode.el)
+
+        // 移动DOM完成后，更新索引值，并指向下一个位置
+        oldEndVNode = oldChildren[--odlEnIdx]
+        newStartVNode = newChildren[++newStartIdx]
+
+      } else {
+        // 遍历旧的一组子节点，试图寻找与newstartVNode拥有相同key值的节点
+        // idxInOld就是新的一组子节点的头部节点在旧的一组子节点中的索引
+        const idxInOld = oldChildren.findIndex(
+          node => node.key === newStartVNode.key
+        )
+        // 如果idxInOld 大于0， 说明找到了可复用的节点，并且需要将其对应的真实DOM
+        // 移动到头部
+        if (idxInOld > 0) {
+          // idxInOld 位置对应的vnode就是需要移动的节点
+          const vnodeToMove = oldChildren[idxInOld]
+          // 移动之前需要先打补丁
+          patch(vnodeToMove, newStartVNode, container)
+          // 将vnodeToMove.el 移动到头部节点oldStartVNode.el之前，因此使用后者作为锚点
+          insert(vnodeToMove.el, container, oldStartVNode.el)
+          // 由于位置idxInOld处的节点所对应的真实DOM已经移动到了别处，因此将其设置为undefined
+          oldChildren[idxInOld] = undefined
+          // 最后更新newStartIdx 到下一个位置
+          newStartVNode = newChildren[++newStartIdx]
+        } else {
+          // 将newStartVNode作为新节点挂载到头部，使用当前头部节点oldStartVNode.el作为锚点
+          patch(null, newStartVNode, container, oldStartVNode.el)
+        }
+        newStartVNode = newChildren[++newStartIdx]
+      }
+    }
+
+    // 循环结束后检查索引值的情况
+    if (oldEndIdx < oldStartIdx && newStartIdx <= newEndIdx) {
+      // 如果满足条件，则说明有新的节点遗留，需要挂载它们
+      for (let i = newStartIdx; i < newEndIdx; i++) {
+        patch(null, newChildren[i], container, oldStartVNode.el)
+      }
+    } else if (newEndIdx < newStartIdx && oldStartIdx <= oldEndIdx) { // [!code ++]
+      // 移除操作 // [!code ++]
+      for (let i = oldStartIdx; i <= oldEndIdx; i++) { // [!code ++]
+        unmount(oldChildren[i]) // [!code ++]
+      } // [!code ++]
+    } // [!code ++]
+  }
+```
+
+## 快速Diff算法
+
+快速Diff算法的性能要稍优于vuejs2所采用的双端Diff算法。
+
+快速Diff算法包含预处理步骤。
+快速Diff算法借鉴了纯文本Diff算法中与处理的步骤。
+
+在对两段文本进行Diff之前，可以先对它们进行全等比较`if(text1 === text2) return`。如果两段文本全等，就无须进行核心Diff算法步骤了。除此之外，预处理过程还会处理两段文本相同的前缀和后缀。
+
+```js
+ function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    // 处理相同的前置节点
+    // 索引j指向新旧两组子节点的开头
+    let j = 0;
+    let oldVnode = oldChildren[j]
+    let newVnode = newChildren[j]
+    // while 循环向后遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      // 调用patch函数进行更新
+      patch(oldVnode, newVnode, container)
+      j++
+      oldVnode = oldChildren[j]
+      newVnode = newChildren[j]
+    }
+
+    // 更新相同的后置节点
+    // 索引oldEnd指向旧的一组子节点的最后一个节点
+    let oldEnd = oldChildren.length - 1
+    // 索引newEnd指向新的一组子节点的最后一个节点
+    let newEnd = newChildren.length - 1
+
+    oldVnode = oldChildren[oldEnd]
+    newVnode = newChildren[newEnd]
+
+    // while 循环从后向前遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      patch(oldVnode, newVnode, container)
+
+      oldEnd--
+      newEnd--
+      oldVnode = oldChildren[oldEnd]
+      newVnode = newChildren[newEnd]
+    }
+
+    // oldEnd < j :在预处理过程中，所有的旧子节点都处理完毕了
+    // newEnd >= j : 在预处理过后，在新的一组子节点中，仍然有未被处理的节点，而这些遗留的节点将被视作新增节点
+    // 计算锚点的索引值，如果小于新的一组子节点的数量，则说明锚点元素在新的一组子节点中，
+    // 所以直接使用newChildren[anchorIndex].el作为锚点元素
+    // 否则说明索引newEnd对应的节点已经是尾部节点了，这是无须提供锚点元素。
+
+    if (j > oldEnd && j <= newEnd) {
+      const anchorIndex = newEnd + 1
+      const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null
+
+      while (j <= newEnd) {
+        patch(null, newChildren[j++], container, anchor)
+      }
+    } else if (j > newEnd && j <= oldEnd) {
+      // j 到 oldEnd 之间的节点应该被卸载
+      while (j <= oldEnd) {
+        unmount(oldChildren[j++])
+      }
+    }
+  }
+```
+
+### 判断是否需要进行DOM移动操作
+
+
+- 判断是否有节点需要移动，以及应该如何移动
+- 找出那些需要被添加或移除的节点
+
+需要构造一个数组source，它的长度等于新的一组子节点在经过预处理之后剩余未处理节点的数量，并且source中每个元素的初始值都是-1
+**source 数组将用来存储新的一组子节点中的节点在旧的一组子节点中的位置索引，后面将会使用它计算出一个最长递增子序列，并用于辅助完成DOM移动的操作**
+
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    // 处理相同的前置节点
+    // 索引j指向新旧两组子节点的开头
+    let j = 0;
+    let oldVnode = oldChildren[j]
+    let newVnode = newChildren[j]
+    // while 循环向后遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      // 调用patch函数进行更新
+      patch(oldVnode, newVnode, container)
+      j++
+      oldVnode = oldChildren[j]
+      newVnode = newChildren[j]
+    }
+
+    // 更新相同的后置节点
+    // 索引oldEnd指向旧的一组子节点的最后一个节点
+    let oldEnd = oldChildren.length - 1
+    // 索引newEnd指向新的一组子节点的最后一个节点
+    let newEnd = newChildren.length - 1
+
+    oldVnode = oldChildren[oldEnd]
+    newVnode = newChildren[newEnd]
+
+    // while 循环从后向前遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      patch(oldVnode, newVnode, container)
+
+      oldEnd--
+      newEnd--
+      oldVnode = oldChildren[oldEnd]
+      newVnode = newChildren[newEnd]
+    }
+
+    // oldEnd < j :在预处理过程中，所有的旧子节点都处理完毕了
+    // newEnd >= j : 在预处理过后，在新的一组子节点中，仍然有未被处理的节点，而这些遗留的节点将被视作新增节点
+    // 计算锚点的索引值，如果小于新的一组子节点的数量，则说明锚点元素在新的一组子节点中，
+    // 所以直接使用newChildren[anchorIndex].el作为锚点元素
+    // 否则说明索引newEnd对应的节点已经是尾部节点了，这是无须提供锚点元素。
+
+    if (j > oldEnd && j <= newEnd) {
+      const anchorIndex = newEnd + 1
+      const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null
+
+      while (j <= newEnd) {
+        patch(null, newChildren[j++], container, anchor)
+      }
+    } else if (j > newEnd && j <= oldEnd) {
+      // j 到 oldEnd 之间的节点应该被卸载
+      while (j <= oldEnd) {
+        unmount(oldChildren[j++])
+      }
+    } else { // [!code ++]
+      // 构造source数组 // [!code ++]
+      // 新的一组子节点中剩余未处理节点的数量 // [!code ++]
+      const count = newEnd - j + 1 // [!code ++]
+      const source = new Array(count) // [!code ++]
+      source.fill(-1) // [!code ++]
+      // oldStart 和 newStart 分别为起始索引，即 j // [!code ++]
+      const oldStart = j // [!code ++]
+      const newStart = j // [!code ++]
+
+      //遍历旧的一组子节点 // [!code ++]
+      for(let i = oldStart; i <= oldEnd; i++) { // [!code ++]
+        const oldVnode = oldChildren[i] // [!code ++]
+        // 遍历新的一组子节点 // [!code ++]
+        for(let k = newStart; k <= newEnd; k++) { // [!code ++]
+          const newVnode  = newChildren[k] // [!code ++]
+          if(oldVnode.key === newVnode.key) { // [!code ++]
+            patch(oldVnode, newVnode, container) // [!code ++]
+            source[k - newStart] = i // [!code ++]
+          } // [!code ++]
+        } // [!code ++]
+      } // [!code ++]
+    } // [!code ++]
+  }
+```
+采用了两层嵌套循环，当新旧两组子节点的数量较多时，两层嵌套循环会带来性能问题。
+**优化 -- 为新的一组子节点构建一张索引表，用来存储节点的key和节点位置索引之间的映射**
+
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    // 处理相同的前置节点
+    // 索引j指向新旧两组子节点的开头
+    let j = 0;
+    let oldVnode = oldChildren[j]
+    let newVnode = newChildren[j]
+    // while 循环向后遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      // 调用patch函数进行更新
+      patch(oldVnode, newVnode, container)
+      j++
+      oldVnode = oldChildren[j]
+      newVnode = newChildren[j]
+    }
+
+    // 更新相同的后置节点
+    // 索引oldEnd指向旧的一组子节点的最后一个节点
+    let oldEnd = oldChildren.length - 1
+    // 索引newEnd指向新的一组子节点的最后一个节点
+    let newEnd = newChildren.length - 1
+
+    oldVnode = oldChildren[oldEnd]
+    newVnode = newChildren[newEnd]
+
+    // while 循环从后向前遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      patch(oldVnode, newVnode, container)
+
+      oldEnd--
+      newEnd--
+      oldVnode = oldChildren[oldEnd]
+      newVnode = newChildren[newEnd]
+    }
+
+    // oldEnd < j :在预处理过程中，所有的旧子节点都处理完毕了
+    // newEnd >= j : 在预处理过后，在新的一组子节点中，仍然有未被处理的节点，而这些遗留的节点将被视作新增节点
+    // 计算锚点的索引值，如果小于新的一组子节点的数量，则说明锚点元素在新的一组子节点中，
+    // 所以直接使用newChildren[anchorIndex].el作为锚点元素
+    // 否则说明索引newEnd对应的节点已经是尾部节点了，这是无须提供锚点元素。
+
+    if (j > oldEnd && j <= newEnd) {
+      const anchorIndex = newEnd + 1
+      const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null
+
+      while (j <= newEnd) {
+        patch(null, newChildren[j++], container, anchor)
+      }
+    } else if (j > newEnd && j <= oldEnd) {
+      // j 到 oldEnd 之间的节点应该被卸载
+      while (j <= oldEnd) {
+        unmount(oldChildren[j++])
+      }
+    } else {
+      // 构造source数组
+      // 新的一组子节点中剩余未处理节点的数量
+      const count = newEnd - j + 1
+      const source = new Array(count)
+      source.fill(-1)
+
+      // oldStart 和 newStart 分别为起始索引，即 j
+      const oldStart = j
+      const newStart = j
+
+      const keyIndex = {} // [!code ++]
+      for (let i = newStart; i <= newEnd; i++) { // [!code ++]
+        keyIndex[newChildren[i].key] = i // [!code ++]
+      } // [!code ++]
+      for (let i = oldStart; i <= oldEnd; i++) { // [!code ++]
+        oldVnode = oldChildren[i] // [!code ++]
+        const k = keyIndex[oldVnode.key] // [!code ++]
+        if (typeof k !== 'undefined') { // [!code ++]
+          newVnode = newChildren[k] // [!code ++]
+          patch(oldVnode, newVnode, container) // [!code ++]
+          source[k - newStart] = i // [!code ++]
+        } else { // [!code ++]
+          unmount(oldVnode) // [!code ++]
+        } // [!code ++]
+      } // [!code ++]
+
+
+      //遍历旧的一组子节点 // [!code --]
+      for (let i = oldStart; i <= oldEnd; i++) { // [!code --]
+        const oldVnode = oldChildren[i] // [!code --]
+        // 遍历新的一组子节点 // [!code --]
+        for (let k = newStart; k <= newEnd; k++) { // [!code --]
+          const newVnode = newChildren[k] // [!code --]
+          if (oldVnode.key === newVnode.key) { // [!code --]
+            patch(oldVnode, newVnode, container) // [!code --]
+            source[k - newStart] = i // [!code --]
+          } // [!code --]
+        } // [!code --]
+      } // [!code --]
+    }
+  }
+```
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    // 处理相同的前置节点
+    // 索引j指向新旧两组子节点的开头
+    let j = 0;
+    let oldVnode = oldChildren[j]
+    let newVnode = newChildren[j]
+    // while 循环向后遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      // 调用patch函数进行更新
+      patch(oldVnode, newVnode, container)
+      j++
+      oldVnode = oldChildren[j]
+      newVnode = newChildren[j]
+    }
+
+    // 更新相同的后置节点
+    // 索引oldEnd指向旧的一组子节点的最后一个节点
+    let oldEnd = oldChildren.length - 1
+    // 索引newEnd指向新的一组子节点的最后一个节点
+    let newEnd = newChildren.length - 1
+
+    oldVnode = oldChildren[oldEnd]
+    newVnode = newChildren[newEnd]
+
+    // while 循环从后向前遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      patch(oldVnode, newVnode, container)
+
+      oldEnd--
+      newEnd--
+      oldVnode = oldChildren[oldEnd]
+      newVnode = newChildren[newEnd]
+    }
+
+    // oldEnd < j :在预处理过程中，所有的旧子节点都处理完毕了
+    // newEnd >= j : 在预处理过后，在新的一组子节点中，仍然有未被处理的节点，而这些遗留的节点将被视作新增节点
+    // 计算锚点的索引值，如果小于新的一组子节点的数量，则说明锚点元素在新的一组子节点中，
+    // 所以直接使用newChildren[anchorIndex].el作为锚点元素
+    // 否则说明索引newEnd对应的节点已经是尾部节点了，这是无须提供锚点元素。
+
+    if (j > oldEnd && j <= newEnd) {
+      const anchorIndex = newEnd + 1
+      const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null
+
+      while (j <= newEnd) {
+        patch(null, newChildren[j++], container, anchor)
+      }
+    } else if (j > newEnd && j <= oldEnd) {
+      // j 到 oldEnd 之间的节点应该被卸载
+      while (j <= oldEnd) {
+        unmount(oldChildren[j++])
+      }
+    } else {
+      // 构造source数组
+      // 新的一组子节点中剩余未处理节点的数量
+      const count = newEnd - j + 1
+      const source = new Array(count)
+      source.fill(-1)
+
+      // oldStart 和 newStart 分别为起始索引，即 j
+      const oldStart = j
+      const newStart = j
+
+      // 新增两个变量，moved 和pos // [!code ++]
+      let moved = false // [!code ++]
+      let pos = 0 // [!code ++]
+
+      const keyIndex = {}
+      for (let i = newStart; i <= newEnd; i++) {
+        keyIndex[newChildren[i].key] = i
+      }
+
+
+      // 新增patched变量，代表更新过的节点数量 // [!code ++]
+      let patched = 0 // [!code ++]
+      for (let i = oldStart; i <= oldEnd; i++) {
+        oldVnode = oldChildren[i]
+        // 如果更新过的节点数量小于等于需要更新的节点数量，则执行更新 // [!code ++]
+        if (patched <= count) { // [!code ++]
+          const k = keyIndex[oldVnode.key]
+          if (typeof k !== 'undefined') {
+            newVnode = newChildren[k]
+            patch(oldVnode, newVnode, container)
+            // 没更新一个节点，都将patched变量 +1
+            patched++ // [!code ++]
+            source[k - newStart] = i
+            // 判断节点是否需要移动 // [!code ++]
+            if (k < pos) { // [!code ++]
+              moved = true // [!code ++]
+            } else { // [!code ++]
+              pos = k // [!code ++]
+            } // [!code ++]
+          } else {
+            unmount(oldVnode)
+          }
+        } else { // [!code ++]
+          // 如果更新过的节点数量大于需要更新的节点数量，则卸载多余的节点 // [!code ++]
+          unmount(oldVnode) // [!code ++]
+        }
+      }
+    }
+  }
+```
+
+### 移动元素
+- moved值为true时，需要进行DOM移动操作
+- 构建source数组。该数组的长度等于新的一组子节点去掉相同的前置/后置节点后，剩余未处理节点的数量。source数组中存储着新的一组子节点中的节点在旧的一组子节点中的位置。
+
+**最长递增子序列**
+
+给定一个数值序列，找到它的一个子序列，并且该子序列中的值是递增的，子序列中的元素在原序列中不一定连续。一个序列可能有多个递增子序列，其中最长的那一个就称为最长递增子序列。
+例： 给定一个数值序列[0, 8, 6, 12]，它的最长递增子序列就是[0, 8, 12],也可以是[0, 6, 12]
+
+```js
+function patchKeyedChildren(n1, n2, container) {
+    const oldChildren = n1.children
+    const newChildren = n2.children
+
+    // 处理相同的前置节点
+    // 索引j指向新旧两组子节点的开头
+    let j = 0;
+    let oldVnode = oldChildren[j]
+    let newVnode = newChildren[j]
+    // while 循环向后遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      // 调用patch函数进行更新
+      patch(oldVnode, newVnode, container)
+      j++
+      oldVnode = oldChildren[j]
+      newVnode = newChildren[j]
+    }
+
+    // 更新相同的后置节点
+    // 索引oldEnd指向旧的一组子节点的最后一个节点
+    let oldEnd = oldChildren.length - 1
+    // 索引newEnd指向新的一组子节点的最后一个节点
+    let newEnd = newChildren.length - 1
+
+    oldVnode = oldChildren[oldEnd]
+    newVnode = newChildren[newEnd]
+
+    // while 循环从后向前遍历，直到遇到拥有不同key值的节点为止
+    while (oldVnode.key === newVnode.key) {
+      patch(oldVnode, newVnode, container)
+
+      oldEnd--
+      newEnd--
+      oldVnode = oldChildren[oldEnd]
+      newVnode = newChildren[newEnd]
+    }
+
+    // oldEnd < j :在预处理过程中，所有的旧子节点都处理完毕了
+    // newEnd >= j : 在预处理过后，在新的一组子节点中，仍然有未被处理的节点，而这些遗留的节点将被视作新增节点
+    // 计算锚点的索引值，如果小于新的一组子节点的数量，则说明锚点元素在新的一组子节点中，
+    // 所以直接使用newChildren[anchorIndex].el作为锚点元素
+    // 否则说明索引newEnd对应的节点已经是尾部节点了，这是无须提供锚点元素。
+
+    if (j > oldEnd && j <= newEnd) {
+      const anchorIndex = newEnd + 1
+      const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null
+
+      while (j <= newEnd) {
+        patch(null, newChildren[j++], container, anchor)
+      }
+    } else if (j > newEnd && j <= oldEnd) {
+      // j 到 oldEnd 之间的节点应该被卸载
+      while (j <= oldEnd) {
+        unmount(oldChildren[j++])
+      }
+    } else {
+      // 构造source数组
+      // 新的一组子节点中剩余未处理节点的数量
+      const count = newEnd - j + 1
+      const source = new Array(count)
+      source.fill(-1)
+
+      // oldStart 和 newStart 分别为起始索引，即 j
+      const oldStart = j
+      const newStart = j
+
+      // 新增两个变量，moved 和pos
+      let moved = false
+      let pos = 0
+
+      const keyIndex = {}
+      for (let i = newStart; i <= newEnd; i++) {
+        keyIndex[newChildren[i].key] = i
+      }
+      console.log(keyIndex)
+
+
+      // 新增patched变量，代表更新过的节点数量
+      let patched = 0
+      for (let i = oldStart; i <= oldEnd; i++) {
+        oldVnode = oldChildren[i]
+        // 如果更新过的节点数量小于等于需要更新的节点数量，则执行更新
+        if (patched <= count) {
+          const k = keyIndex[oldVnode.key]
+          if (typeof k !== 'undefined') {
+            newVnode = newChildren[k]
+            patch(oldVnode, newVnode, container)
+            // 没更新一个节点，都将patched变量 +1
+            patched++
+            source[k - newStart] = i
+            // 判断节点是否需要移动
+            if (k < pos) {
+              moved = true
+            } else {
+              pos = k
+            }
+          } else {
+            unmount(oldVnode)
+          }
+        } else {
+          // 如果更新过的节点数量大于需要更新的节点数量，则卸载多余的节点
+          unmount(oldVnode)
+        }
+      }
+
+      if (moved) { // [!code ++]
+        const seq = lis(sources) // [!code ++]
+        // s 指向最长递增子序列的最后一个元素 // [!code ++]
+        let s = seq.length - 1 // [!code ++]
+        // i 指向新的一组子节点的最后一个元素 // [!code ++]
+        let i = count - 1 // [!code ++]
+        // for 循环使得i递减， // [!code ++]
+        for (i; i >= 0; i--) { // [!code ++]
+          if(source[i]===-1){ // [!code ++]
+            const pos = i + newStart // [!code ++]
+            const newVnode = newChildren[pos] // [!code ++]
+            const nextPos = pos + 1 // [!code ++]
+            const anchor = nextPos < newChildren.length ? newChildren[nextPos].el:null // [!code ++]
+            patch(null, newVnode, container, anchor) // [!code ++]
+          } else if (i !== seq[s]) { // [!code ++]
+            // 如果节点的索引i不等于seq[s]的值，说明该节点需要移动 // [!code ++]
+            const pos = i + newStart // [!code ++]
+            const newVnode = newChildren[pos] // [!code ++]
+            const nextPos = pos + 1 // [!code ++]
+            const anchor = nextPos < newChildren.length ? newChildren[nextPos]:null // [!code ++]
+            insert(newVnode.el, container, anchor) // [!code ++]
+          } else { // [!code ++]
+            // 当i===seq[s]时，说明该位置的节点不需要移动， 只需要让s指向下一个位置 // [!code ++]
+            s-- // [!code ++]
+          } // [!code ++]
+        } // [!code ++]
+      } // [!code ++]
+    }
+  }
+```

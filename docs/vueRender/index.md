@@ -1,3 +1,6 @@
+---
+editLink: false
+---
 # 渲染器的设计
 
 首次调用`renderer.render`函数时，只需要创建新的`DOM`元素即可，这个过程只涉及挂载。
