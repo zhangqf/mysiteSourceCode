@@ -41,8 +41,7 @@ jobs:
           npm install -g yarn
       - name: Build and Deploy
         run: |
-          chomd +x deploy.sh
-          ./deploy.sh
+          yarn run deploy
 
 
 
