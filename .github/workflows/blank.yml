@@ -36,7 +36,10 @@ jobs:
         env: 
             SSH_PRIVATE_KEY: ${{ secrets.MYSITE}}
         run: |
-          ssh-add "$SSH_PRIVATE_KEY"
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
       - name: Install dependecies
         run: |
           # 安装Node.js
