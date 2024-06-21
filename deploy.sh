@@ -11,11 +11,15 @@ cd docs/.vitepress/dist  #进到dist目录
 
 git init  #执行这些git命令
 
-git config --global user.email "15893652937@163.com"
-git config --global user.name "yinian"
+# git config --global user.email "15893652937@163.com"
+# git config --global user.name "yinian"
+
 
 git add -A
 git commit -m 'deploy'
+
+ssh-agent -a "$SSH_AUTH_SOCK" -e
+ssh-add - <<< "$MYSITE"
 
 git push -f git@github.com:zhangqf/mysite.git master:gh-pages  #提交到这个分支
 
