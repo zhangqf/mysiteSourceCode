@@ -17,9 +17,6 @@ git config --global user.name "yinian"
 git add -A
 git commit -m 'deploy'
 
-SSH_PRIVATE_KEY_PATH="${SSH_PRIVATE_KEY_PATH:-~/.ssh/id_rsa}"
-ssh-add "$SSH_PRIVATE_KEY_PATH"
-
 git push -f git@github.com:zhangqf/mysite.git master:gh-pages  #提交到这个分支
 
 cd -
