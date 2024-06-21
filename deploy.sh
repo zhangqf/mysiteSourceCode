@@ -18,8 +18,8 @@ git init  #执行这些git命令
 git add -A
 git commit -m 'deploy'
 
-ssh-agent -a "$SSH_AUTH_SOCK"
-ssh-add - <<< "$MYSITE"
+# ssh-agent -a "$SSH_AUTH_SOCK"
+# ssh-add - <<< "$MYSITE"
 
 git push -f git@github.com:zhangqf/mysite.git main:gh-pages  #提交到这个分支
 
