@@ -18,6 +18,9 @@ git init  #执行这些git命令
 git add -A
 git commit -m 'deploy'
 
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_rsa
+
 # ssh-agent -a "$SSH_AUTH_SOCK"
 # ssh-add - <<< "$MYSITE"
 
