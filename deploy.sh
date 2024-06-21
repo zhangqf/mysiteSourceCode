@@ -3,6 +3,15 @@
 # 忽略错误
 set -e  #有错误抛出错误
 
+# 检查 SSH 代理是否已启动
+if ! ssh-add -l > /dev/null 2>&1; then
+  eval $(ssh-agent -s)
+fi
+
+# 添加 SSH 密钥
+ssh-add ~/.ssh/id_rsa
+
+
 # 构建
 yarn run docs:build  #然后执行打包命令
 
