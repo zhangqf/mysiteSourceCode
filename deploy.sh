@@ -8,7 +8,7 @@ yarn run docs:build  #然后执行打包命令
 
 # 进入待发布的目录
 cd docs/.vitepress/dist  #进到dist目录
-
+git config --global init.defaultBranch main
 git init  #执行这些git命令
 
  git config --global user.email "15893652937@163.com"
@@ -21,7 +21,7 @@ git commit -m 'deploy'
 ssh-agent -a "$SSH_AUTH_SOCK" -e
 ssh-add - <<< "$MYSITE"
 
-git push -f git@github.com:zhangqf/mysite.git master:gh-pages  #提交到这个分支
+git push -f git@github.com:zhangqf/mysite.git main:gh-pages  #提交到这个分支
 
 cd -
 
