@@ -3,15 +3,6 @@
 # 忽略错误
 set -e  #有错误抛出错误
 
-# 检查 SSH 代理是否已启动
-if ! ssh-add -l > /dev/null 2>&1; then
-  eval $(ssh-agent -s)
-fi
-
-# 添加 SSH 密钥
-ssh-add ~/.ssh/id_rsa
-
-
 # 构建
 yarn run docs:build  #然后执行打包命令
 
@@ -25,6 +16,9 @@ git config --global user.name "yinian"
 
 git add -A
 git commit -m 'deploy'
+
+SSH_PRIVATE_KEY_PATH="${SSH_PRIVATE_KEY_PATH:-~/.ssh/id_rsa}"
+ssh-add "$SSH_PRIVATE_KEY_PATH"
 
 git push -f git@github.com:zhangqf/mysite.git master:gh-pages  #提交到这个分支
 
