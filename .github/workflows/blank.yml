@@ -40,9 +40,17 @@ jobs:
           # 安装yarn
           npm install -g yarn
           yarn
-      - name: Build and Deploy
-        run: |
-         yarn run deploy
+          yarn run docs:build
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{secrets.HOST}}
+          username: ${{secret.REMOTE_USER}}
+          password: ${{secret.REMOTE_PASS}}
+          port: ${{secret.PORT}}
+          source: "docs/.vitepress/dist"
+          target: ${{secret.REMOTE_TARGET}}
+        
           
 
 
