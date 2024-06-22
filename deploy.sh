@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+export GITHUB_TOKEN=${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
 # 忽略错误
 set -e  #有错误抛出错误
