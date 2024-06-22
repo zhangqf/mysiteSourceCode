@@ -20,7 +20,7 @@ git init  #执行这些git命令
 git add -A
 git commit -m 'deploy'
 
-git push -f git@github.com:zhangqf/mysite.git main:gh-pages  #提交到这个分支
+git push -f https://$GITHUB_TOKEN@github.com:zhangqf/mysite.git main:gh-pages  #提交到这个分支
 
 #cd -
 
