@@ -50,7 +50,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/.vitepress/dist
+          publish_dir: ./public
+          # publish_dir: ./docs/.vitepress/dist
           destination_dir: .
           external_repository: https://github.com/zhangqf/mysite
           force_orphan: true
