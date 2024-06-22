@@ -48,7 +48,7 @@ jobs:
           username: ${{secrets.REMOTE_USER}}
           password: ${{secrets.REMOTE_PASS}}
           port: ${{secrets.PORT}}
-          source: "docs/.vitepress/dist"
+          source: "docs/.vitepress/dist/"
           target: ${{secrets.REMOTE_TARGET}}
         
           
