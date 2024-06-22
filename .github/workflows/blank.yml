@@ -40,23 +40,9 @@ jobs:
           # 安装yarn
           npm install -g yarn
           yarn
-          yarn run docs:build 
-      #- name: Build and Deploy
-       # env:
-        #  MY_SECRET: ${{ secrets.MYSITE }}
-       # run: |
-        #  yarn run deploy
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          # github_token: ${{ secrets.GITHUB_TOKEN }}
-          personal_token: ${{ secrets.MYSITE }}
-          publish_dir: ./public
-          # publish_dir: ./docs/.vitepress/dist
-          destination_dir: .
-          external_repository: https://github.com/zhangqf/mysite
-          force_orphan: true
-          ssh_private_key: ${{ secrets.MYSITE }}
+      - name: Build and Deploy
+        run: |
+         yarn run deploy
           
 
 
