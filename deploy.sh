@@ -20,7 +20,7 @@ git commit -m 'deploy'
 
 # eval $(ssh-agent -s)
 # ssh-add ~/.ssh/id_rsa
-eval `ssh-agent`
+eval $(ssh-agent -a ~/.ssh-agent.$$)
 
 echo $SSH_AGENT_PID
 echo $SSH_AUTH_SOCK
