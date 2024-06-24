@@ -1,6 +1,6 @@
 module.exports = {
   title: '谦-后花园',
-  base: '',
+  // base: './',
   description: 'Just playing around.',
   themeConfig: {
     outline: {

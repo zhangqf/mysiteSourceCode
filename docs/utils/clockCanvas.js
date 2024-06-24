@@ -51,6 +51,7 @@ ClockCanvas.prototype = {
     const w = canvas.clientWidth
     const h = canvas.clientHeight
     const ctx = canvas.getContext('2d')
+    if (w <= 0 && h <= 0) return
     ctx.save()
     // 开始画图前清空画布
     ctx.clearRect(0, 0, w, h)
