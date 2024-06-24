@@ -28,13 +28,14 @@ hero:
     #   link: https://github.com/vuejs/vitepress
 
 features:
-  - icon: w
+  - icon: 📜
     title: Vite, The DX that can't be beat
     details: Lorem ipsum...
     link: /张养浩
-  - icon: 🛠️
-    title: Simple and minimal, always
-    details: Lorem ipsum...
+  - icon: 🧘
+    title: 经典书籍
+    details: 心经 金刚经 坛经
+    link: /scriptures
 ---
 <style>
 
@@ -43,8 +44,6 @@ features:
   --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #bd34fe, #41d1ff);
 }
 </style>
-
-
 
 <script setup>
 import clockCanvas from './components/clockCanvas.vue'
