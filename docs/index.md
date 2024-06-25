@@ -32,7 +32,7 @@ features:
     title: Vite, The DX that can't be beat
     details: Lorem ipsum...
     link: /张养浩
-  - icon: 🧘
+  - icon: 🔱
     title: 经典书籍
     details: 心经 金刚经 坛经
     link: /scriptures

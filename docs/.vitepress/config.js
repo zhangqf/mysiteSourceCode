@@ -42,7 +42,7 @@ module.exports = {
     ],
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2019-present Evan You'
+      copyright: 'Copyright © 2024 Qian'
     },
     editLink: {
       pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
