@@ -14,7 +14,6 @@
 
 # git push -f git@github.com:zhangqf/mysite.git master:gh-pages  #提交到这个分支
 
-
 # cd -
 
 # rm -rf docs/.vitepress/dist  #删除dist文件夹
