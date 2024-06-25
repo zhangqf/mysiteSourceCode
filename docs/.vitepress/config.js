@@ -11,12 +11,29 @@ module.exports = {
       {
         text: '笔记',
         items: [
+          { text: 'vue', link: '/vue' },
           { text: 'vue响应式系统', link: '/vuedocs' },
-          { text: 'vue渲染器', link: '/vueRender' }
+          { text: 'vue渲染器', link: '/vueRender' },
+
         ]
       }
     ],
     sidebar: {
+      '/vue/': {
+        text: 'vue',
+        items: [
+          { text: 'vue的设计', link: '/vue/vuedocs/index' },
+          { text: '响应系统', link: '/vue/vuedocs/reactivesystem' },
+          { text: '非原始值的响应式方案', link: '/vue/vuedocs/Aresponsiveschemeofnonoriginalvalues' },
+          { text: '原始值的响应式方案', link: '/vue/vuedocs/AresponsivesofPrimiteValue' },
+          { text: '渲染器的设计', link: '/vue/vueRender/' },
+          { text: '挂载与更新', link: '/vue/vueRender/mountedandupdated' },
+          { text: '简单Diff算法', link: '/vue/vueRender/simpleDiffAlgorithm' },
+          { text: '组件的实现原理', link: '/vue/components/' },
+        ],
+        collapsed: false,
+        link: '/vue/vuedocs/index'
+      },
       '/vuedocs/': {
         text: 'vue的设计',
         items: [
