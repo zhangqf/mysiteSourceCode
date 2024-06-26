@@ -30,6 +30,7 @@ module.exports = {
           { text: '挂载与更新', link: '/vue/vueRender/mountedandupdated' },
           { text: '简单Diff算法', link: '/vue/vueRender/simpleDiffAlgorithm' },
           { text: '组件的实现原理', link: '/vue/components/' },
+          { text: '异步组件与函数式组件', link: '/vue/components/asyncComponent' },
         ],
         collapsed: false,
         link: '/vue/vuedocs/index'
@@ -62,7 +63,7 @@ module.exports = {
       copyright: 'Copyright © 2024 Qian'
     },
     editLink: {
-      pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
+      pattern: 'https://github.com/zhangqf/mysiteSourceCode/tree/master/docs/:path',
       text: 'Edit this page on GitHub'
     },
     lastUpdated: {
