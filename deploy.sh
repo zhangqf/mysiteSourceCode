@@ -16,5 +16,6 @@
 
 # cd -
 
+
 # rm -rf docs/.vitepress/dist  #删除dist文件夹
 
