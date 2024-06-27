@@ -337,7 +337,7 @@ function mountComponent(vnode, container, anchor) {
       } else {
 
         // 在这里调用beforeUpdate钩子  // [!code ++]
-        beforeUpdate && beforeUpdate.call(state) v
+        beforeUpdate && beforeUpdate.call(state)
 
         // 当isMounted为true时，说明组件已经被挂载，只需要完成更新即可，
         // 所以在调用patch函数时，第一个参数为组件上一次渲染的子树
@@ -1420,8 +1420,8 @@ function mountComponent(vnode, container, anchor) {
 
         // 遍历instance.mounted数组并逐个执行即可 // [!code ++]
         instance.mounted && instance.mounted.forEach(hook => hook.call(renderContext)) // [!code ++]
-        // 在这里调用mounted钩子
-        mounted && mounted()
+        // 在这里调用mounted钩子 // [!code --]
+        mounted && mounted() // [!code --]
       } else {
 
         // 在这里调用beforeUpdate钩子
