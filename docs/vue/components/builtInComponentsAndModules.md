@@ -189,3 +189,191 @@ function patch(n1, n2, container, anchor) {
 
   }
 ```
+
+
+```js
+
+function mountComponent(vnode, container, anchor) {
+
+    const isFunctional = typeof vnode.type === 'function'
+
+    const componentOptions = vnode.type
+
+    if (isFunctional) {
+      componentOptions = {
+        render: vnode.type,
+        props: vnode.type.props
+      }
+    }
+
+    const { render, data, beforCreate, create, props: propOptions, beforeMount, mounted, beforeUpdate, updated } = componentOptions
+
+    beforCreate && beforCreate()
+
+    // 解析出最终的props数据 attrs数据
+    const [props, attrs] = resolveProps(propOptions, vnode.props)
+
+    const state = data ? reactive(data()) : null
+
+    const instance = {
+      state,
+      //将解析出的props 数据包装为shalloReactive并定义到组件实例上
+      props: shallowReactive(props),
+      isMounted: false,
+      subTree: null,
+      // 将插槽添加到组件实例上
+      slots,
+      // 在组件实例中添加mounted数组，用来储存通过onMounted函数注册的生命周期钩子函数
+      mounted: [],
+      // 只有KeepAlive组件的实例下会有KeepAliveCtx属性
+      keepAliveCtx: null
+    }
+
+    // 检查当前要挂载的组件是否是KeepAlive组件 // [!code ++]
+    const isKeepAlive = vnode.type.__isKeepAlive // [!code ++]
+    if (isKeepAlive) { // [!code ++]
+      // 在KeepAlive组件实例上添加keepAliveCtx对象 // [!code ++]
+      instance.keepAliveCtx = { // [!code ++]
+        // move 函数用来移动一段vnode // [!code ++]
+        move(vnode, container, anchor) { // [!code ++]
+          // 本质上是将组件渲染的内容移动到指定容器中，即隐藏容器中 // [!code ++]
+          insert(vnode.component.subTree.el, container, anchor) // [!code ++]
+        }, // [!code ++]
+        createElement // [!code ++]
+      } // [!code ++]
+    } // [!code ++]
+
+
+    // 定义emit函数，它接收两个参数
+    // event：事件名称
+    // payload： 传递给事件处理函数的参数
+
+    function emit(event, ...payload) {
+      // 根据约定对事件名称进行处理
+      const eventName = `on${event[0].toUpperCase() + event.slice(1)}`
+      // 根据处理后的事件名称去props中寻找对应的事件处理函数
+      const handler = instance.props[eventName]
+      if (handler) {
+        // 调用事件处理函数并传递参数
+        handler(...payload)
+      } else {
+        console.log('事件不存在')
+      }
+    }
+
+    // 直接使用编译好的vnode.children对象作为slots对象即可
+    const slots = vnode.children || {}
+
+
+    // setupContext
+    const setupContext = { attrs, emit, slots }
+
+    // 在调用setup函数之前，设置当前组件实例
+    setCurrentInstance(instance)
+
+    // 调用setup函数，将只读版本的props作为第一个参数传递，避免用户意外地修改props值
+    // 将setupContext作为第二个参数传递
+    const setupResult = setup(shollowReadonly(instance.props), setupContext)
+
+    // 在setup函数执行完毕之后，重置当前组件实例
+    setCurrentInstance(null)
+
+    // setupState 用来储存由setup放回的数据
+    let setupState = null
+    // 如果setup函数的返回值是函数，则将其作为渲染函数
+    if (typeof setupResult === "function") {
+      if (render) console.log('setup 函数返回渲染函数，render 选项将被忽略')
+      // 将setupResult 作为渲染函数
+      render = setupResult
+    } else {
+      // 如果setup 的返回值不是函数，则作为数据状态赋值给setupState
+      setupState = setupContext
+    }
+
+    vnode.component = instance
+
+    /** 由于props数据与组件自身的状态数据都需要暴露到渲染函数中，
+     * 并使得渲染函数能够通过this访问它们，因此需要分装一个渲染上下午对象
+     * */
+    const renderContext = new Proxy(instance, {
+      get(t, k, r) {
+        const { state, props } = t
+        // 当k当值为$slots时，直接返回组件实例上的slots
+        if (k === '$slots') return slots
+        if (state && k in state) {
+          return state[k]
+        } else if (k in props) {
+          return props[k]
+        } else if (setupState && k in setupState) {
+          // 渲染上下文需要增加对setupState的支持
+          return setupState[k]
+        } else {
+          console.log('不存在')
+        }
+      },
+      set(t, k, v, r) {
+        const { state, props } = t
+        if (state && k in state) {
+          state[k] = v
+        } else if (k in props) {
+          props[k] = v
+        } else if (setupState && k in setupState) {
+          setupState[k] = v
+        } else {
+          console.log('不存在')
+        }
+      }
+    })
+
+
+    create && create.call(renderContext)
+    effect(() => {
+      const subTree = render.call(renderContext, renderContext)
+      if (!instance.isMounted) {
+        beforeMount && beforeMount.call(renderContext)
+        patch(null, subTree, container, anchor)
+        instance.isMounted = true
+        // 遍历instance.mounted数组并逐个执行即可
+        instance.mounted && instance.mounted.forEach(hook => hook.call(renderContext))
+      } else {
+        beforeUpdate && beforeUpdate.call(renderContext)
+        patch(instance.subTree, subTree, container, anchor)
+
+        // 在这里调用updated钩子
+        updated && updated.call(renderContext)
+      }
+      instance.subTree = subTree
+    }, { scheduler: queueJob })
+  }
+```
+
+### include 和 exclude
+
+KeepAlive组件会对所有“内部组件“进行缓存。如果用户期望只缓存特点组件。为了使用户能够自定义缓存规则，需要让KeepAlive组件支持两个props，分别是include和exclude。其中，include用来显式地配置应该被缓存组件，而exclude用来显式地配置不应该被缓存组件
+
+```js
+const KeepAlive = {
+  __isKeepAlive: true,
+  // 定义include 和 exclude
+  props: {
+    include: RegExp,
+    exclude: RegExp
+  },
+  setup(props, { slots }){
+    // ...
+    return () => {
+      let rawVNode = slots.default()
+      if(typeof rawVNode.type !== 'object') {
+        return rawVNode
+      }
+      // 获取 “内部组件” 的name
+      const name = rawVNode.type.name
+      // 对name进行匹配 如果name无法被include匹配 或者被exclude匹配
+      if(name && ((props.include && !props.include.test(name))) || (props.exclude && props.exclude.test(name))) {
+        // 则直接渲染 “内部组件”， 不对其进行后续的缓存操作
+        return rawVNode
+      }
+    }
+  }
+}
+```
