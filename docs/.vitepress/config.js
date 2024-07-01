@@ -32,6 +32,7 @@ module.exports = {
           { text: '组件的实现原理', link: '/vue/components/' },
           { text: '异步组件与函数式组件', link: '/vue/components/asyncComponent' },
           { text: '内建组件和模块', link: '/vue/components/builtInComponentsAndModules' },
+          { text: '编译器', link: '/vue/compiler' },
         ],
         collapsed: false,
         link: '/vue/vuedocs/index'
