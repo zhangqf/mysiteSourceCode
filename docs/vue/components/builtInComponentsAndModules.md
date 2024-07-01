@@ -377,3 +377,104 @@ const KeepAlive = {
   }
 }
 ```
+### 缓存管理
+
+```js
+  const cache = new Map()
+
+  const cachedVNode = cache.get(rawVNode.type)
+
+  if(cachedVNode) {
+    rawVNode.component = cachedVNode.component
+    rawVNode.keptAlive = true
+  } else {
+    cache.set(rawVNode.type, rawVNode)
+  }
+```
+
+
+## Teleport 组件的实现原理
+
+可以将指定的内容渲染到特定的容器中，而不受DOM层级的限制
+
+
+```js
+// Overlay.vue
+<template>
+  <Teleport to='body'>
+    <div class="overlay"></div>
+  </Teleport> 
+
+</template>
+<style>
+  .overlay {
+    z-index: 999
+  }
+</style>
+```
+<Overlay/>组件要渲染的内容都包含在Teleport组件内。通过Teleport组件指定渲染目标body。
+
+### 实现Teleport 组件
+
+```js
+function patch(n1, n2, container, anchor) {
+  if(n1 && n1.type !== n2.type){
+    unmount(n1)
+    n1 = null
+  }
+  const {type} = n2
+  if(typeof type === 'string') {
+
+  }else if(typeof type ===Text) {
+
+  } else if(typeof type === 'object' && type.__isTeleport) {
+    type.process(n1, n2, container, anchor, {
+      patch,
+      patchChildren,
+      unmount,
+      move(vnode, container, anchor) {
+        insert(vnode.component?vnode.component.subTree.el : vnode.el, container, anchor)
+      }
+    }) 
+  }...
+}
+
+const Teleport = {
+  __isTeleport: true,
+  process(n1, n2, container, anchor, internals) {
+    const {patch} = internals
+    if(!n1) {
+      const target = typeof n2.props.to === 'string' ? document.querySelector(n2.porps.to): n2.props.to
+      n2.children.forEach(c => patch(null, c, target, anchor))
+    } else {
+      patchChildren(n1, n2, container)
+      if(n2.props.to !== n1.props.to) {
+        const newTarget = typeof n2.props.to === 'string' ? document.querySelector(n2.props.to): n2.props.to
+        n2.children.forEach(c => move(c, newTarget))
+      }
+    }
+  } 
+}
+```
+
+### Transition组件的实现原理
+
+- 当DOM元素被挂载时，将动效附加到该DOM元素uh
+- 当DOM元素被卸载时，不要立即卸载DOM元素，而是等到附加到该DOM元素上的动效执行完成后再卸载它
+
+```js
+const Transition = {
+  name: 'Transition',
+  setup(props, { slots }) {
+    return () => {
+      const innerVNode = slots.default()
+      innerVNode.transition = {
+        beforeEnter(el){},
+        enter(el){},
+        leave(el, performaRemove) {}
+      }
+      return innerVnode
+    }
+  }
+}
+```
