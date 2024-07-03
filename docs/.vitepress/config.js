@@ -12,8 +12,8 @@ module.exports = {
         text: '笔记',
         items: [
           { text: 'vue', link: '/vue' },
-          { text: 'vue响应式系统', link: '/vuedocs' },
-          { text: 'vue渲染器', link: '/vueRender' },
+          { text: '浏览器', link: '/browse' },
+          // { text: 'vue渲染器', link: '/vueRender' },
 
         ]
       }
@@ -37,13 +37,11 @@ module.exports = {
         collapsed: false,
         link: '/vue/vuedocs/index'
       },
-      '/vuedocs/': {
-        text: 'vue的设计',
+      '/browse/': {
+        text: '浏览器',
         items: [
-          { text: 'vue的设计', link: '/vuedocs/' },
-          { text: '响应系统', link: '/vuedocs/reactivesystem' },
-          { text: '非原始值的响应式方案', link: '/vuedocs/Aresponsiveschemeofnonoriginalvalues' },
-          { text: '原始值的响应式方案', link: '/vuedocs/AresponsivesofPrimiteValue' }
+          { text: 'javascript运行机制', link: '/browse/' },
+          { text: 'V8的工作原理', link: '/browse/v8WorkingPrinciple' },
         ]
       },
       '/vueRender/': {
