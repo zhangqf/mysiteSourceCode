@@ -23,6 +23,9 @@ hero:
     - theme: brand
       text: 笔记
       link: /vueRender
+    - theme: brand
+      text: linux
+      link: /linux
     # - theme: alt
     #   text: View on GitHub
     #   link: https://github.com/vuejs/vitepress

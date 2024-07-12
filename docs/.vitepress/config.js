@@ -44,6 +44,13 @@ module.exports = {
           { text: 'V8的工作原理', link: '/browse/v8WorkingPrinciple' },
         ]
       },
+      '/linux/': {
+        text: 'linux',
+        items: [
+          { text: 'Linux基础', link: '/linux/' },
+          { text: '文件权限和目录配置', link: '/linux/Linux文件权限和目录配置' },
+        ]
+      },
       '/vueRender/': {
         text: '渲染器的设计',
         items: [
