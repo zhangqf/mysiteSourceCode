@@ -1,8 +1,9 @@
 ---
 editLink: false
+outline: deep
+outlineText: "33"
 ---
 # 鸟哥的 Linux 私房菜鸟叔Linux
-
 
 ## Linux中各硬件的文件名
 
