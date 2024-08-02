@@ -123,6 +123,7 @@ module.exports = {
           { text: '文件权限和目录配置', link: '/linux/Linux文件权限和目录配置' },
           { text: '文件和目录管理', link: '/linux/文件与目录管理' },
           { text: '文件系统', link: '/linux/文件系统' },
+          { text: '文件与文件系统的压缩、打包与备份', link: '/linux/文件与文件系统的压缩、打包与备份' },
         ]
       },
       '/vueRender/': {
