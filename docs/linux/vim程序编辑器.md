@@ -50,13 +50,13 @@
     <td>-</td><td>光标移动到非空格符的上一列</td>
   </tr>
   <tr>
-    <td>n<span></td><td>光标向右移动这一列的n个字符</td>
+    <td>n &lt;space&gt;</td><td>光标向右移动这一列的n个字符</td>
   </tr>
   <tr>
     <td bgcolor="Hotpink">0 [home]</td><td>移动到这一列的最前面字符处</td>
   </tr>
   <tr>
-    <td bgcolor="Hotpink">\$ [end]</td><td>移动到这一列的最后字符处</td>
+    <td bgcolor="Hotpink">$ [end]</td><td>移动到这一列的最后字符处</td>
   </tr>
   <tr>
     <td>H</td><td>光标移动到这个屏幕的最上方那一列的第一个字符</td>
@@ -77,7 +77,7 @@
     <td bgcolor="Hotpink">gg</td><td>移动到这个文件的第一列，相当于1G</td>
   </tr>
   <tr>
-    <td bgcolor="Hotpink">n\<Enter\></td><td>光标向下移动n列</td>
+    <td bgcolor="Hotpink">n &lt;Enter&gt;</td><td>光标向下移动n列</td>
   </tr>
 </table>
 
