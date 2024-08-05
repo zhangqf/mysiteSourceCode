@@ -50,7 +50,7 @@
     <td>-</td><td>光标移动到非空格符的上一列</td>
   </tr>
   <tr>
-    <td>n\<span\></td><td>光标向右移动这一列的n个字符</td>
+    <td>n<span></td><td>光标向右移动这一列的n个字符</td>
   </tr>
   <tr>
     <td bgcolor="Hotpink">0 [home]</td><td>移动到这一列的最前面字符处</td>
