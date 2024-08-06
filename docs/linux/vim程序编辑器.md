@@ -10,11 +10,11 @@
 >因为程序简单，编辑速度相当快速
 
 ## 按键说明
-
+- 一般指令模式
 <table>
   <capital>按键说明</capital>
   <tr>
-    <td colspan='2' align='center'>移动光标的方法</td>
+    <td colspan='2' align='center'><font size='24'>移动光标的方法</font></td>
   </tr>
   <tr>
     <td>h（ $\leftarrow$ ）</td> <td>光标向左移动一个字符</td>
@@ -80,7 +80,7 @@
     <td bgcolor="#ffffcc">n &lt;Enter&gt;</td><td bgcolor="#ffffcc">光标向下移动n列</td>
   </tr>
   <tr>
-    <td colspan='2' align='center'>搜寻与取代</td>
+    <td colspan='2' align='center'><font size='24'>搜寻与取代</font></td>
   </tr>
   <tr>
     <td bgcolor="#ffffcc">/word</td><td bgcolor="#ffffcc">向光标下面查找一个名称为word的字符串</td>
@@ -104,7 +104,7 @@
     <td bgcolor="#ffffcc">:1,$s/word1/word2/gc</td><td bgcolor="#ffffcc">从第一列到最后一列查询word1字符串，并将它替换为word2，且在替换前显示提示字符给用户确认是要替换</td>
   </tr>
   <tr>
-    <td colspan='2' align='center'><font size='30'>删除、复制、粘贴</font></td>
+    <td colspan='2' align='center'><font size='24'>删除、复制、粘贴</font></td>
   </tr>
   <tr>
     <td bgcolor="#ffffcc">x,X</td><td bgcolor="#ffffcc">x向后删除一个字符，X为向前删除一个字符，相当于Backspace</td>
@@ -168,4 +168,72 @@
   </tr>
 </table>
 
+- 一般指令模式切换到编辑模式可用的按钮说明
+
+<table>
+  <capital>按键说明</capital>
+   <tr>
+    <td colspan='2' align='center'>指令模式切换到编辑模式</td>
+  </tr>
+  <tr>
+    <td bgcolor="#ffffcc">i,I</td><td bgcolor="#ffffcc">进入插入模式，i为 从当前光标所插入，I为当前所在行的第一个非空字符出开始插入</td>
+  </tr>
+  <tr>
+    <td bgcolor="#ffffcc">a,A</td><td bgcolor="#ffffcc">进入插入模式，a 从当前光标所在的下一个字符出开始插入，A 从光标所在行的最后一个字符出插入</td>
+  </tr>
+  <tr>
+    <td bgcolor="#ffffcc">o, O</td><td bgcolor="#ffffcc">进入插入模式，o 当前光标所在的下一行处插入新行， O 当前光标所在的上一行插入新的行</td>
+  </tr>
+  <tr>
+    <td bgcolor="#ffffcc">r,R</td><td bgcolor="#ffffcc">进入替换模式， r只会替换光标所在的那一个字符一次， R会一直替换光标所在的文字，知道按下ESC为止</td>
+  </tr>
+</table>
+
+- 一般指令切换到指令行模式的可选按钮
+
+<table>
+  <capital>按键说明</capital>
+  <tr>
+    <td colspan='2'>指令行模式的存储、离开</td>
+  </tr>
+  <tr>
+    <td>:w</td><td>将编辑的数据写入硬盘文件中</td>
+  </tr>
+  <tr>
+    <td>:w!</td><td>若文件属性为 只读 时， 强制写入该文件。 能不能写入，还跟文件的权限有关</td>
+  </tr>
+  <tr>
+    <td>:q</td><td>离开vi</td>
+  </tr>
+  <tr>
+    <td>:q!</td><td>强制离开不存储文件</td>
+  </tr>
+  <tr>
+    <td>:wq</td><td>存储后离开</td>
+  </tr>
+  <tr>
+    <td>ZZ</td><td>若文件没有改动，则不存储离开，若文件已经被更改过，则存储后离开</td>
+  </tr>
+  <tr>
+    <td>:w [filename]</td><td>将编辑的数据存储成另一个文件</td>
+  </tr>
+  <tr>
+    <td>:r [filename]</td><td>在编辑的数据中，读入另一个文件的数据。</td>
+  </tr>
+  <tr>
+    <td>:n1,n2 w [filename]</td><td>将n1到n2的内容存储成filename这个文件</td>
+  </tr>
+  <tr>
+    <td>:! commond</td><td>暂时离开vi到指令模式下执行command的显示结果 如 :! ls /home 即可在vi当中查看 /home 底下以ls 输出的文件信息</td>
+  </tr>
+  <tr>
+    <td colspan='2'>vim环境的变更</td>
+  </tr>
+  <tr>
+    <td>:set nu</td><td>显示行号，会在每一行前缀显示行号</td>
+  </tr>
+  <tr>
+    <td>:set nonu</td><td>取消行号</td>
+  </tr>
+</table>
 
