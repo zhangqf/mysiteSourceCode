@@ -14,7 +14,7 @@
 <table>
   <capital>按键说明</capital>
   <tr>
-    <td colspan='2' align='center'><font size='24'>移动光标的方法</font></td>
+    <td colspan='2' align='center'><font size='16'>移动光标的方法</font></td>
   </tr>
   <tr>
     <td>h（ $\leftarrow$ ）</td> <td>光标向左移动一个字符</td>
@@ -80,7 +80,7 @@
     <td bgcolor="#ffffcc">n &lt;Enter&gt;</td><td bgcolor="#ffffcc">光标向下移动n列</td>
   </tr>
   <tr>
-    <td colspan='2' align='center'><font size='24'>搜寻与取代</font></td>
+    <td colspan='2' align='center'><font size='16'>搜寻与取代</font></td>
   </tr>
   <tr>
     <td bgcolor="#ffffcc">/word</td><td bgcolor="#ffffcc">向光标下面查找一个名称为word的字符串</td>
@@ -104,7 +104,7 @@
     <td bgcolor="#ffffcc">:1,$s/word1/word2/gc</td><td bgcolor="#ffffcc">从第一列到最后一列查询word1字符串，并将它替换为word2，且在替换前显示提示字符给用户确认是要替换</td>
   </tr>
   <tr>
-    <td colspan='2' align='center'><font size='24'>删除、复制、粘贴</font></td>
+    <td colspan='2' align='center'><font size='16'>删除、复制、粘贴</font></td>
   </tr>
   <tr>
     <td bgcolor="#ffffcc">x,X</td><td bgcolor="#ffffcc">x向后删除一个字符，X为向前删除一个字符，相当于Backspace</td>
@@ -274,3 +274,15 @@ vim 功能与vi一样，但是vim提供了颜色显示功能，支持程序语�
 ### vim 环境设定与记录： ~/.vimrc, ~/.viminfo
 
 ![](images/2024-08-08115134.png)
+
+### vim使用的的注意事项
+- 中文编码
+  - linux系统默认支持的语系数据：与/etc/local.conf有关
+  - bash语系：与LANG，LC_ALL这几个变数有关
+  - 文件原本的编码
+  - 开启终端机的软件
+
+- DOS与Linux的断行字符
+  dos2unix 及 unix2dos 可以变更文件每一列的行尾断行字符
+- 语系编码转换
+  使用 iconv 进行文件语系编码的转换
