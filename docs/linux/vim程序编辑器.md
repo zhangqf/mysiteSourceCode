@@ -14,7 +14,7 @@
 <table>
   <capital>按键说明</capital>
   <tr>
-    <td colspan='2' align='center'><font size='16'>移动光标的方法</font></td>
+    <td colspan='2' align='center'><font size='14'>移动光标的方法</font></td>
   </tr>
   <tr>
     <td>h（ $\leftarrow$ ）</td> <td>光标向左移动一个字符</td>
@@ -80,7 +80,7 @@
     <td bgcolor="#ffffcc">n &lt;Enter&gt;</td><td bgcolor="#ffffcc">光标向下移动n列</td>
   </tr>
   <tr>
-    <td colspan='2' align='center'><font size='16'>搜寻与取代</font></td>
+    <td colspan='2' align='center'><font size='14'>搜寻与取代</font></td>
   </tr>
   <tr>
     <td bgcolor="#ffffcc">/word</td><td bgcolor="#ffffcc">向光标下面查找一个名称为word的字符串</td>
@@ -104,7 +104,7 @@
     <td bgcolor="#ffffcc">:1,$s/word1/word2/gc</td><td bgcolor="#ffffcc">从第一列到最后一列查询word1字符串，并将它替换为word2，且在替换前显示提示字符给用户确认是要替换</td>
   </tr>
   <tr>
-    <td colspan='2' align='center'><font size='16'>删除、复制、粘贴</font></td>
+    <td colspan='2' align='center'><font size='14'>删除、复制、粘贴</font></td>
   </tr>
   <tr>
     <td bgcolor="#ffffcc">x,X</td><td bgcolor="#ffffcc">x向后删除一个字符，X为向前删除一个字符，相当于Backspace</td>
