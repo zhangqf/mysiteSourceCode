@@ -247,5 +247,112 @@ VBrid
   [root@iZbp13op1xah7j3j1x457dZ ~]# 
   ```
 - set 观察所有变量（包含环境变量与自定义变量）
-  
+  使用｛大写的字母｝来设定的变量，一般为系统内定需要的变量
+  - PS1：（提示字符的设定）
+    这是命令提示符。每次按下enter取执行某个指令后，最后再次出现提示字符时，就会主动取读取这个变量值
 
+    |选项|解释|
+    |---|---|
+    |\d|可显示出 星期 月 日 的日期格式 |
+    |\H|完整的主机名|
+    |\h|仅取主机名在第一个小数点之前的名字|
+    |\t|显示时间，为24小时格式的 HH：MM：SS|
+    |\T|显示时间，为12小时格式的 HH：MM：SS|
+    |\A|显示时间，为24小时格式的 HH：MM|
+    |\@|显示时间，为12小时格式的 am/pm |
+    |\u|目前使用者的账号名称|
+    |\v|BASH的版本信息|
+    |\w|完整的工作目录名称，有根目录写器的目录名称。 但家目录会以~代替|
+    |\W|利用basename函数取得工作目录名称，所以仅会列出最后一个目录名|
+    |\#|下达的第几个指令|
+    |\$|提示字符，若是root 则为# 否则为$|
+    ```shell
+    [root@iZbp13op1xah7j3j1x457dZ ~]# cd /home
+    [root@iZbp13op1xah7j3j1x457dZ home]# PS1='[\u@\h \w \A #\#]\$'
+    [root@iZbp13op1xah7j3j1x457dZ /home 17:38 #14]#
+    ```
+  - $ shell的PID（线程代号）
+    ```shell
+    [root@iZbp13op1xah7j3j1x457dZ ~]# echo $$
+    25061
+    [root@iZbp13op1xah7j3j1x457dZ ~]# 
+    ```
+  - ? (关于上个执行指令的回传值)
+    执行某些指令时，都会回传一个执行后的代码。一般来说，如果成功的执行了该指令，则会回传一个0值。如果执行过程中发生了错误，就会回传 错误代码
+    ```shell
+    [root@iZbp13op1xah7j3j1x457dZ ~]# echo $SHELL
+    /bin/bash
+    [root@iZbp13op1xah7j3j1x457dZ ~]# echo $?
+    0
+    [root@iZbp13op1xah7j3j1x457dZ ~]# 12name=VBrid
+    bash: 12name=VBrid: command not found
+    [root@iZbp13op1xah7j3j1x457dZ ~]# echo $?
+    127
+    # 关于上一个指令的回传值
+    [root@iZbp13op1xah7j3j1x457dZ ~]# echo $?
+    0
+    [root@iZbp13op1xah7j3j1x457dZ ~]# 
+    ```
+  - OSTYPE，HOSTTYPE，MACHTYPE（主机硬件与核心的等级）
+    个人主机的CPU主要分为32/64位，32位又可分为i386，i586，i686,。64位称为x86_64。不同等级的CPU指令集不太相同，这可能需要针对某些CPU进行优化，以取得较佳的性能。高价的硬件通常会向下兼容旧的软件，高价的软件不兼容旧的硬件。
+  - export 自定义变量转化成环境变量
+    环境变量与自定义的变量差异是该变量是否会被子程序所继承引用
+    在一个bash底下下达的任何指令都是由这个bash所衍生出来的，那些被下达的指令就被称为子程序。
+    子程序仅会继承父程序的环境变量，不会继承父程序的自定义变量。
+### 影响显示结果的语系变量（locale）
+
+locale -a 查看支持的语系
+```shell
+[root@iZbp13op1xah7j3j1x457dZ ~]# locale -a
+aa_DJ
+aa_DJ.iso88591
+aa_DJ.utf8
+aa_ER
+aa_ER@saaho
+aa_ER.utf8
+aa_ER.utf8@saaho
+aa_ET
+aa_ET.utf8
+af_ZA
+...
+zh_CN
+zh_CN.gb18030
+zh_CN.gb2312
+zh_CN.gbk
+zh_CN.utf8
+zh_HK
+zh_HK.big5hkscs
+zh_HK.utf8
+zh_SG
+zh_SG.gb2312
+zh_SG.gbk
+zh_SG.utf8
+zh_TW
+zh_TW.big5
+zh_TW.euctw
+zh_TW.utf8
+zu_ZA
+zu_ZA.iso88591
+zu_ZA.utf8
+[root@iZbp13op1xah7j3j1x457dZ ~]#
+
+# 查看当前使用的语系
+[root@iZbp13op1xah7j3j1x457dZ ~]# locale
+LANG=en_US.UTF-8      # 系统的默认语言环境
+LC_CTYPE="en_US.UTF-8"      # 字符分类、大小写转换、字符编解码等行为的语言环境
+LC_NUMERIC="en_US.UTF-8"      # 数字格式,如小数点和千位分隔符的显示方式
+LC_TIME="en_US.UTF-8"      # 日期和时间的格式化方式
+LC_COLLATE="en_US.UTF-8"      # 字符串的排序和比较规则
+LC_MONETARY="en_US.UTF-8"      # 货币符号、小数点、千位分隔符等货币格式
+LC_MESSAGES="en_US.UTF-8"      # 系统消息的语言
+LC_PAPER="en_US.UTF-8"      # 纸张大小和方向等打印相关的本地化选项
+LC_NAME="en_US.UTF-8"      # 人名的格式化方式
+LC_ADDRESS="en_US.UTF-8"      # 地址的格式化方式
+LC_TELEPHONE="en_US.UTF-8"      # 电话号码的格式化方式
+LC_MEASUREMENT="en_US.UTF-8"      # 度量单位的格式化方式
+LC_IDENTIFICATION="en_US.UTF-8"      # 包含了 locale 的标识信息
+LC_ALL=      # 可以用来覆盖所有其他的 LC_ 设置,将所有本地化选项统一设置为同一个 locale。但在这里它是空的,表示不使用这个设置
+[root@iZbp13op1xah7j3j1x457dZ ~]# 
+```
+如果设定了LANG 或 LC_ALL,则其他的语系变量就会被中两个变量所取代
+语系文件在  /usr/lib/locale/ 目录中
