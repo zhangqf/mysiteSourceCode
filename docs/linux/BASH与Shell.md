@@ -355,4 +355,212 @@ LC_ALL=      # 可以用来覆盖所有其他的 LC_ 设置,将所有本地化�
 [root@iZbp13op1xah7j3j1x457dZ ~]# 
 ```
 如果设定了LANG 或 LC_ALL,则其他的语系变量就会被中两个变量所取代
-语系文件在  /usr/lib/locale/ 目录中
+语系文件在  /usr/lib/locale/ 目录中， 整体系统默认的语系在 /etc/local.conf这个目录下。
+
+### 变量的有效范围
+环境变量=全局变量
+自定义变量=局部变量
+
+为什么环境变量的数据可以被子程序所引用呢，这是因为内存配置的关系。理论上是这样
+- 当启动要给shell，操作系统分配一记忆区块给shell使用，此内存的变量可以让子程序使用
+- 若在父程序利用export功能，可以让自定义变量的内容写到上述的记忆区块当中（环境变量）
+- 当加载另一个shell时（即启动子程序，而离开原本的父程序），子shell可以将父shell的环境变量所在的记忆区块导入自己的环境变量区块当中
+
+### 变量键盘读取、数组与宣告： read，array，declare
+
+- read
+  |选项|解释|
+  |---|---|
+  |-p|后面可以接提示字符|
+  |-t|后面可以接等待的 秒数 |
+
+  ```shell
+  # 将用户输入的内容变成 atest变量的内容
+  [root@iZbp13op1xah7j3j1x457dZ ~]# read atest
+  this is a test
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${atest}
+  this is a test
+  # 30秒内输入自己的名字，并将输入字符串作为名为named的变量内容
+  [root@iZbp13op1xah7j3j1x457dZ ~]# read -p "Please keyin your name:" -t 30 named
+  Please keyin your name:VBrid Tsai
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${named}
+  VBrid Tsai
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+- declare / typeset
+  声明变量类型 如果使用declare后面没有接任何参数，bash就会主动将所有变量名称与内容通通叫出来
+  |选项|解释|
+  |---|---|
+  |-a|将后面名为variable的变量定义成为数组array类型|
+  |-i|将后面名为variable的变量定义成为整数数字（integer）类型|
+  |-x|用法与export一样，就是将后面的variable变成环境变量|
+  |-r|将变量设定成为readonly类型，该变量不可被更改内容，也不能unset|
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# sum=100+400+50
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${sum}
+  100+400+50
+  # 上面没有计算是因为他是文本类型
+  [root@iZbp13op1xah7j3j1x457dZ ~]# declare -i sum=100+400+50
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${sum}
+  550
+  [root@iZbp13op1xah7j3j1x457dZ ~]#
+
+  # 将sum变成环境变量
+  [root@iZbp13op1xah7j3j1x457dZ ~]# declare -x sum
+  [root@iZbp13op1xah7j3j1x457dZ ~]# export | grep sum
+  declare -ix sum="550"
+  [root@iZbp13op1xah7j3j1x457dZ ~]#
+
+  # 将sum 变成只读属性
+  [root@iZbp13op1xah7j3j1x457dZ ~]# declare -r sum
+  [root@iZbp13op1xah7j3j1x457dZ ~]# sum=testting
+  bash: sum: readonly variable
+  [root@iZbp13op1xah7j3j1x457dZ ~]#
+
+  # 将sum变成非环境变量的自定义变量
+  [root@iZbp13op1xah7j3j1x457dZ ~]# declare +x sum
+  [root@iZbp13op1xah7j3j1x457dZ ~]# declare -p sum
+  declare -ir sum="550"
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+- 数组（array）变量类型
+  在bash中 数组的设定方式：var[index]=content
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# var[1]='small min'
+  [root@iZbp13op1xah7j3j1x457dZ ~]# var[2]='big min'
+  [root@iZbp13op1xah7j3j1x457dZ ~]# var[3]='nice min'
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo "${var[1]},${var[2]},${var[3]}"
+  small min,big min,nice min
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+### 与文件系统及程序的限制关系：ulimit
+限制用户的某些系统资源，包括可以开启的文件数量，可以使用的CUP时间，可以使用的内存总量等等
+|选项|解释|
+|---|---|
+|-H|hard limit，严格的设定，必定不能超过这个设定的数值|
+|-S|soft limit，警告的设定，可以超过这个设定值，但是若超过则有警告讯息，在设定上，通常soft会比hard小。如： soft可以设定为80而hard设定为100，那么可以使用到90系统会有警告讯息通知|
+|-a|后面不接任何选项与参数，可列出所有限制额度|
+|-c|当某些程序发生错误时，系统可能会将该程序在内存中的信息写成文件（除错用）。这种文件就被称为核心文件（core file）。此为限制每个核心文件的最大容量|
+|-f|此shell可以建立的最大文件容量（一般可能设定为2GB）单位为KBytes|
+|-d|程序可使用的最大断裂内存（segment）容量|
+|-l|可用于锁定（lock）的内存量|
+|-t|可使用的最大CPU时间（单位为秒）|
+|-u|单一用户可以使用的最大程序（process）数量|
+```shell
+[root@iZbp13op1xah7j3j1x457dZ ~]# ulimit -a
+core file size          (blocks, -c) 0      # 只要是0就代表没限制
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited       # 可建立的单一文件的大小
+pending signals                 (-i) 6942
+max locked memory       (kbytes, -l) 64
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 65535       # 同时可开启的文件数量
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) 8192
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 6942
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+[root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+```
+### 变量内容的删除、取代与替换（Optional）
+- 变量内容的删除与取代
+  |变量设定方式|说明|
+  |---|---|
+  |${变量#关键词}|若变量内容从头开始的数据符合 关键词 ，则将符合的最短数据删除|
+  |${变量##关键词}|若变量内容从头开始的数据符合　关键词，　则将符合的最长数据删除|
+  |${变量%关键词}|若变量内容从尾向前的数据符合 关键词， 则将符合的最短数据删除|
+  |${变量%%关键词}|若变量内容从尾向前的数据符合 关键词， 则讲符合的最长数据删除|
+  |${变量/旧字符串/新字符串}|若变量内容符合 旧字符串 则 第一个旧字符串会被新字符串取代|
+  |${变量//旧字符串/新字符串}|若变量内容符合 旧字符串 则 全部的旧字符串会被新字符串取代|
+- 变量的测试与内容替换
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${username}
+
+  [root@iZbp13op1xah7j3j1x457dZ ~]# username=${username-root}
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${usrename}
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${username}
+  root
+  [root@iZbp13op1xah7j3j1x457dZ ~]# user='vbird tsai'
+  [root@iZbp13op1xah7j3j1x457dZ ~]# user=${user-root}
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${user}
+  vbird tsai
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  [root@iZbp13op1xah7j3j1x457dZ ~]# username=""
+  [root@iZbp13op1xah7j3j1x457dZ ~]# username=${username-root}
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${username}
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# username=${username:-root}
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${username}
+  root
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  ```
+  |变量设定方式|str没有设定|str为空字符串|str已设定非为空字符串|
+  |---|---|---|---|
+  |var=${str-expr}|var=expr|var=|var=$str|
+  |var=${str:expr}|var=expr|var=expr|var=$str|
+  |var=${str+expr}|var=|var=expr|var=expr|
+  |var=${str:+expr}|var=|var=|var=expr|
+  |var=${str=expr}|str=expr var=expr|str不变 var=|str 不变 var=$str|
+  |var=${str:=expr}|str=expr var=expr|str=expr var=expr|str 不变  var=$str|
+  |var=${str?expr}|expr输出至stderr|var=|var=$str|
+  |var=${str:?expr}|expr输出至stderr|expr输出至stdrr|var=$str|
+
+### 命令别名与历史命令
+- 命令别名设定： alias，unalias
+- 历史命令：history
+|选项|解释|
+|---|---|
+|n|数字，意思是 要列出最近的n笔命令行表|
+|-c|将目前的shell中的所有history内容全部消除|
+|-a|将目前新增的history指令新增入的his他file中，若没有加histfiles，则预设写入 ~/.bash_history|
+|-r|将histfiles的内容读到目前这个shell的history记忆中|
+|-w|将目前的histroy记忆内容写入histfiles中|
+  
+### Bash Shell 的操作环境
+- 路径与指令搜寻顺序
+  指令执行的顺序 如下
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# alias echo="echo -n"
+  [root@iZbp13op1xah7j3j1x457dZ ~]# type -a echo
+  echo is aliased to `echo -n'
+  echo is a shell builtin
+  echo is /usr/bin/echo
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  ```
+- bash的进站与欢迎讯息： /etc/issue, /etc/motd
+  终端机接口（tty1~tty6）登入的时候，会有几行提示字符串，这就是进站画面，这些字符串写在 /etc/issue里面
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# cat /etc/issue
+  \S
+  Kernel \r on an \m
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  ```
+  |issue内的各代码意义|
+  |---|
+  |\d 本地端时间的日期|
+  |\l 显示第几个终端机接口|
+  |\m 显示硬件的等级（i386/i486/i586/i686...）|
+  |\n 显示主机的网络名称|
+  |\O 显示domain name|
+  |\r 操作系统的版本（相当于 uname -r）|
+  |\t 显示本地端时间的时间|
+  |\S 操作系统名称|
+  |\v 操作系统版本|
+
+  让使用者登入后取得一些讯息， 可以将讯息加入 /etc/motd 里面去！
+
+- bash的环境配置文件
+- 终端机的环境设定：stty，set
+- 通配符与特殊符号
+  
