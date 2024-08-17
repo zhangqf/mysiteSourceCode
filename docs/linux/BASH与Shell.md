@@ -561,6 +561,199 @@ file locks                      (-x) unlimited
   让使用者登入后取得一些讯息， 可以将讯息加入 /etc/motd 里面去！
 
 - bash的环境配置文件
+  - login 与 non-login shell
+    login shell：取得bash时需要完整的登入流程。如：要使用tty1~tty6登入，需要输入用户的账号与密码，此时取得的bash 称为login shell
+    non-login：取得bash接口的方法不需要重复登入的动作。如 在原本的bash环境下再下达bash这个指令，这第二个子程序就是non-login shell。以X window 登入的Linux后，再以X的图形化接口启动终端机，此时这个终端机并没有输入账号与密码，这时它也是non-login shell。
+    这两中方式取得bash，读取的配置文件数据是不一样的。
+    - login shell读取的配置文件
+      
+      /etc/profile: 系统整体的设定，
+      
+      ```shell
+        1 # /etc/profile
+        2 
+        3 # System wide environment and startup programs, for login setup
+        4 # Functions and aliases go in /etc/bashrc
+        5 
+        6 # It's NOT a good idea to change this file unless you know what you
+        7 # are doing. It's much better to create a custom.sh shell script in
+        8 # /etc/profile.d/ to make custom changes to your environment, as this
+        9 # will prevent the need for merging in future updates.
+       10 
+       11 pathmunge () {
+       12     case ":${PATH}:" in
+       13         *:"$1":*)
+       14             ;;
+       15         *)
+       16             if [ "$2" = "after" ] ; then
+       17                 PATH=$PATH:$1
+       18             else
+       19                 PATH=$1:$PATH
+       20             fi
+       21     esac
+       22 }
+       23 
+       24 
+       25 if [ -x /usr/bin/id ]; then
+       26     if [ -z "$EUID" ]; then
+       27         # ksh workaround
+       28         EUID=`/usr/bin/id -u`
+       29         UID=`/usr/bin/id -ru`
+       30     fi
+       31     USER="`/usr/bin/id -un`"
+       32     LOGNAME=$USER
+       33     MAIL="/var/spool/mail/$USER"
+       34 fi
+       35 
+       36 # Path manipulation
+       37 if [ "$EUID" = "0" ]; then
+       38     pathmunge /usr/sbin
+       39     pathmunge /usr/local/sbin
+       40 else
+       41     pathmunge /usr/local/sbin after
+       42     pathmunge /usr/sbin after
+       43 fi
+       44 
+       45 HOSTNAME=`/usr/bin/hostname 2>/dev/null`
+       46 HISTSIZE=1000
+       47 if [ "$HISTCONTROL" = "ignorespace" ] ; then
+       48     export HISTCONTROL=ignoreboth
+       49 else
+       50     export HISTCONTROL=ignoredups
+       51 fi
+       52 
+       53 export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTROL
+       54 
+       55 # By default, we want umask to get set. This sets it for login shell
+       56 # Current threshold for system reserved uid/gids is 200
+       57 # You could check uidgid reservation validity in
+       58 # /usr/share/doc/setup-*/uidgid file
+       59 if [ $UID -gt 199 ] && [ "`/usr/bin/id -gn`" = "`/usr/bin/id -un`" ]; then
+       60     umask 002
+       61 else
+       62     umask 022
+       63 fi
+       64 
+       65 for i in /etc/profile.d/*.sh /etc/profile.d/sh.local ; do
+       66     if [ -r "$i" ]; then
+       67         if [ "${-#*i}" != "$-" ]; then
+       68             . "$i"
+       69         else
+       70             . "$i" >/dev/null
+       71         fi
+       72     fi
+       73 done
+       74 
+       75 unset i
+      ```
+      - PATH: 会根据UID决定PATH变量要不要含有sbin的系统指令目录
+      - MAIL：根据账号设定好使用者的mailbox到/var/spool/mail/账号名
+      - USER：根据用户的账号设定这一变量的内容
+      - HOSTNAME：根据主机的hostname指令决定这个变量的内容
+      - HISTSIZE：历史命令记录笔数
+      - umask：root默认为022 而一般用户为002
+        
+      下面的这些数据也会被呼叫进来
+       - /etc/profile.d/*sh
+         只要在/etc/profile.d/目录下且扩展名为.sh，使用者有r的权限，那么该文件就会被/etc/profile呼叫进来。这个目录下的文件规范了bash操作接口的颜色、语系、ll与ls指令的命令别名、vi的命令别名、which的命令别名等。如果需要帮助使用者设定一些共享的命令别名时，可以在这个目录下新建扩展名为.sh的文件，并将所需要的数据写入即可
+       - /etc/locale.conf
+         这个文件是由/etc/profile.d/lang.sh呼叫进来的。这也是决定bash预设哪种语系的重要配置文件。文件里最重要的就是LANG/LC_ALL这些个变量的设定。
+       - /usr/share/bash-completion/completions/*
+         命令补全、档名补全以及进行指令的选项/参数不全功能，就是从这个目录里面找到相应的指令来处理的。这个目录里的内容是由/etc/profile.d/bash_completion.sh这个文件载入的
+    bash的login shell情况下所读取的整体环境配置文件其实只有/etc/profile,但是/etc/profile还会呼叫其他的配置文件，所以可以让bash操作接口变得非常友善    
+      \~/.bash_profile或~/.bash_login 或 ~/.profile： 使用者个人设定，
+      bash读取完系统整体配置文件后，便会读取使用者的个人配置文件。依序有如下三个主要文件
+        1. ~/.bash_profile
+        2. ~/.bash_login
+        3. \~/.profile
+      其实bash的login shell 设定只会读取上面三个文件中的一个，二读取的顺序则是按照上面的顺序进行读取的。也就是说，如果~/.bash_profile存在，那么其他两个文件不论有无存在，都不会被读取。如果~/.bash_profile不存在才会读取~/.bash_login。依此类推。 之所有会有这么多的文件，是因为其他shell转换过来的使用者的习惯
+      ```shell
+      [root@iZbp13op1xah7j3j1x457dZ ~]# cat ~/.bash_profile
+      # .bash_profile
+      
+      # Get the aliases and functions
+      if [ -f ~/.bashrc ]; then
+              . ~/.bashrc
+      fi
+      
+      # User specific environment and startup programs
+      
+      PATH=$PATH:$HOME/bin
+      
+      export PATH
+      [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+      [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/.bash_profile
+      # .bash_profile
+      
+      # Get the aliases and functions
+      if [ -f ~/.bashrc ]; then      # 判断并读取 ~/.bashrc
+              . ~/.bashrc
+      fi
+      
+      # User specific environment and startup programs
+      
+      PATH=$PATH:$HOME/.local/bin:$HOME/bin   #  处理个人化设定
+      
+      export PATH
+      [az@iZbp13op1xah7j3j1x457dZ root]$ 
+      ```
+      文件内有设定PATH这个变量，并使用export 将 PATH变成环境变量。由于PATH在/etc/profile当中已经设定过了，所以这里就以累加的方式增加用户家目录下的~/bin/为额外的执行文件放置的目录。也就是说，可以将自己建立的执行档放置到自己家目录下的~/bin/ 目录。就可以直接执行该执行档而不需要使用绝对/相对路径来执行该文件。
+      ```mermaid
+      flowchart LR;
+          A("/etc/profile")--> B("~/.bash_profile")--> C("开始操作BASH")
+          A -.->D("/etc/profile.d/*.sh")
+          D -.->E("/etc/locale.conf")
+          B -.->F("~/.bashrc")
+          F -.->G("/etc/bashrc")
+      ```
+      实现的方向是主流程，虚线的方向则是被呼叫的配置文件。
+      - source：读取环境配置文件的指令
+        将配置文件设定好后，通常都是注销后再次登入，才会生效，使用source这个指令可以直接读取配置文件而不用注销登录。 使用 `source ~/.bashrc` 与 `. ~/.bashrc` 效果一样
+    - non-login shell 读取的配置文件
+      - ~/.bashrc
+        使用 non-login shell这种非登录情况下取得bash操作接口的环境配置文件仅仅是 ~/.bashrc。
+        ```shell
+        [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/.bashrc
+        # .bashrc
+        
+        # Source global definitions
+        if [ -f /etc/bashrc ]; then
+                . /etc/bashrc
+        fi
+        
+        # Uncomment the following line if you don't like systemctl's auto-paging feature:
+        # export SYSTEMD_PAGER=
+        
+        # User specific aliases and functions
+        [az@iZbp13op1xah7j3j1x457dZ root]$ su -
+        Password: 
+        Last login: Thu Aug  8 11:37:28 CST 2024 from 36.142.32.177 on pts/2
+        Last failed login: Sat Aug 17 12:31:05 CST 2024 from 121.196.208.112 on ssh:notty
+        There were 183 failed login attempts since the last successful login.
+        [root@iZbp13op1xah7j3j1x457dZ ~]# cat ~/.bashrc
+        # .bashrc
+        
+        # User specific aliases and functions
+        
+        alias rm='rm -i'
+        alias cp='cp -i'
+        alias mv='mv -i'
+        
+        # Source global definitions
+        if [ -f /etc/bashrc ]; then
+                . /etc/bashrc
+        fi
+        [root@iZbp13op1xah7j3j1x457dZ ~]# 
+        ```
+        在/etc/bashrc中帮bash定义了如下数据：
+          - 根据不同的UID规范出umask的值
+          - 根据不同的UID规范出提示字符（PS1的变量）
+          - 呼叫/etc/profile.d/*.sh的设定
+  - 其他相关配置文件
+      - /etc/man_db.conf
+      - \~/.bash_history
+      - \~/.bash_logout : 当注销bash后，系统需要处理完其他这些任务才能离开    
 - 终端机的环境设定：stty，set
 - 通配符与特殊符号
   
