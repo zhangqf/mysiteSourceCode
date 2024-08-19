@@ -2022,10 +2022,691 @@ file locks                      (-x) unlimited
   [az@iZbp13op1xah7j3j1x457dZ ~]$ 
   ```
   - 字符转换命令： tr, col, join, paste, expand
- 
-  - 分区命令： split
- 
-  - 参数代换： xargs
- 
-  - 关于减号 - 用途
+     在vim程序编辑器中，DOS断行字符与Unix断行字符不同，可以使用`dos2unix` 与 `unix2dos`来完成转换。
+    tr 可以用来删除一段信息当中的文字，或者是进行文字信息的替换
+
+  |选项|解释|
+  |---|---|
+  |-d|删除信息当中的 关键词 这个字符|
+  |-s|替换掉重复的字符|
+  ```shell
+  # 将last输出的信息中，所有的小写转换成大写
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | tr '[a-z]' '[A-Z]'
+  ROOT     PTS/2        36.142.32.177    THU AUG  8 11:37 - 13:55  (02:18)    
+  ROOT     PTS/2        36.142.32.177    WED AUG  7 17:44 - 20:21  (02:36)    
+  ROOT     PTS/3        42.91.165.230    THU AUG  1 22:48 - 01:08  (02:19)    
+  ROOT     PTS/2        42.91.165.230    THU AUG  1 22:42 - 00:54  (02:12)    
+  ROOT     PTS/1        42.91.165.230    THU AUG  1 22:13 - 00:24  (02:11)    
+  ROOT     PTS/1        36.142.66.249    THU JUL 25 15:05 - 17:19  (02:13)    
+  ROOT     PTS/1        36.142.43.234    TUE JUL 23 17:03 - 17:03  (00:00)    
+  ROOT     PTS/0        36.142.43.234    TUE JUL 23 16:53 - 19:05  (02:11)    
+  ROOT     PTS/1        36.142.41.63     FRI JUL 12 16:33 - 18:53  (02:19)    
+  ROOT     PTS/0        36.142.41.63     FRI JUL 12 16:07 - 18:49  (02:41)    
+  ROOT     PTS/0        36.142.40.246    WED JUL 10 19:00 - 22:08  (03:07)    
+  ROOT     PTS/0        36.142.33.124    WED JUN 26 17:37 - 20:05  (02:28)    
+  ROOT     PTS/1        42.91.175.208    SUN JUN 23 01:34 - 04:05  (02:30)    
+  ROOT     PTS/2        8.139.112.56     SUN JUN 23 01:13 - 01:26  (00:12)    
+  ROOT     PTS/2        8.139.99.236     SUN JUN 23 01:13 - 01:13  (00:00)    
+  ROOT     PTS/1        47.96.60.217     SAT JUN 22 23:58 - 01:26  (01:28)    
+  ROOT     PTS/1        47.96.60.109     SAT JUN 22 23:58 - 23:58  (00:00)    
+  ROOT     PTS/0        42.91.175.208    SAT JUN 22 23:53 - 03:01  (03:08)    
+  ROOT     PTS/0        42.91.175.208    SAT JUN 22 23:32 - 23:32  (00:00)    
+  REBOOT   SYSTEM BOOT  3.10.0-1160.114. SAT JUN 22 23:25 - 21:16 (57+21:51)  
+  ROOT     PTS/0        42.91.175.208    SAT JUN 22 22:44 - CRASH  (00:40)    
+  ROOT     PTS/0        47.96.60.216     SAT JUN 22 21:35 - 22:42  (01:06)    
+  ROOT     PTS/0        47.96.60.218     SAT JUN 22 21:35 - 21:35  (00:00)    
+  ROOT     PTS/0        47.96.60.211     THU JUN 20 22:22 - 00:00  (01:37)    
+  ROOT     PTS/0        47.96.60.218     THU JUN 20 22:22 - 22:22  (00:00)    
+  ROOT     PTS/2        8.139.112.103    TUE APR 30 15:26 - 15:29  (00:03)    
+  ROOT     PTS/1        47.96.60.110     TUE APR 30 15:26 - 15:26  (00:00)    
+  ROOT     PTS/1        47.96.60.216     TUE APR 30 15:26 - 15:26  (00:00)    
+  ROOT     PTS/0        8.139.112.109    TUE APR 30 15:19 - 15:41  (00:21)    
+  ROOT     PTS/0        8.139.112.97     TUE APR 30 15:19 - 15:19  (00:00)    
+  ROOT     PTS/1        47.96.60.213     MON APR 29 16:28 - 22:41  (06:12)    
+  ROOT     PTS/0        8.139.112.153    MON APR 29 16:28 - 22:29  (06:00)    
+  ROOT     PTS/0        47.96.60.217     MON APR 29 16:28 - 16:28  (00:00)    
+  ROOT     PTS/0        8.139.112.183    MON APR 29 16:28 - 16:28  (00:00)    
+  ROOT     PTS/3        8.139.112.25     SUN APR 28 22:35 - 22:35  (00:00)    
+  ROOT     PTS/3        8.139.112.77     SUN APR 28 22:35 - 22:35  (00:00)    
+  ROOT     PTS/1        8.139.112.25     SUN APR 28 22:26 - 04:51  (06:25)    
+  ROOT     PTS/1        8.139.112.161    SUN APR 28 22:26 - 22:26  (00:00)    
+  ROOT     PTS/2        8.139.112.147    SUN APR 28 22:24 - 23:52  (01:28)    
+  ROOT     PTS/1        8.139.99.209     SUN APR 28 22:24 - 22:24  (00:00)    
+  ROOT     PTS/1        8.139.99.209     SUN APR 28 22:24 - 22:24  (00:00)    
+  ROOT     PTS/0        8.139.112.83     SUN APR 28 21:59 - 04:36  (06:36)    
+  ROOT     PTS/0        8.139.112.54     SUN APR 28 21:59 - 21:59  (00:00)    
+  ROOT     PTS/2        118.31.243.36    FRI APR 26 15:07 - 21:17  (06:10)    
+  ROOT     PTS/2        118.31.243.249   FRI APR 26 15:07 - 15:07  (00:00)    
+  ROOT     PTS/0        47.96.60.110     FRI APR 26 11:38 - 17:39  (06:01)    
+  ROOT     PTS/1        118.31.243.178   FRI APR 26 11:38 - 17:40  (06:02)    
+  ROOT     PTS/1        118.31.243.222   FRI APR 26 11:38 - 11:38  (00:00)    
+  ROOT     PTS/0        118.31.243.60    FRI APR 26 11:15 - 11:38  (00:23)    
+  ROOT     PTS/0        118.31.243.246   FRI APR 26 11:15 - 11:15  (00:00)    
+  ROOT     PTS/0        47.96.60.109     SAT APR 20 11:47 - 13:06  (01:19)    
+  ROOT     PTS/0        47.96.60.213     SAT APR 20 11:47 - 11:47  (00:00)    
+  ROOT     PTS/0        47.96.60.109     SAT APR 20 11:44 - 11:44  (00:00)    
+  ROOT     PTS/0        47.96.60.218     SAT APR 20 11:44 - 11:44  (00:00)    
+  ROOT     PTS/1        47.96.60.110     SAT APR 20 11:23 - 13:06  (01:43)    
+  ROOT     PTS/1        47.96.60.214     SAT APR 20 11:23 - 11:23  (00:00)    
+  ROOT     PTS/0        118.31.243.176   SAT APR 20 11:11 - 11:42  (00:30)    
+  ROOT     PTS/0        118.31.243.97    SAT APR 20 11:11 - 11:11  (00:00)    
+  ROOT     PTS/0        47.96.60.216     FRI APR 19 09:33 - 16:04  (06:30)    
+  ROOT     PTS/0        47.96.60.213     FRI APR 19 09:33 - 09:33  (00:00)    
+  REBOOT   SYSTEM BOOT  3.10.0-1160.108. FRI APR 19 09:29 - 21:16 (122+11:47) 
   
+  WTMP BEGINS FRI MAR 22 11:34:39 2024
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+
+  # 将/etc/passwd输出的信息中的 ： 删除
+
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/passwd | tr -d ':'
+  rootx00root/root/bin/bash
+  binx11bin/bin/sbin/nologin
+  daemonx22daemon/sbin/sbin/nologin
+  admx34adm/var/adm/sbin/nologin
+  lpx47lp/var/spool/lpd/sbin/nologin
+  syncx50sync/sbin/bin/sync
+  shutdownx60shutdown/sbin/sbin/shutdown
+  haltx70halt/sbin/sbin/halt
+  mailx812mail/var/spool/mail/sbin/nologin
+  operatorx110operator/root/sbin/nologin
+  gamesx12100games/usr/games/sbin/nologin
+  ftpx1450FTP User/var/ftp/sbin/nologin
+  nobodyx9999Nobody//sbin/nologin
+  systemd-networkx192192systemd Network Management//sbin/nologin
+  dbusx8181System message bus//sbin/nologin
+  polkitdx999998User for polkitd//sbin/nologin
+  sshdx7474Privilege-separated SSH/var/empty/sshd/sbin/nologin
+  postfixx8989/var/spool/postfix/sbin/nologin
+  chronyx998996/var/lib/chrony/sbin/nologin
+  nscdx2828NSCD Daemon//sbin/nologin
+  tcpdumpx7272//sbin/nologin
+  rpcx3232Rpcbind Daemon/var/lib/rpcbind/sbin/nologin
+  rpcuserx2929RPC Service User/var/lib/nfs/sbin/nologin
+  nfsnobodyx6553465534Anonymous NFS User/var/lib/nfs/sbin/nologin
+  nginxx997995Nginx web server/var/lib/nginx/sbin/nologin
+  gitlab-wwwx996993/var/opt/gitlab/nginx/bin/false
+  gitx995992/var/opt/gitlab/bin/sh
+  gitlab-redisx994991/var/opt/gitlab/redis/bin/false
+  gitlab-psqlx993990/var/opt/gitlab/postgresql/bin/sh
+  gitlab-prometheusx992989/var/opt/gitlab/prometheus/bin/sh
+  azx10001000/home/az/bin/bash
+  alexx10011002/home/alex/bin/bash
+  arodx10021001/home/arod/bin/bash
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+  col
+  |选项|解释|
+  |---|---|
+  |-x|将tab键转换成对等的空格键|
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat -A /etc/man_db.conf
+  # $
+  #$
+  # This file is used by the man-db package to configure the man and cat paths.$
+  # It is also used to provide a manpath for those without one by examining$
+  # their PATH environment variable. For details see the manpath(5) man page.$
+  #$
+  # Lines beginning with `#' are comments and are ignored. Any combination of$
+  # tabs or spaces may be used as `whitespace' separators.$
+  #$
+  # There are three mappings allowed in this file:$
+  # --------------------------------------------------------$
+  # MANDATORY_MANPATH^I^I^Imanpath_element$
+  # MANPATH_MAP^I^Ipath_element^Imanpath_element$
+  # MANDB_MAP^I^Iglobal_manpath^I[relative_catpath]$
+  #---------------------------------------------------------$
+  # every automatically generated MANPATH includes these fields$
+  #$
+  #MANDATORY_MANPATH ^I^I^I/usr/src/pvm3/man$
+  #$
+  MANDATORY_MANPATH^I^I^I/usr/man$
+  MANDATORY_MANPATH^I^I^I/usr/share/man$
+  MANDATORY_MANPATH^I^I^I/usr/local/share/man$
+  #---------------------------------------------------------$
+  # set up PATH to MANPATH mapping$
+  # ie. what man tree holds man pages for what binary directory.$
+  #$
+  #^I^I*PATH*        ->^I*MANPATH*$
+  #$
+  MANPATH_MAP^I/bin^I^I^I/usr/share/man$
+  MANPATH_MAP^I/usr/bin^I^I/usr/share/man$
+  MANPATH_MAP^I/sbin^I^I^I/usr/share/man$
+  MANPATH_MAP^I/usr/sbin^I^I/usr/share/man$
+  MANPATH_MAP^I/usr/local/bin^I^I/usr/local/man$
+  MANPATH_MAP^I/usr/local/bin^I^I/usr/local/share/man$
+  MANPATH_MAP^I/usr/local/sbin^I^I/usr/local/man$
+  MANPATH_MAP^I/usr/local/sbin^I^I/usr/local/share/man$
+  MANPATH_MAP^I/usr/X11R6/bin^I^I/usr/X11R6/man$
+  MANPATH_MAP^I/usr/bin/X11^I^I/usr/X11R6/man$
+  MANPATH_MAP^I/usr/games^I^I/usr/share/man$
+  MANPATH_MAP^I/opt/bin^I^I/opt/man$
+  MANPATH_MAP^I/opt/sbin^I^I/opt/man$
+  #---------------------------------------------------------$
+  # For a manpath element to be treated as a system manpath (as most of those$
+  # above should normally be), it must be mentioned below. Each line may have$
+  # an optional extra string indicating the catpath associated with the$
+  # manpath. If no catpath string is used, the catpath will default to the$
+  # given manpath.$
+  #$
+  # You *must* provide all system manpaths, including manpaths for alternate$
+  # operating systems, locale specific manpaths, and combinations of both, if$
+  # they exist, otherwise the permissions of the user running man/mandb will$
+  # be used to manipulate the manual pages. Also, mandb will not initialise$
+  # the database cache for any manpaths not mentioned below unless explicitly$
+  # requested to do so.$
+  #$
+  # In a per-user configuration file, this directive only controls the$
+  # location of catpaths and the creation of database caches; it has no effect$
+  # on privileges.$
+  #$
+  # Any manpaths that are subdirectories of other manpaths must be mentioned$
+  # *before* the containing manpath. E.g. /usr/man/preformat must be listed$
+  # before /usr/man.$
+  #$
+  #^I^I*MANPATH*     ->^I*CATPATH*$
+  #$
+  MANDB_MAP^I/usr/man^I^I/var/cache/man/fsstnd$
+  MANDB_MAP^I/usr/share/man^I^I/var/cache/man$
+  MANDB_MAP^I/usr/local/man^I^I/var/cache/man/oldlocal$
+  MANDB_MAP^I/usr/local/share/man^I/var/cache/man/local$
+  MANDB_MAP^I/usr/X11R6/man^I^I/var/cache/man/X11R6$
+  MANDB_MAP^I/opt/man^I^I/var/cache/man/opt$
+  #$
+  #---------------------------------------------------------$
+  # Program definitions.  These are commented out by default as the value$
+  # of the definition is already the default.  To change: uncomment a$
+  # definition and modify it.$
+  #$
+  #DEFINE ^Ipager^Iless -s$
+  #DEFINE ^Icat^Icat$
+  #DEFINE ^Itr^Itr '\255\267\264\327' '\055\157\047\170'$
+  #DEFINE^I^Igrep^Igrep$
+  #DEFINE ^Itroff ^Igroff -mandoc$
+  #DEFINE ^Inroff ^Inroff -mandoc -c$
+  #DEFINE ^Ieqn ^Ieqn$
+  #DEFINE ^Ineqn^Ineqn$
+  #DEFINE ^Itbl ^Itbl$
+  #DEFINE ^Icol ^Icol$
+  #DEFINE ^Ivgrind ^I$
+  #DEFINE ^Irefer ^Irefer$
+  #DEFINE ^Igrap ^I$
+  #DEFINE ^Ipic ^Ipic -S$
+  #$
+  #DEFINE^I^Icompressor^Igzip -c7$
+  #---------------------------------------------------------$
+  # Misc definitions: same as program definitions above.$
+  #$
+  #DEFINE^I^Iwhatis_grep_flags^I^I-i$
+  #DEFINE^I^Iapropos_grep_flags^I^I-iEw$
+  #DEFINE^I^Iapropos_regex_grep_flags^I-iE$
+  #---------------------------------------------------------$
+  # Section names. Manual sections will be searched in the order listed here;$
+  # the default is 1, n, l, 8, 3, 0, 2, 5, 4, 9, 6, 7. Multiple SECTION$
+  # directives may be given for clarity, and will be concatenated together in$
+  # the expected way.$
+  # If a particular extension is not in this list (say, 1mh), it will be$
+  # displayed with the rest of the section it belongs to. The effect of this$
+  # is that you only need to explicitly list extensions if you want to force a$
+  # particular order. Sections with extensions should usually be adjacent to$
+  # their main section (e.g. "1 1mh 8 ...").$
+  #$
+  SECTION^I^I1 1p 8 2 3 3p 4 5 6 7 9 0p n l p o 1x 2x 3x 4x 5x 6x 7x 8x$
+  #$
+  #---------------------------------------------------------$
+  # Range of terminal widths permitted when displaying cat pages. If the$
+  # terminal falls outside this range, cat pages will not be created (if$
+  # missing) or displayed.$
+  #$
+  #MINCATWIDTH^I80$
+  #MAXCATWIDTH^I80$
+  #$
+  # If CATWIDTH is set to a non-zero number, cat pages will always be$
+  # formatted for a terminal of the given width, regardless of the width of$
+  # the terminal actually being used. This should generally be within the$
+  # range set by MINCATWIDTH and MAXCATWIDTH.$
+  #$
+  #CATWIDTH^I0$
+  #$
+  #---------------------------------------------------------$
+  # Flags.$
+  # NOCACHE keeps man from creating cat pages.$
+  #NOCACHE$
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/man_db.conf | col -x | cat -A | more
+  #$
+  #$
+  # This file is used by the man-db package to configure the man and cat paths.$
+  # It is also used to provide a manpath for those without one by examining$
+  # their PATH environment variable. For details see the manpath(5) man page.$
+  #$
+  # Lines beginning with `#' are comments and are ignored. Any combination of$
+  # tabs or spaces may be used as `whitespace' separators.$
+  #$
+  # There are three mappings allowed in this file:$
+  # --------------------------------------------------------$
+  # MANDATORY_MANPATH                     manpath_element$
+  # MANPATH_MAP           path_element    manpath_element$
+  # MANDB_MAP             global_manpath  [relative_catpath]$
+  #---------------------------------------------------------$
+  # every automatically generated MANPATH includes these fields$
+  #$
+  #MANDATORY_MANPATH                      /usr/src/pvm3/man$
+  #$
+  MANDATORY_MANPATH                       /usr/man$
+  MANDATORY_MANPATH                       /usr/share/man$
+  MANDATORY_MANPATH                       /usr/local/share/man$
+  #---------------------------------------------------------$
+  # set up PATH to MANPATH mapping$
+  # ie. what man tree holds man pages for what binary directory.$
+  #$
+  #               *PATH*        ->        *MANPATH*$
+  #$
+  MANPATH_MAP     /bin                    /usr/share/man$
+  MANPATH_MAP     /usr/bin                /usr/share/man$
+  MANPATH_MAP     /sbin                   /usr/share/man$
+  MANPATH_MAP     /usr/sbin               /usr/share/man$
+  No previous regular expression
+  Most commands optionally preceded by integer argument k.  Defaults in brackets.
+  Star (*) indicates argument becomes new default.
+  -------------------------------------------------------------------------------
+  <space>                 Display next k lines of text [current screen size]
+  z                       Display next k lines of text [current screen size]*
+  <return>                Display next k lines of text [1]*
+  d or ctrl-D             Scroll k lines [current scroll size, initially 11]*
+  q or Q or <interrupt>   Exit from more
+  s                       Skip forward k lines of text [1]
+  f                       Skip forward k screenfuls of text [1]
+  b or ctrl-B             Skip backwards k screenfuls of text [1]
+  '                       Go to place where previous search started
+  =                       Display current line number
+  /<regular expression>   Search for kth occurrence of regular expression [1]
+  n                       Search for kth occurrence of last r.e [1]
+  !<cmd> or :!<cmd>       Execute <cmd> in a subshell
+  v                       Start up /usr/bin/vi at current line
+  ctrl-L                  Redraw screen
+  :n                      Go to kth next file [1]
+  :p                      Go to kth previous file [1]
+  :f                      Display current file name and line number
+  .                       Repeat previous command
+  -------------------------------------------------------------------------------
+  --More--
+  Most commands optionally preceded by integer argument k.  Defaults in brackets.
+  Star (*) indicates argument becomes new default.
+  -------------------------------------------------------------------------------
+  <space>                 Display next k lines of text [current screen size]
+  z                       Display next k lines of text [current screen size]*
+  <return>                Display next k lines of text [1]*
+  d or ctrl-D             Scroll k lines [current scroll size, initially 11]*
+  q or Q or <interrupt>   Exit from more
+  s                       Skip forward k lines of text [1]
+  f                       Skip forward k screenfuls of text [1]
+  b or ctrl-B             Skip backwards k screenfuls of text [1]
+  '                       Go to place where previous search started
+  =                       Display current line number
+  /<regular expression>   Search for kth occurrence of regular expression [1]
+  n                       Search for kth occurrence of last r.e [1]
+  !<cmd> or :!<cmd>       Execute <cmd> in a subshell
+  v                       Start up /usr/bin/vi at current line
+  ctrl-L                  Redraw screen
+  :n                      Go to kth next file [1]
+  :p                      Go to kth previous file [1]
+  :f                      Display current file name and line number
+  .                       Repeat previous command
+  -------------------------------------------------------------------------------
+  --More--
+  Most commands optionally preceded by integer argument k.  Defaults in brackets.
+  Star (*) indicates argument becomes new default.
+  -------------------------------------------------------------------------------
+  <space>                 Display next k lines of text [current screen size]
+  z                       Display next k lines of text [current screen size]*
+  <return>                Display next k lines of text [1]*
+  d or ctrl-D             Scroll k lines [current scroll size, initially 11]*
+  q or Q or <interrupt>   Exit from more
+  s                       Skip forward k lines of text [1]
+  f                       Skip forward k screenfuls of text [1]
+  b or ctrl-B             Skip backwards k screenfuls of text [1]
+  '                       Go to place where previous search started
+  =                       Display current line number
+  /<regular expression>   Search for kth occurrence of regular expression [1]
+  n                       Search for kth occurrence of last r.e [1]
+  !<cmd> or :!<cmd>       Execute <cmd> in a subshell
+  v                       Start up /usr/bin/vi at current line
+  ctrl-L                  Redraw screen
+  :n                      Go to kth next file [1]
+  :p                      Go to kth previous file [1]
+  :f                      Display current file name and line number
+  .                       Repeat previous command
+  -------------------------------------------------------------------------------
+  --More--
+  Most commands optionally preceded by integer argument k.  Defaults in brackets.
+  Star (*) indicates argument becomes new default.
+  -------------------------------------------------------------------------------
+  <space>                 Display next k lines of text [current screen size]
+  z                       Display next k lines of text [current screen size]*
+  <return>                Display next k lines of text [1]*
+  d or ctrl-D             Scroll k lines [current scroll size, initially 11]*
+  q or Q or <interrupt>   Exit from more
+  s                       Skip forward k lines of text [1]
+  f                       Skip forward k screenfuls of text [1]
+  b or ctrl-B             Skip backwards k screenfuls of text [1]
+  '                       Go to place where previous search started
+  =                       Display current line number
+  /<regular expression>   Search for kth occurrence of regular expression [1]
+  n                       Search for kth occurrence of last r.e [1]
+  !<cmd> or :!<cmd>       Execute <cmd> in a subshell
+  v                       Start up /usr/bin/vi at current line
+  ctrl-L                  Redraw screen
+  :n                      Go to kth next file [1]
+  :p                      Go to kth previous file [1]
+  :f                      Display current file name and line number
+  .                       Repeat previous command
+  -------------------------------------------------------------------------------
+  --More--
+  ```
+  join 处理两个文件当中，有“相同数据”的那一行，才将它加在一起
+  |选项|解释|
+  |---|---|
+  |-t|join默认以空格符分隔数据，并且比对 第一个字段 的数据，<br> 如果两个文件相同，则将两笔数据联成一行，且第一个字段放在第一个|
+  |-i|忽略大小写的差异|
+  |-1|代表 第一个文件要用那个字段来分析 的意思|
+  |-2|代表 第二个文件要用那个字段来分析 的意思|
+
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# head -n 3 /etc/passwd /etc/shadow
+  ==> /etc/passwd <==
+  root:x:0:0:root:/root:/bin/bash
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  
+  ==> /etc/shadow <==
+  root:$6$zwuInQeQ$u6.Loifs73Fyc8OdP9V1xRIg0.gfmEUvCPQxhShyvCiFiYI94UM3WDT/szMMctv3Oy.9XMUi8FY3/fiMOkaUp/:19914:0:99999:7:::
+  bin:*:18353:0:99999:7:::
+  daemon:*:18353:0:99999:7:::
+
+  # 由输出的资料可以发现这两个文件最左边字段都是相同的账号，且以：分隔
+  [root@iZbp13op1xah7j3j1x457dZ ~]# join -t ':' /etc/passwd /etc/shadow | head -n 3
+  root:x:0:0:root:/root:/bin/bash:$6$zwuInQeQ$u6.Loifs73Fyc8OdP9V1xRIg0.gfmEUvCPQxhShyvCiFiYI94UM3WDT/szMMctv3Oy.9XMUi8FY3/fiMOkaUp/:19914:0:99999:7:::
+  bin:x:1:1:bin:/bin:/sbin/nologin:*:18353:0:99999:7:::
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin:*:18353:0:99999:7:::
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  # 通过上面的指令，可以将两个文件第一个字段相同的整合成一行
+  # 第二个文件的相同字段并不会显示（已经在最左边的字段出现了）
+
+  [root@iZbp13op1xah7j3j1x457dZ ~]# head -n 3 /etc/passwd /etc/group
+  ==> /etc/passwd <==
+  root:x:0:0:root:/root:/bin/bash
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  
+  ==> /etc/group <==
+  root:x:0:az
+  bin:x:1:
+  daemon:x:2:
+  [root@iZbp13op1xah7j3j1x457dZ ~]# join -t ':' -1 4 /etc/passwd -2 3 /etc/group | head -n 3
+  0:root:x:0:root:/root:/bin/bash:root:x:az
+  1:bin:x:1:bin:/bin:/sbin/nologin:bin:x:
+  2:daemon:x:2:daemon:/sbin:/sbin/nologin:daemon:x:
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+  在使用join之前，需要处理的文件应该要事先经过排序(sort)处理，否则有些对比的项目会被略过。
+  paste
+  join 必须要比对两个文件的数据相关性，而paste就直接将两行贴在一起，且中间以 tab 键隔开
+  |选项|解释|
+  |---|---|
+  |-d|后面可以接分隔字符。默认是以 tab 来分隔的|
+  |-|如果file部分写成 - ，表示来自 standard input 的资料的意思|
+  
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# paste /etc/passwd /etc/shadow
+  root:x:0:0:root:/root:/bin/bash root:$6$zwuInQeQ$u6.Loifs73Fyc8OdP9V1xRIg0.gfmEUvCPQxhShyvCiFiYI94UM3WDT/szMMctv3Oy.9XMUi8FY3/fiMOkaUp/:19914:0:99999:7:::
+  bin:x:1:1:bin:/bin:/sbin/nologin        bin:*:18353:0:99999:7:::
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin daemon:*:18353:0:99999:7:::
+  adm:x:3:4:adm:/var/adm:/sbin/nologin    adm:*:18353:0:99999:7:::
+  lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin        lp:*:18353:0:99999:7:::
+  sync:x:5:0:sync:/sbin:/bin/sync sync:*:18353:0:99999:7:::
+  shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown    shutdown:*:18353:0:99999:7:::
+  halt:x:7:0:halt:/sbin:/sbin/halt        halt:*:18353:0:99999:7:::
+  mail:x:8:12:mail:/var/spool/mail:/sbin/nologin  mail:*:18353:0:99999:7:::
+  operator:x:11:0:operator:/root:/sbin/nologin    operator:*:18353:0:99999:7:::
+  games:x:12:100:games:/usr/games:/sbin/nologin   games:*:18353:0:99999:7:::
+  ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin     ftp:*:18353:0:99999:7:::
+  nobody:x:99:99:Nobody:/:/sbin/nologin   nobody:*:18353:0:99999:7:::
+  systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin    systemd-network:!!:19804::::::
+  dbus:x:81:81:System message bus:/:/sbin/nologin dbus:!!:19804::::::
+  polkitd:x:999:998:User for polkitd:/:/sbin/nologin      polkitd:!!:19804::::::
+  sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin      sshd:!!:19804::::::
+  postfix:x:89:89::/var/spool/postfix:/sbin/nologin       postfix:!!:19804::::::
+  chrony:x:998:996::/var/lib/chrony:/sbin/nologin chrony:!!:19804::::::
+  nscd:x:28:28:NSCD Daemon:/:/sbin/nologin        nscd:!!:19804::::::
+  tcpdump:x:72:72::/:/sbin/nologin        tcpdump:!!:19804::::::
+  rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin       rpc:!!:19804:0:99999:7:::
+  rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin     rpcuser:!!:19804::::::
+  nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin   nfsnobody:!!:19804::::::
+  nginx:x:997:995:Nginx web server:/var/lib/nginx:/sbin/nologin   nginx:!!:19832::::::
+  gitlab-www:x:996:993::/var/opt/gitlab/nginx:/bin/false  gitlab-www:!!:19894::::::
+  git:x:995:992::/var/opt/gitlab:/bin/sh  git:!!:19894::::::
+  gitlab-redis:x:994:991::/var/opt/gitlab/redis:/bin/false        gitlab-redis:!!:19894::::::
+  gitlab-psql:x:993:990::/var/opt/gitlab/postgresql:/bin/sh       gitlab-psql:!!:19894::::::
+  gitlab-prometheus:x:992:989::/var/opt/gitlab/prometheus:/bin/sh gitlab-prometheus:!!:19894::::::
+  az:x:1000:1000::/home/az:/bin/bash      az:$6$6jdrWNkL$pDRpsYnngHkoFgSUdT1H0FRiae9of69/pyTWMMaFqXe6IiLuEXs5xvmzSTZe88Rm7gtCSDszcH071DkD5t9UP.:19914:0:99999:7:::
+  alex:x:1001:1002::/home/alex:/bin/bash  alex:!!:19930:0:99999:7:::
+  arod:x:1002:1001::/home/arod:/bin/bash  arod:!!:19930:0:99999:7:::
+
+
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# cat /etc/passwd 
+  root:x:0:0:root:/root:/bin/bash
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  adm:x:3:4:adm:/var/adm:/sbin/nologin
+  lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+  sync:x:5:0:sync:/sbin:/bin/sync
+  shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+  halt:x:7:0:halt:/sbin:/sbin/halt
+  mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+  operator:x:11:0:operator:/root:/sbin/nologin
+  games:x:12:100:games:/usr/games:/sbin/nologin
+  ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+  nobody:x:99:99:Nobody:/:/sbin/nologin
+  systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+  dbus:x:81:81:System message bus:/:/sbin/nologin
+  polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+  sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+  postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+  chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+  nscd:x:28:28:NSCD Daemon:/:/sbin/nologin
+  tcpdump:x:72:72::/:/sbin/nologin
+  rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+  rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+  nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin
+  nginx:x:997:995:Nginx web server:/var/lib/nginx:/sbin/nologin
+  gitlab-www:x:996:993::/var/opt/gitlab/nginx:/bin/false
+  git:x:995:992::/var/opt/gitlab:/bin/sh
+  gitlab-redis:x:994:991::/var/opt/gitlab/redis:/bin/false
+  gitlab-psql:x:993:990::/var/opt/gitlab/postgresql:/bin/sh
+  gitlab-prometheus:x:992:989::/var/opt/gitlab/prometheus:/bin/sh
+  az:x:1000:1000::/home/az:/bin/bash
+  alex:x:1001:1002::/home/alex:/bin/bash
+  arod:x:1002:1001::/home/arod:/bin/bash
+
+
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# cat /etc/shadow
+  root:$6$zwuInQeQ$u6.Loifs73Fyc8OdP9V1xRIg0.gfmEUvCPQxhShyvCiFiYI94UM3WDT/szMMctv3Oy.9XMUi8FY3/fiMOkaUp/:19914:0:99999:7:::
+  bin:*:18353:0:99999:7:::
+  daemon:*:18353:0:99999:7:::
+  adm:*:18353:0:99999:7:::
+  lp:*:18353:0:99999:7:::
+  sync:*:18353:0:99999:7:::
+  shutdown:*:18353:0:99999:7:::
+  halt:*:18353:0:99999:7:::
+  mail:*:18353:0:99999:7:::
+  operator:*:18353:0:99999:7:::
+  games:*:18353:0:99999:7:::
+  ftp:*:18353:0:99999:7:::
+  nobody:*:18353:0:99999:7:::
+  systemd-network:!!:19804::::::
+  dbus:!!:19804::::::
+  polkitd:!!:19804::::::
+  sshd:!!:19804::::::
+  postfix:!!:19804::::::
+  chrony:!!:19804::::::
+  nscd:!!:19804::::::
+  tcpdump:!!:19804::::::
+  rpc:!!:19804:0:99999:7:::
+  rpcuser:!!:19804::::::
+  nfsnobody:!!:19804::::::
+  nginx:!!:19832::::::
+  gitlab-www:!!:19894::::::
+  git:!!:19894::::::
+  gitlab-redis:!!:19894::::::
+  gitlab-psql:!!:19894::::::
+  gitlab-prometheus:!!:19894::::::
+  az:$6$6jdrWNkL$pDRpsYnngHkoFgSUdT1H0FRiae9of69/pyTWMMaFqXe6IiLuEXs5xvmzSTZe88Rm7gtCSDszcH071DkD5t9UP.:19914:0:99999:7:::
+  alex:!!:19930:0:99999:7:::
+  arod:!!:19930:0:99999:7:::
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+  expand
+  |选项|解释|
+  |---|---|
+  |-t|后面可以姐数字。一个tab按键可以用8个空格键取代<br>也可以自行定义一个 tab 按键代表多少个字符|
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# grep '^MANPATH' /etc/man_db.conf | head -n 3
+  MANPATH_MAP     /bin                    /usr/share/man
+  MANPATH_MAP     /usr/bin                /usr/share/man
+  MANPATH_MAP     /sbin                   /usr/share/man
+  [root@iZbp13op1xah7j3j1x457dZ ~]# grep '^MANPATH' /etc/man_db.conf | head -n 3 | cat -A
+  MANPATH_MAP^I/bin^I^I^I/usr/share/man$
+  MANPATH_MAP^I/usr/bin^I^I/usr/share/man$
+  MANPATH_MAP^I/sbin^I^I^I/usr/share/man$
+  # 将 tab 按键 设定成 6 个字符
+  [root@iZbp13op1xah7j3j1x457dZ ~]# grep '^MANPATH' /etc/man_db.conf | head -n 3 | expand -t 6 - | cat -A
+  MANPATH_MAP /bin              /usr/share/man$
+  MANPATH_MAP /usr/bin          /usr/share/man$
+  MANPATH_MAP /sbin             /usr/share/man$
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  ```
+  expand 会将tab 转成空格 unexpand 可以将空格转成 tab
+  
+  - 分区命令： split
+  如果文件太大，导致一些携带式的装置无法复制。可以使用split，它可以将一个大文件，根据文件大小或行数来分区，就可以将大文件分区成小文件了。快速又有效
+  
+  |选项|解释|
+  |---|---|
+  |-b|后面可接欲分区的文件大小，可加单位，如：b k m 等|
+  |-l|以行数来进行分区|
+  |PREFIX|代表前导符的意思，可做为分区文件的前导文字|
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# cd /tmp; split -b 300k /etc/services services
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# ll -k services*
+  -rw-r--r-- 1 root root 307200 Aug 19 22:20 servicesaa
+  -rw-r--r-- 1 root root 307200 Aug 19 22:20 servicesab
+  -rw-r--r-- 1 root root  55893 Aug 19 22:20 servicesac
+  [root@iZbp13op1xah7j3j1x457dZ tmp]#
+  # 将上面的三个小文件合并成一个文件，名字为 servicesback
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# cat services* >> servicesback
+  # 查看 / 目录，并将其输出以行数（10行）分区写入 lsroot*中
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# ls -al / | split -l 10 - lsroot
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# wc -l lsroot*
+    10 lsrootaa
+    10 lsrootab
+     5 lsrootac
+    25 total
+  # wc -l 列出行数
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# 
+  ```
+  - 参数代换： xargs
+  给其他命令传递参数的一个过滤器
+  
+  |选项|解释|
+  |---|---|
+  |-0|如果输入的stdin含有特殊字符，如：`,\.空格等字符时，这个参数可以将他还原成一般字符。这个参数可以用于特殊状态|
+  |-e|这个是EOF（end of file）的意思。后面可以接一个字符串，档xargs分析到这个字符串时，就会停止继续工作|
+  |-p|在执行每个指令的argument时，都会询问使用者的意思|
+  |-n|后面接次数，每次command指令执行时，要使用几个参数的意思|
+  档xargs后面没有接任何的指令时，默认是以echo来进行输出的
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# cut -d ':' -f 1 /etc/passwd | xargs -e'sync' -n 1 id
+  uid=0(root) gid=0(root) groups=0(root)
+  uid=1(bin) gid=1(bin) groups=1(bin)
+  uid=2(daemon) gid=2(daemon) groups=2(daemon)
+  uid=3(adm) gid=4(adm) groups=4(adm)
+  uid=4(lp) gid=7(lp) groups=7(lp)
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# 
+
+
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# find /usr/sbin -perm /7000 | xargs ls -l
+  -rwsr-xr-x  1 root root     117432 Oct 14  2021 /usr/sbin/mount.nfs
+  -rwxr-sr-x  1 root root      11224 Nov 17  2020 /usr/sbin/netreport
+  -rwsr-xr-x. 1 root root      11232 Apr  1  2020 /usr/sbin/pam_timestamp_check
+  -rwxr-sr-x. 1 root postdrop 218560 Apr  1  2020 /usr/sbin/postdrop
+  -rwxr-sr-x. 1 root postdrop 264128 Apr  1  2020 /usr/sbin/postqueue
+  -rwsr-xr-x. 1 root root      36272 Apr  1  2020 /usr/sbin/unix_chkpwd
+  -rwsr-xr-x  1 root root      11296 Nov 17  2020 /usr/sbin/usernetctl
+  [root@iZbp13op1xah7j3j1x457dZ tmp]# 
+
+  ```
+  - 关于减号 - 用途
+  在管线命令当中，常常会使用到前一个指令的stdout作为这次的stdin，某些指令需要用到文件名来进行处理时，该stdin与stdout可以利用减号 - 来替代
+
+  将/home里面的文件给它打包，但打包的数据不是记录到文件，而是传送到stdout；经过管线后，将 tar -cvf - /home 传送给后面的 tar -xvf -。 后面的这个 - 则是取用前一个指令的stdout，故，不需要使用filename。
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# tar -cvf - /home | tar -xvf - -C /tmp/homeback
+  tar: Removing leading `/' from member names
+  /home/
+  /home/arod/
+  /home/arod/.bash_history
+  /home/arod/.bashrc
+  /home/arod/.bash_logout
+  /home/arod/.bash_profile
+  /home/alex/
+  /home/alex/.bash_history
+  /home/alex/.bashrc
+  /home/alex/.bash_logout
+  /home/alex/.bash_profile
+  /home/az/
+  /home/az/homefile
+  /home/az/bashrc
+  home/
+  home/arod/
+  home/arod/.bash_history
+  home/arod/.bashrc
+  home/arod/.bash_logout
+  home/arod/.bash_profile
+  home/alex/
+  home/alex/.bash_history
+  home/alex/.bashrc
+  home/alex/.bash_logout
+  home/alex/.bash_profile
+  /home/az/.bash_history
+  /home/az/.viminfo
+  home/az/
+  /home/az/list_error
+  /home/az/list_right
+  /home/az/passwd
+  /home/az/.bashrc
+  /home/az/catfile
+  /home/az/text1.txt
+  home/az/homefile
+  home/az/bashrc
+  home/az/.bash_history
+  home/az/.viminfo
+  home/az/list_error
+  home/az/list_right
+  home/az/passwd
+  home/az/.bashrc
+  /home/az/.bash_logout
+  /home/az/.bash_profile
+  /home/az/last.list
+  /home/az/rootfile
+  home/az/catfile
+  home/az/text1.txt
+  home/az/.bash_logout
+  home/az/.bash_profile
+  home/az/last.list
+  home/az/rootfile
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
