@@ -1077,14 +1077,14 @@ file locks                      (-x) unlimited
   |()|在中间为子 shell 的起始与结束|
   |{}|在中间为命令区块的组合|
 
-- 数据流重导向（redirect）： 将数据给它传导到其他地方
-  数据流重导向就是将某个指令执行后应该要出现在屏幕上的数据，给他传输到其他的地方
+### 数据流重导向（redirect）： 将数据给它传导到其他地方
+ #### 数据流重导向就是将某个指令执行后应该要出现在屏幕上的数据，给他传输到其他的地方
   ```mermaid
   flowchart LR
       A(file)-->|Standard input STDIN <, <<|B(Command)-->|Standard output STDOUT >, >>|C(screen file/device)
       B-->|standard error output STDERR 2>, 2>>|D(screen file/device)
   ```
-  - standard output 与 standard error output
+   standard output 与 standard error output
     标准输出： 指令执行所回传的正确的信息
     标志错误输出：指令执行失败后，所回传的错误信息
     数据流重导向可以将standard output与standard error output 分别传送到其他文件或装置中
@@ -1257,7 +1257,7 @@ file locks                      (-x) unlimited
     > eof
     [az@iZbp13op1xah7j3j1x457dZ ~]$ 
     ```
-- 命令执行的判断依据： ;,&&,||
+#### 命令执行的判断依据： ;,&&,||
   - cmd: cmd(不考虑指令相关性的连续指令下达)
     指令与指令中间利用分号（;）来隔开
     ```shell
@@ -1283,14 +1283,14 @@ file locks                      (-x) unlimited
 
   ```
     
-- 管线命令（pipe）
+### 管线命令（pipe）
   管线命令仅会处理standard output，对于standard error output会给予忽略
   管线命令必须要能够接受来自一个指令的数据成为standard input继续处理才行
   ```shell
   [az@iZbp13op1xah7j3j1x457dZ ~]$ ls -al /etc | less
   ```
-  - 截取命令： cut，grep
-  cut： 在一行信息中，取出某部分我们想要的
+  #### 截取命令： cut，grep
+  - cut： 在一行信息中，取出某部分我们想要的
   |选项|解释|
   |---|---|
   |-d|后面接分隔字符。 与-f一起使用|
@@ -1501,7 +1501,7 @@ file locks                      (-x) unlimited
   ```
   若是处理多个空格相连的数据时，就会比较不容易了
 
-  grep：分析一行信息，若当中有我们需要的信息，就将该行拿出来
+  - grep：分析一行信息，若当中有我们需要的信息，就将该行拿出来
 
   |选项|解释|
   |---|---|
@@ -1665,8 +1665,8 @@ file locks                      (-x) unlimited
   [az@iZbp13op1xah7j3j1x457dZ ~]$ 
   ```
   
-  - 排序命令： sort，wc， uniq
-   sort排序
+  ####  排序命令： sort，wc， uniq
+   - sort排序
   
   |选项|解释|
   |---|---|
@@ -1827,7 +1827,7 @@ file locks                      (-x) unlimited
   [az@iZbp13op1xah7j3j1x457dZ ~]$ 
   ```
   
-  uniq 重复的资料仅列一行显示
+  - uniq 重复的资料仅列一行显示
 
   |选项|解释|
   |---|---|
@@ -1848,7 +1848,7 @@ file locks                      (-x) unlimited
   [az@iZbp13op1xah7j3j1x457dZ ~]$ 
   ```
 
-  wc 文件中有多少字？ 多少行？ 多少字符？
+  - wc 文件中有多少字？ 多少行？ 多少字符？
 
   |选项|解释|
   |---|---|
@@ -1868,7 +1868,7 @@ file locks                      (-x) unlimited
 
   ```
   
-  - 双向重导向： tee
+  #### 双向重导向： tee
   会同时将数据流分送到文件去与屏幕（screen）；而输出到屏幕的，其实就是stdout。
   
   |选项|解释|
@@ -2021,9 +2021,9 @@ file locks                      (-x) unlimited
   wtmp begins Fri Mar 22 11:34:39 2024
   [az@iZbp13op1xah7j3j1x457dZ ~]$ 
   ```
-  - 字符转换命令： tr, col, join, paste, expand
+  ####  字符转换命令： tr, col, join, paste, expand
      在vim程序编辑器中，DOS断行字符与Unix断行字符不同，可以使用`dos2unix` 与 `unix2dos`来完成转换。
-    tr 可以用来删除一段信息当中的文字，或者是进行文字信息的替换
+    - tr 可以用来删除一段信息当中的文字，或者是进行文字信息的替换
 
   |选项|解释|
   |---|---|
@@ -2135,7 +2135,7 @@ file locks                      (-x) unlimited
   arodx10021001/home/arod/bin/bash
   [az@iZbp13op1xah7j3j1x457dZ ~]$ 
   ```
-  col
+  - col
   |选项|解释|
   |---|---|
   |-x|将tab键转换成对等的空格键|
@@ -2403,7 +2403,7 @@ file locks                      (-x) unlimited
   -------------------------------------------------------------------------------
   --More--
   ```
-  join 处理两个文件当中，有“相同数据”的那一行，才将它加在一起
+  - join 处理两个文件当中，有“相同数据”的那一行，才将它加在一起
   |选项|解释|
   |---|---|
   |-t|join默认以空格符分隔数据，并且比对 第一个字段 的数据，<br> 如果两个文件相同，则将两笔数据联成一行，且第一个字段放在第一个|
@@ -2450,7 +2450,7 @@ file locks                      (-x) unlimited
   [root@iZbp13op1xah7j3j1x457dZ ~]# 
   ```
   在使用join之前，需要处理的文件应该要事先经过排序(sort)处理，否则有些对比的项目会被略过。
-  paste
+  - paste
   join 必须要比对两个文件的数据相关性，而paste就直接将两行贴在一起，且中间以 tab 键隔开
   |选项|解释|
   |---|---|
@@ -2568,7 +2568,7 @@ file locks                      (-x) unlimited
   arod:!!:19930:0:99999:7:::
   [root@iZbp13op1xah7j3j1x457dZ ~]# 
   ```
-  expand
+  - expand
   |选项|解释|
   |---|---|
   |-t|后面可以姐数字。一个tab按键可以用8个空格键取代<br>也可以自行定义一个 tab 按键代表多少个字符|
@@ -2591,7 +2591,7 @@ file locks                      (-x) unlimited
   ```
   expand 会将tab 转成空格 unexpand 可以将空格转成 tab
   
-  - 分区命令： split
+  #### 分区命令： split
   如果文件太大，导致一些携带式的装置无法复制。可以使用split，它可以将一个大文件，根据文件大小或行数来分区，就可以将大文件分区成小文件了。快速又有效
   
   |选项|解释|
@@ -2618,7 +2618,7 @@ file locks                      (-x) unlimited
   # wc -l 列出行数
   [root@iZbp13op1xah7j3j1x457dZ tmp]# 
   ```
-  - 参数代换： xargs
+  #### 参数代换： xargs
   给其他命令传递参数的一个过滤器
   
   |选项|解释|
@@ -2649,7 +2649,7 @@ file locks                      (-x) unlimited
   [root@iZbp13op1xah7j3j1x457dZ tmp]# 
 
   ```
-  - 关于减号 - 用途
+  #### 关于减号 - 用途
   在管线命令当中，常常会使用到前一个指令的stdout作为这次的stdin，某些指令需要用到文件名来进行处理时，该stdin与stdout可以利用减号 - 来替代
 
   将/home里面的文件给它打包，但打包的数据不是记录到文件，而是传送到stdout；经过管线后，将 tar -cvf - /home 传送给后面的 tar -xvf -。 后面的这个 - 则是取用前一个指令的stdout，故，不需要使用filename。
