@@ -755,5 +755,1277 @@ file locks                      (-x) unlimited
       - \~/.bash_history
       - \~/.bash_logout : 当注销bash后，系统需要处理完其他这些任务才能离开    
 - 终端机的环境设定：stty，set
+  在tty1~tty6这六个文件接口的终端机环境中登录的时候可以取得一下字符设定的功能。如：使用backspace来删除命令行上的字符，使用ctrl+c 强制终止一个指令的运行，当输入错误时，会有警告声等等。这是因为登录终端机的时候，会自动取得一些终端机的输入环境的设定。
+  ```shell
+  # stty 即 setting tty
+  [root@iZbp13op1xah7j3j1x457dZ ~]# stty -a
+  speed 38400 baud; rows 19; columns 98; line = 0;
+  intr = ^C; quit = ^\; erase = ^?; kill = ^U; eof = ^D; eol = M-^?; eol2 = M-^?; swtch = <undef>;
+  start = ^Q; stop = ^S; susp = ^Z; rprnt = ^R; werase = ^W; lnext = ^V; flush = ^O;
+  min = 1; time = 0;
+  -parenb -parodd -cmspar cs8 hupcl -cstopb cread -clocal -crtscts
+  -ignbrk brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr icrnl ixon -ixoff -iuclc ixany imaxbel
+  iutf8
+  opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
+  isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+  - intr：发送一个interrupt（中断）的信号给目前正在run的程序      [Ctrl] +　C
+  - quit：发送一个quit的信号给目前正在run的程序      [Ctrl] +　\
+  - erase：向后删除字符      [Ctrl] +　?
+  - kill：删除在目前指令列上的所有文字      [Ctrl] +　U
+  - eof：End of file ，代表结束输入      [Ctrl] +　D
+  - start：在某个程序停止后，重新启动它的output      [Ctrl] +　Q
+  - stop：停止目前屏幕的输出      [Ctrl] +　S
+  - susp：发送一个terminal stop 的信号给正在run的程序      [Ctrl] +　Z
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# stty erase ^h # 自定义快捷键
+  ```
+  其他终端机设置的方式： set
+
+  |选项|解释|
+  |---|---|
+  |-u|默认不启用。若启用，当使用未设定变量时，会显示错误信息|
+  |-v|默认不启用。若启用，在信息被输出前，会先显示信息的原始内容|
+  |-x|默认不启用。若启用，在指令被执行前，会显示指令内容（前面有++符号）|
+  |-h|默认启用。与历史命令有关|
+  |-H|默认启用。与历史命令有关|
+  |-m|默认启用。与工作管理有关|
+  |-B|默认启用。与[]的作用有关|
+  |-C|默认不启用。若使用>等，则若文件存在时，该文件不会被覆盖|
+  
+  ```shell
+  # 显示目前所有的set设定值
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo $-
+  himBH
+  # $- 变量内容就是set的所有设定。 bash预设是himBH
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  # 默认情况下 -u 不开启，所有未设定的变量为空
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo $vbirding
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# set－ｕ
+  bash: set－ｕ: command not found
+  # 使用未设定的变量时，会显示错误信息
+  [root@iZbp13op1xah7j3j1x457dZ ~]# set -u
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo $vbirding
+  bash: vbirding: unbound variable
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+
+  root@iZbp13op1xah7j3j1x457dZ ~]# echo ${HOME}
+  /root
+  [root@iZbp13op1xah7j3j1x457dZ ~]# set -x
+  +++ __vsc_preexec_only -x
+  +++ '[' 1 = 0 ']'
+  ++ __vsc_prompt_cmd_original
+  ++ __vsc_status=0
+  ++ __vsc_restore_exit_code 0
+  ++ return 0
+  ++ for cmd in '"${__vsc_original_prompt_command[@]}"'
+  ++ eval 'printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"'
+  +++ printf '\033]0;%s@%s:%s\007' root iZbp13op1xah7j3j1x457dZ '~'
+  ++ __vsc_precmd
+  ++ __vsc_command_complete 0
+  ++ '[' 'set -x' = '' ']'
+  ++ builtin printf '\e]633;D;%s\a' 0
+  ++ __vsc_update_cwd
+  +++ __vsc_escape_value /root
+  +++ '[' 5 -ge 2000 ']'
+  +++ builtin local LC_ALL=C str=/root i byte token out=
+  +++ (( i=0 ))
+  +++ (( i < 5 ))
+  +++ byte=/
+  +++ '[' / = '\' ']'
+  +++ '[' / = ';' ']'
+  +++ token=/
+  +++ out+=/
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=r
+  +++ '[' r = '\' ']'
+  +++ '[' r = ';' ']'
+  +++ token=r
+  +++ out+=r
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=o
+  +++ '[' o = '\' ']'
+  +++ '[' o = ';' ']'
+  +++ token=o
+  +++ out+=o
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=o
+  +++ '[' o = '\' ']'
+  +++ '[' o = ';' ']'
+  +++ token=o
+  +++ out+=o
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=t
+  +++ '[' t = '\' ']'
+  +++ '[' t = ';' ']'
+  +++ token=t
+  +++ out+=t
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ builtin printf '%s\n' /root
+  ++ builtin printf '\e]633;P;Cwd=%s\a' /root
+  ++ __vsc_current_command=
+  ++ __vsc_update_prompt
+  ++ '[' 1 = 1 ']'
+  ++ [[ \[\][\u@\h \W]\$ \[\] == '' ]]
+  ++ [[ \[\][\u@\h \W]\$ \[\] != \\\[\]\6\3\3\;\A\\\\]\[\\\u\@\\\h\ \\\W\]\\\$\ \\\[\]\6\3\3\;\B\\\\] ]]
+  ++ [[ \[\]> \[\] == '' ]]
+  ++ [[ \[\]> \[\] != \\\[\]\6\3\3\;\F\\\\]\>\ \\\[\]\6\3\3\;\G\\\\] ]]
+  ++ __vsc_in_command_execution=0
+
+  
+  [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${HOME}
+  ++ __vsc_preexec_only -x
+  ++ '[' 0 = 0 ']'
+  ++ __vsc_in_command_execution=1
+  ++ __vsc_preexec
+  ++ __vsc_initialized=1
+  ++ [[ ! echo ${HOME} == __vsc_prompt* ]]
+  ++ '[' 0 = 1 ']'
+  ++ __vsc_current_command='echo ${HOME}'
+  ++ __vsc_command_output_start
+  ++ builtin printf '\e]633;C\a'
+  +++ __vsc_escape_value 'echo ${HOME}'
+  +++ '[' 12 -ge 2000 ']'
+  +++ builtin local LC_ALL=C 'str=echo ${HOME}' i byte token out=
+  +++ (( i=0 ))
+  +++ (( i < 12 ))
+  +++ byte=e
+  +++ '[' e = '\' ']'
+  +++ '[' e = ';' ']'
+  +++ token=e
+  +++ out+=e
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=c
+  +++ '[' c = '\' ']'
+  +++ '[' c = ';' ']'
+  +++ token=c
+  +++ out+=c
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=h
+  +++ '[' h = '\' ']'
+  +++ '[' h = ';' ']'
+  +++ token=h
+  +++ out+=h
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=o
+  +++ '[' o = '\' ']'
+  +++ '[' o = ';' ']'
+  +++ token=o
+  +++ out+=o
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=' '
+  +++ '[' ' ' = '\' ']'
+  +++ '[' ' ' = ';' ']'
+  +++ token=' '
+  +++ out+=' '
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte='$'
+  +++ '[' '$' = '\' ']'
+  +++ '[' '$' = ';' ']'
+  +++ token='$'
+  +++ out+='$'
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte='{'
+  +++ '[' '{' = '\' ']'
+  +++ '[' '{' = ';' ']'
+  +++ token='{'
+  +++ out+='{'
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=H
+  +++ '[' H = '\' ']'
+  +++ '[' H = ';' ']'
+  +++ token=H
+  +++ out+=H
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=O
+  +++ '[' O = '\' ']'
+  +++ '[' O = ';' ']'
+  +++ token=O
+  +++ out+=O
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=M
+  +++ '[' M = '\' ']'
+  +++ '[' M = ';' ']'
+  +++ token=M
+  +++ out+=M
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte=E
+  +++ '[' E = '\' ']'
+  +++ '[' E = ';' ']'
+  +++ token=E
+  +++ out+=E
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ byte='}'
+  +++ '[' '}' = '\' ']'
+  +++ '[' '}' = ';' ']'
+  +++ token='}'
+  +++ out+='}'
+  +++ (( ++i  ))
+  +++ (( i < 12 ))
+  +++ builtin printf '%s\n' 'echo ${HOME}'
+  ++ builtin printf '\e]633;E;%s;%s\a' 'echo ${HOME}' 9f04bede-f3e7-4945-bb97-1397f4f4e115
+  + echo /root
+  /root
+  +++ __vsc_preexec_only /root
+  +++ '[' 1 = 0 ']'
+  ++ __vsc_prompt_cmd_original
+  ++ __vsc_status=0
+  ++ __vsc_restore_exit_code 0
+  ++ return 0
+  ++ for cmd in '"${__vsc_original_prompt_command[@]}"'
+  ++ eval 'printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"'
+  +++ printf '\033]0;%s@%s:%s\007' root iZbp13op1xah7j3j1x457dZ '~'
+  ++ __vsc_precmd
+  ++ __vsc_command_complete 0
+  ++ '[' 'echo ${HOME}' = '' ']'
+  ++ builtin printf '\e]633;D;%s\a' 0
+  ++ __vsc_update_cwd
+  +++ __vsc_escape_value /root
+  +++ '[' 5 -ge 2000 ']'
+  +++ builtin local LC_ALL=C str=/root i byte token out=
+  +++ (( i=0 ))
+  +++ (( i < 5 ))
+  +++ byte=/
+  +++ '[' / = '\' ']'
+  +++ '[' / = ';' ']'
+  +++ token=/
+  +++ out+=/
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=r
+  +++ '[' r = '\' ']'
+  +++ '[' r = ';' ']'
+  +++ token=r
+  +++ out+=r
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=o
+  +++ '[' o = '\' ']'
+  +++ '[' o = ';' ']'
+  +++ token=o
+  +++ out+=o
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=o
+  +++ '[' o = '\' ']'
+  +++ '[' o = ';' ']'
+  +++ token=o
+  +++ out+=o
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ byte=t
+  +++ '[' t = '\' ']'
+  +++ '[' t = ';' ']'
+  +++ token=t
+  +++ out+=t
+  +++ (( ++i  ))
+  +++ (( i < 5 ))
+  +++ builtin printf '%s\n' /root
+  ++ builtin printf '\e]633;P;Cwd=%s\a' /root
+  ++ __vsc_current_command=
+  ++ __vsc_update_prompt
+  ++ '[' 1 = 1 ']'
+  ++ [[ \[\][\u@\h \W]\$ \[\] == '' ]]
+  ++ [[ \[\][\u@\h \W]\$ \[\] != \\\[\]\6\3\3\;\A\\\\]\[\\\u\@\\\h\ \\\W\]\\\$\ \\\[\]\6\3\3\;\B\\\\] ]]
+  ++ [[ \[\]> \[\] == '' ]]
+  ++ [[ \[\]> \[\] != \\\[\]\6\3\3\;\F\\\\]\>\ \\\[\]\6\3\3\;\G\\\\] ]]
+  ++ __vsc_in_command_execution=0
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
 - 通配符与特殊符号
+
+  |符号|意义|
+  |---|---|
+  |*|代表 0 到 无穷多个 任意字符|
+  |?|代表 一定有一个 任意字符|
+  |[]|代表一定有一个在括号内的字符（非任意字符）。如 [abcd]代表 一定有一个字符，可能是a, b, c, d 这四个任何一个|
+  |[-]|代表 在编码顺序内的所有字符 如 [0-9] 代表0 - 9 之间的所有数字，因为数字的语系是编码连续的|
+  |[^]|代表反向选择 如[^abc]代表一定有一个字符，只要是非a，b， c的其他字符就解说|
+  |#|批注符合：这个最常被使用在script当中|
+  |\|跳脱符号：将 特殊字符或通配符 还原成一般字符|
+  |||管线（pipe）：分隔两个管线命令的界定|
+  |;|连续指令下达分隔符：连续性命令的界定|
+  |~|用户的家目录|
+  |$|取用变数前导符：即变量之前需要加的变量取代值|
+  |&|工作控制：将指令变成背景下工作|
+  |!|逻辑运算意义上的 非|
+  |/|目录符合：路径分隔的符合|
+  |>, >>|数据流重导向：输出导向，分别是取代与累加|
+  |<, <<|数据流重导向： 输入导向|
+  |''|单引号，不具有变量置换功能（$变为纯文本）|
+  |""|具有变量置换的功能（$可保留相关功能）|
+  |``|两个 ` 中间为可以先执行的指令，也可使用 ${}|
+  |()|在中间为子 shell 的起始与结束|
+  |{}|在中间为命令区块的组合|
+
+- 数据流重导向（redirect）： 将数据给它传导到其他地方
+  数据流重导向就是将某个指令执行后应该要出现在屏幕上的数据，给他传输到其他的地方
+  ```mermaid
+  flowchart LR
+      A(file)-->|Standard input STDIN <, <<|B(Command)-->|Standard output STDOUT >, >>|C(screen file/device)
+      B-->|standard error output STDERR 2>, 2>>|D(screen file/device)
+  ```
+  - standard output 与 standard error output
+    标准输出： 指令执行所回传的正确的信息
+    标志错误输出：指令执行失败后，所回传的错误信息
+    数据流重导向可以将standard output与standard error output 分别传送到其他文件或装置中
+    1. 标准输入 （stdin）：代码为0， 使用 < 或 <<;
+    2. 标准输出 （stdout）：代码为1， 使用 > 或 >>;
+    3. 标准错误输出（stderr）：代码为2， 使用2> 或 2>>;
+    ```shell
+    [az@iZbp13op1xah7j3j1x457dZ root]$ ll /
+    total 64
+    lrwxrwxrwx.   1 root root     7 Mar 22 11:16 bin -> usr/bin
+    dr-xr-xr-x.   5 root root  4096 Apr 19 09:53 boot
+    drwxr-xr-x   19 root root  3000 Aug  1 22:52 dev
+    drwxr-xr-x.  81 root root  4096 Aug 17 22:07 etc
+    drwxr-xr-x.   5 root root  4096 Jul 26 16:21 home
+    lrwxrwxrwx.   1 root root     7 Mar 22 11:16 lib -> usr/lib
+    lrwxrwxrwx.   1 root root     9 Mar 22 11:16 lib64 -> usr/lib64
+    drwx------.   2 root root 16384 Mar 22 11:16 lost+found
+    drwxr-xr-x.   2 root root  4096 Apr 11  2018 media
+    drwxr-xr-x.   2 root root  4096 Apr 11  2018 mnt
+    drwxr-xr-x.   2 root root  4096 Jun 23 01:53 opt
+    dr-xr-xr-x  111 root root     0 Jun 22 23:25 proc
+    dr-xr-x---.  11 root root  4096 Aug 17 22:50 root
+    drwxr-xr-x   26 root root   800 Aug  6 22:09 run
+    lrwxrwxrwx.   1 root root     8 Mar 22 11:16 sbin -> usr/sbin
+    drwxr-xr-x.   3 root root  4096 Aug  1 22:43 srv
+    dr-xr-xr-x   13 root root     0 Jul 12 16:27 sys
+    drwxrwxrwt.  10 root root  4096 Aug 19 11:12 tmp
+    drwxr-xr-x.  13 root root  4096 Mar 22 11:16 usr
+    drwxr-xr-x.  19 root root  4096 Mar 22 03:20 var
+    drwxr-xr-x    6 root root  4096 Jun 22 22:21 web
+    [az@iZbp13op1xah7j3j1x457dZ root]$ ll / > ~/rootfile
+    [az@iZbp13op1xah7j3j1x457dZ root]$ ll ~/rootfile
+    -rw-rw-r-- 1 az az 1101 Aug 19 15:26 /home/az/rootfile
+    [az@iZbp13op1xah7j3j1x457dZ root]$
+    [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/rootfile
+    total 64
+    lrwxrwxrwx.   1 root root     7 Mar 22 11:16 bin -> usr/bin
+    dr-xr-xr-x.   5 root root  4096 Apr 19 09:53 boot
+    drwxr-xr-x   19 root root  3000 Aug  1 22:52 dev
+    drwxr-xr-x.  81 root root  4096 Aug 17 22:07 etc
+    drwxr-xr-x.   5 root root  4096 Jul 26 16:21 home
+    lrwxrwxrwx.   1 root root     7 Mar 22 11:16 lib -> usr/lib
+    lrwxrwxrwx.   1 root root     9 Mar 22 11:16 lib64 -> usr/lib64
+    drwx------.   2 root root 16384 Mar 22 11:16 lost+found
+    drwxr-xr-x.   2 root root  4096 Apr 11  2018 media
+    drwxr-xr-x.   2 root root  4096 Apr 11  2018 mnt
+    drwxr-xr-x.   2 root root  4096 Jun 23 01:53 opt
+    dr-xr-xr-x  113 root root     0 Jun 22 23:25 proc
+    dr-xr-x---.  11 root root  4096 Aug 17 22:50 root
+    drwxr-xr-x   26 root root   800 Aug  6 22:09 run
+    lrwxrwxrwx.   1 root root     8 Mar 22 11:16 sbin -> usr/sbin
+    drwxr-xr-x.   3 root root  4096 Aug  1 22:43 srv
+    dr-xr-xr-x   13 root root     0 Jul 12 16:27 sys
+    drwxrwxrwt.  10 root root  4096 Aug 19 11:12 tmp
+    drwxr-xr-x.  13 root root  4096 Mar 22 11:16 usr
+    drwxr-xr-x.  19 root root  4096 Mar 22 03:20 var
+    drwxr-xr-x    6 root root  4096 Jun 22 22:21 web
+    [az@iZbp13op1xah7j3j1x457dZ root]$
+
+    # > 会将输出到一个已经存在的文件中的数据覆盖掉
+    [az@iZbp13op1xah7j3j1x457dZ root]$ ll /home > ~/rootfile
+    [az@iZbp13op1xah7j3j1x457dZ root]$ ll ~/rootfile
+    -rw-rw-r-- 1 az az 154 Aug 19 15:32 /home/az/rootfile
+    [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/rootfile
+    total 12
+    drwx------ 2 alex alex    4096 Jul 26 16:31 alex
+    drwx------ 2 arod project 4096 Jul 26 16:31 arod
+    drwx------ 2 az   az      4096 Aug 19 15:26 az
+    [az@iZbp13op1xah7j3j1x457dZ root]$
+    # 如果需要追加，而不是覆盖掉原本的数据 可以使用 >>
+    [az@iZbp13op1xah7j3j1x457dZ root]$ ll / >> ~/rootfile
+    [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/rootfile
+    total 12
+    drwx------ 2 alex alex    4096 Jul 26 16:31 alex
+    drwx------ 2 arod project 4096 Jul 26 16:31 arod
+    drwx------ 2 az   az      4096 Aug 19 15:26 az
+    total 64
+    lrwxrwxrwx.   1 root root     7 Mar 22 11:16 bin -> usr/bin
+    dr-xr-xr-x.   5 root root  4096 Apr 19 09:53 boot
+    drwxr-xr-x   19 root root  3000 Aug  1 22:52 dev
+    drwxr-xr-x.  81 root root  4096 Aug 17 22:07 etc
+    drwxr-xr-x.   5 root root  4096 Jul 26 16:21 home
+    lrwxrwxrwx.   1 root root     7 Mar 22 11:16 lib -> usr/lib
+    lrwxrwxrwx.   1 root root     9 Mar 22 11:16 lib64 -> usr/lib64
+    drwx------.   2 root root 16384 Mar 22 11:16 lost+found
+    drwxr-xr-x.   2 root root  4096 Apr 11  2018 media
+    drwxr-xr-x.   2 root root  4096 Apr 11  2018 mnt
+    drwxr-xr-x.   2 root root  4096 Jun 23 01:53 opt
+    dr-xr-xr-x  111 root root     0 Jun 22 23:25 proc
+    dr-xr-x---.  11 root root  4096 Aug 17 22:50 root
+    drwxr-xr-x   26 root root   800 Aug  6 22:09 run
+    lrwxrwxrwx.   1 root root     8 Mar 22 11:16 sbin -> usr/sbin
+    drwxr-xr-x.   3 root root  4096 Aug  1 22:43 srv
+    dr-xr-xr-x   13 root root     0 Jul 12 16:27 sys
+    drwxrwxrwt.  10 root root  4096 Aug 19 11:12 tmp
+    drwxr-xr-x.  13 root root  4096 Mar 22 11:16 usr
+    drwxr-xr-x.  19 root root  4096 Mar 22 03:20 var
+    drwxr-xr-x    6 root root  4096 Jun 22 22:21 web
+    [az@iZbp13op1xah7j3j1x457dZ root]$ 
+    ```
+    - 1>:以覆盖的方法将【正确的数据】输出到指定的文件或装置上；
+    - 1>>:以累加的方法将【正确的数据】输出到指定的文件或装置上；
+    - 2>:以覆盖的方法将【错误的数据】输出到指定的文件或装置上；
+    - 2>>:以累加的方法将【错误的数据】输出到指定的文件或装置上；
+    ```shell
+    [az@iZbp13op1xah7j3j1x457dZ root]$ find /home -name .bashrc
+    find: ‘/home/arod’: Permission denied      # Standard error output
+    find: ‘/home/alex’: Permission denied      # Standard error output
+    /home/az/.bashrc      # Standard output
+    [az@iZbp13op1xah7j3j1x457dZ root]$
+    [az@iZbp13op1xah7j3j1x457dZ root]$ find /home -name .bashrc > ~/list_right 2> ~/list_error
+    [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/list_right
+    /home/az/.bashrc
+    [az@iZbp13op1xah7j3j1x457dZ root]$ cat ~/list_error
+    find: ‘/home/arod’: Permission denied
+    find: ‘/home/alex’: Permission denied
+    [az@iZbp13op1xah7j3j1x457dZ root]$ 
+    ```
+  - /dev/null 垃圾通黑洞装置与特殊写法
+    如果知道错误信息会发生，所有要将错误信息忽略掉而不显示或存储。/dev/null 可以吃掉任何导向这个装置的信息
+    ```shell
+    [az@iZbp13op1xah7j3j1x457dZ root]$ find /home -name .bashrc 2> /dev/null
+    /home/az/.bashrc
+    [az@iZbp13op1xah7j3j1x457dZ root]$
+    # 将正确与错误数据写入同一个文件中
+    [az@iZbp13op1xah7j3j1x457dZ root]$ find /home -name .bashrc > list  2> list # 错误 由于两股数据同时写入同一个文件，有没有使用特殊的语法，此时两股数据可能会交叉写入该文件内，造成次序的错乱
+    [az@iZbp13op1xah7j3j1x457dZ root]$ find /home -name .bashrc > list  2>&1    # 正确
+    [az@iZbp13op1xah7j3j1x457dZ root]$ find /home -name .bashrc &> list         # 错误
+    ```
+  - standard input： < 与 <<
+    将原本需要由键盘输入的数据，改由文件内容取代
+    ```shell
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat > catfile
+    testing 
+    cat file test
+    tty ^\Quit
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat catfile
+    testing 
+    cat file test
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat >> catfile
+    test tow
+    测试终端机的环境设定 stty tty
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat catfile
+    testing 
+    cat file test
+    test tow
+    测试终端机的环境设定 stty tty
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat > catfile < ~/.bashrc
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ ll catfile ~/.bashrc
+    -rw-rw-r-- 1 az az 231 Aug 19 16:01 catfile
+    -rw-r--r-- 1 az az 231 Nov 25  2021 /home/az/.bashrc
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat catfile
+    # .bashrc
+    
+    # Source global definitions
+    if [ -f /etc/bashrc ]; then
+            . /etc/bashrc
+    fi
+    
+    # Uncomment the following line if you don't like systemctl's auto-paging feature:
+    # export SYSTEMD_PAGER=
+    
+    # User specific aliases and functions
+    [az@iZbp13op1xah7j3j1x457dZ ~]$
+
+    # 关键词结束，当输入这个关键词时便会退出
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ cat > catfile << 'eof'
+    > this is a test
+    > OK now stop
+    > eof
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+    ```
+- 命令执行的判断依据： ;,&&,||
+  - cmd: cmd(不考虑指令相关性的连续指令下达)
+    指令与指令中间利用分号（;）来隔开
+    ```shell
+    [az@iZbp13op1xah7j3j1x457dZ ~]$ sync; sync; shutdown -h now
+    ```
+  - $?(指令回传值)与&& 或 ||
+    若前一个指令执行的结果为正确，在linux底下会回传一个$?=0的值
+
+  |指令下达的情况|说明|
+  |---|---|
+  |cmd1 && cmd2|若cmd1执行完毕且正确执行（$?=0），则开始执行cmd2。<br> 若cmd1执行完毕且为错误（$?!=0），则cmd2不执行|
+  |cmd1||cmd2|若cmd1执行完毕且正确执行($?=0)，则cmd2不执行。<br>若cmd1执行完毕且为错误($?!=0)，则开始执行cmd2|
+  ```shell
+  # 若/tmp/abc是否存在，若存在则用 touch 建立 /tmp/abc/hehe
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ls /tmp/abc && touch /tmp/abc/hehe
+  ls: cannot access /tmp/abc: No such file or directory
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ mkdir /tmp/abc
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ls /tmp/abc && touch /tmp/abc/hehe
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ll /tmp/abc
+  total 0
+  -rw-rw-r-- 1 az az 0 Aug 19 16:43 hehe
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+
+  ```
+    
+- 管线命令（pipe）
+  管线命令仅会处理standard output，对于standard error output会给予忽略
+  管线命令必须要能够接受来自一个指令的数据成为standard input继续处理才行
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ls -al /etc | less
+  ```
+  - 截取命令： cut，grep
+  cut： 在一行信息中，取出某部分我们想要的
+  |选项|解释|
+  |---|---|
+  |-d|后面接分隔字符。 与-f一起使用|
+  |-f|根据-d的分隔字符将一段信息分区成为数段，用-f取出第几段的意思|
+  |-c|以字符的单位取出固定字符区间|
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ echo ${PATH}
+  /root/.vscode-server/bin/019f4d1419fbc8219a181fab7892ebccf7ee29a2/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+  #                                           1                                   |        2      |      3       |    4    |    5   |     6    |       
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ echo ${PATH} | cut -d ':' -f 3
+  /usr/local/bin
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ echo ${PATH} | cut -d ':' -f 5
+  /usr/bin
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ echo ${PATH} | cut -d ':' -f 3,5
+  /usr/local/bin:/usr/bin
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ export
+  declare -x BROWSER="/root/.vscode-server/bin/019f4d1419fbc8219a181fab7892ebccf7ee29a2/bin/helpers/browser.sh"
+  declare -x COLORTERM="truecolor"
+  declare -x HISTCONTROL="ignoredups"
+  declare -x HISTSIZE="1000"
+  declare -x HOME="/home/az"
+  declare -x HOSTNAME="iZbp13op1xah7j3j1x457dZ"
+  declare -x LANG="en_US.UTF-8"
+  declare -x LESSOPEN="||/usr/bin/lesspipe.sh %s"
+  declare -x LOGNAME="az"
+  declare -x LS_COLORS="rs=0:di=38;5;27:ln=38;5;51:mh=44;38;5;15:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=05;48;5;232;38;5;15:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;34:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.Z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.axv=38;5;13:*.anx=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.axa=38;5;45:*.oga=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:"
+  declare -x MAIL="/var/spool/mail/root"
+  declare -x OLDPWD="/root"
+  declare -x PATH="/root/.vscode-server/bin/019f4d1419fbc8219a181fab7892ebccf7ee29a2/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin"
+  declare -x PWD="/home/az"
+  declare -x SHELL="/bin/bash"
+  declare -x SHLVL="6"
+  declare -x SSH_CLIENT="36.142.58.226 7382 22"
+  declare -x SSH_CONNECTION="36.142.58.226 7382 172.16.100.115 22"
+  declare -x TERM="xterm-256color"
+  declare -x TERM_PROGRAM="vscode"
+  declare -x TERM_PROGRAM_VERSION="1.87.0"
+  declare -x USER="az"
+  declare -x VSCODE_IPC_HOOK_CLI="/run/user/0/vscode-ipc-873feb97-9108-4fee-8805-82c6ffc09c9d.sock"
+  declare -x XDG_RUNTIME_DIR="/run/user/0"
+  declare -x XDG_SESSION_ID="10253"
+
+
+
+
+  
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ export | cut -c 12-
+  BROWSER="/root/.vscode-server/bin/019f4d1419fbc8219a181fab7892ebccf7ee29a2/bin/helpers/browser.sh"
+  COLORTERM="truecolor"
+  HISTCONTROL="ignoredups"
+  HISTSIZE="1000"
+  HOME="/home/az"
+  HOSTNAME="iZbp13op1xah7j3j1x457dZ"
+  LANG="en_US.UTF-8"
+  LESSOPEN="||/usr/bin/lesspipe.sh %s"
+  LOGNAME="az"
+  LS_COLORS="rs=0:di=38;5;27:ln=38;5;51:mh=44;38;5;15:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=05;48;5;232;38;5;15:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;34:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.Z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.axv=38;5;13:*.anx=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.axa=38;5;45:*.oga=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:"
+  MAIL="/var/spool/mail/root"
+  OLDPWD="/root"
+  PATH="/root/.vscode-server/bin/019f4d1419fbc8219a181fab7892ebccf7ee29a2/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin"
+  PWD="/home/az"
+  SHELL="/bin/bash"
+  SHLVL="6"
+  SSH_CLIENT="36.142.58.226 7382 22"
+  SSH_CONNECTION="36.142.58.226 7382 172.16.100.115 22"
+  TERM="xterm-256color"
+  TERM_PROGRAM="vscode"
+  TERM_PROGRAM_VERSION="1.87.0"
+  USER="az"
+  VSCODE_IPC_HOOK_CLI="/run/user/0/vscode-ipc-873feb97-9108-4fee-8805-82c6ffc09c9d.sock"
+  XDG_RUNTIME_DIR="/run/user/0"
+  XDG_SESSION_ID="10253"
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+  
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last
+  root     pts/2        36.142.32.177    Thu Aug  8 11:37 - 13:55  (02:18)    
+  root     pts/2        36.142.32.177    Wed Aug  7 17:44 - 20:21  (02:36)    
+  root     pts/3        42.91.165.230    Thu Aug  1 22:48 - 01:08  (02:19)    
+  root     pts/2        42.91.165.230    Thu Aug  1 22:42 - 00:54  (02:12)    
+  root     pts/1        42.91.165.230    Thu Aug  1 22:13 - 00:24  (02:11)    
+  root     pts/1        36.142.66.249    Thu Jul 25 15:05 - 17:19  (02:13)    
+  root     pts/1        36.142.43.234    Tue Jul 23 17:03 - 17:03  (00:00)    
+  root     pts/0        36.142.43.234    Tue Jul 23 16:53 - 19:05  (02:11)    
+  root     pts/1        36.142.41.63     Fri Jul 12 16:33 - 18:53  (02:19)    
+  root     pts/0        36.142.41.63     Fri Jul 12 16:07 - 18:49  (02:41)    
+  root     pts/0        36.142.40.246    Wed Jul 10 19:00 - 22:08  (03:07)    
+  root     pts/0        36.142.33.124    Wed Jun 26 17:37 - 20:05  (02:28)    
+  root     pts/1        42.91.175.208    Sun Jun 23 01:34 - 04:05  (02:30)    
+  root     pts/2        8.139.112.56     Sun Jun 23 01:13 - 01:26  (00:12)    
+  root     pts/2        8.139.99.236     Sun Jun 23 01:13 - 01:13  (00:00)    
+  root     pts/1        47.96.60.217     Sat Jun 22 23:58 - 01:26  (01:28)    
+  root     pts/1        47.96.60.109     Sat Jun 22 23:58 - 23:58  (00:00)    
+  root     pts/0        42.91.175.208    Sat Jun 22 23:53 - 03:01  (03:08)    
+  root     pts/0        42.91.175.208    Sat Jun 22 23:32 - 23:32  (00:00)    
+  reboot   system boot  3.10.0-1160.114. Sat Jun 22 23:25 - 17:23 (57+17:57)  
+  root     pts/0        42.91.175.208    Sat Jun 22 22:44 - crash  (00:40)    
+  root     pts/0        47.96.60.216     Sat Jun 22 21:35 - 22:42  (01:06)    
+  root     pts/0        47.96.60.218     Sat Jun 22 21:35 - 21:35  (00:00)    
+  root     pts/0        47.96.60.211     Thu Jun 20 22:22 - 00:00  (01:37)    
+  root     pts/0        47.96.60.218     Thu Jun 20 22:22 - 22:22  (00:00)    
+  root     pts/2        8.139.112.103    Tue Apr 30 15:26 - 15:29  (00:03)    
+  root     pts/1        47.96.60.110     Tue Apr 30 15:26 - 15:26  (00:00)    
+  root     pts/1        47.96.60.216     Tue Apr 30 15:26 - 15:26  (00:00)    
+  root     pts/0        8.139.112.109    Tue Apr 30 15:19 - 15:41  (00:21)    
+  root     pts/0        8.139.112.97     Tue Apr 30 15:19 - 15:19  (00:00)    
+  root     pts/1        47.96.60.213     Mon Apr 29 16:28 - 22:41  (06:12)    
+  root     pts/0        8.139.112.153    Mon Apr 29 16:28 - 22:29  (06:00)    
+  root     pts/0        47.96.60.217     Mon Apr 29 16:28 - 16:28  (00:00)    
+  root     pts/0        8.139.112.183    Mon Apr 29 16:28 - 16:28  (00:00)    
+  root     pts/3        8.139.112.25     Sun Apr 28 22:35 - 22:35  (00:00)    
+  root     pts/3        8.139.112.77     Sun Apr 28 22:35 - 22:35  (00:00)    
+  root     pts/1        8.139.112.25     Sun Apr 28 22:26 - 04:51  (06:25)    
+  root     pts/1        8.139.112.161    Sun Apr 28 22:26 - 22:26  (00:00)    
+  root     pts/2        8.139.112.147    Sun Apr 28 22:24 - 23:52  (01:28)    
+  root     pts/1        8.139.99.209     Sun Apr 28 22:24 - 22:24  (00:00)    
+  root     pts/1        8.139.99.209     Sun Apr 28 22:24 - 22:24  (00:00)    
+  root     pts/0        8.139.112.83     Sun Apr 28 21:59 - 04:36  (06:36)    
+  root     pts/0        8.139.112.54     Sun Apr 28 21:59 - 21:59  (00:00)    
+  root     pts/2        118.31.243.36    Fri Apr 26 15:07 - 21:17  (06:10)    
+  root     pts/2        118.31.243.249   Fri Apr 26 15:07 - 15:07  (00:00)    
+  root     pts/0        47.96.60.110     Fri Apr 26 11:38 - 17:39  (06:01)    
+  root     pts/1        118.31.243.178   Fri Apr 26 11:38 - 17:40  (06:02)    
+  root     pts/1        118.31.243.222   Fri Apr 26 11:38 - 11:38  (00:00)    
+  root     pts/0        118.31.243.60    Fri Apr 26 11:15 - 11:38  (00:23)    
+  root     pts/0        118.31.243.246   Fri Apr 26 11:15 - 11:15  (00:00)    
+  root     pts/0        47.96.60.109     Sat Apr 20 11:47 - 13:06  (01:19)    
+  root     pts/0        47.96.60.213     Sat Apr 20 11:47 - 11:47  (00:00)    
+  root     pts/0        47.96.60.109     Sat Apr 20 11:44 - 11:44  (00:00)    
+  root     pts/0        47.96.60.218     Sat Apr 20 11:44 - 11:44  (00:00)    
+  root     pts/1        47.96.60.110     Sat Apr 20 11:23 - 13:06  (01:43)    
+  root     pts/1        47.96.60.214     Sat Apr 20 11:23 - 11:23  (00:00)    
+  root     pts/0        118.31.243.176   Sat Apr 20 11:11 - 11:42  (00:30)    
+  root     pts/0        118.31.243.97    Sat Apr 20 11:11 - 11:11  (00:00)    
+  root     pts/0        47.96.60.216     Fri Apr 19 09:33 - 16:04  (06:30)    
+  root     pts/0        47.96.60.213     Fri Apr 19 09:33 - 09:33  (00:00)    
+  reboot   system boot  3.10.0-1160.108. Fri Apr 19 09:29 - 17:23 (122+07:53) 
+  
+  wtmp begins Fri Mar 22 11:34:39 2024
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | cut -d ' ' -f 1
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  reboot
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  reboot
+  
+  wtmp
+  ```
+  若是处理多个空格相连的数据时，就会比较不容易了
+
+  grep：分析一行信息，若当中有我们需要的信息，就将该行拿出来
+
+  |选项|解释|
+  |---|---|
+  |-a|将binary文件以text文件的方式搜寻数据|
+  |-c|计算找到 ‘搜寻字符串’的次数|
+  |-i|忽略大小写的不同，所以大小写视为相同|
+  |-n|顺便输出行号|
+  |-v|反向选择，亦即显示出没有 ‘搜寻字符串’内容的那一行|
+  |--color=auto|可以讲找到的关键词部分加上颜色的显示|
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | grep 'root'
+  root     pts/2        36.142.32.177    Thu Aug  8 11:37 - 13:55  (02:18)    
+  root     pts/2        36.142.32.177    Wed Aug  7 17:44 - 20:21  (02:36)    
+  root     pts/3        42.91.165.230    Thu Aug  1 22:48 - 01:08  (02:19)    
+  root     pts/2        42.91.165.230    Thu Aug  1 22:42 - 00:54  (02:12)    
+  root     pts/1        42.91.165.230    Thu Aug  1 22:13 - 00:24  (02:11)    
+  root     pts/1        36.142.66.249    Thu Jul 25 15:05 - 17:19  (02:13)    
+  root     pts/1        36.142.43.234    Tue Jul 23 17:03 - 17:03  (00:00)    
+  root     pts/0        36.142.43.234    Tue Jul 23 16:53 - 19:05  (02:11)    
+  root     pts/1        36.142.41.63     Fri Jul 12 16:33 - 18:53  (02:19)    
+  root     pts/0        36.142.41.63     Fri Jul 12 16:07 - 18:49  (02:41)    
+  root     pts/0        36.142.40.246    Wed Jul 10 19:00 - 22:08  (03:07)    
+  root     pts/0        36.142.33.124    Wed Jun 26 17:37 - 20:05  (02:28)    
+  root     pts/1        42.91.175.208    Sun Jun 23 01:34 - 04:05  (02:30)    
+  root     pts/2        8.139.112.56     Sun Jun 23 01:13 - 01:26  (00:12)    
+  root     pts/2        8.139.99.236     Sun Jun 23 01:13 - 01:13  (00:00)    
+  root     pts/1        47.96.60.217     Sat Jun 22 23:58 - 01:26  (01:28)    
+  root     pts/1        47.96.60.109     Sat Jun 22 23:58 - 23:58  (00:00)    
+  root     pts/0        42.91.175.208    Sat Jun 22 23:53 - 03:01  (03:08)    
+  root     pts/0        42.91.175.208    Sat Jun 22 23:32 - 23:32  (00:00)    
+  root     pts/0        42.91.175.208    Sat Jun 22 22:44 - crash  (00:40)    
+  root     pts/0        47.96.60.216     Sat Jun 22 21:35 - 22:42  (01:06)    
+  root     pts/0        47.96.60.218     Sat Jun 22 21:35 - 21:35  (00:00)    
+  root     pts/0        47.96.60.211     Thu Jun 20 22:22 - 00:00  (01:37)    
+  root     pts/0        47.96.60.218     Thu Jun 20 22:22 - 22:22  (00:00)    
+  root     pts/2        8.139.112.103    Tue Apr 30 15:26 - 15:29  (00:03)    
+  root     pts/1        47.96.60.110     Tue Apr 30 15:26 - 15:26  (00:00)    
+  root     pts/1        47.96.60.216     Tue Apr 30 15:26 - 15:26  (00:00)    
+  root     pts/0        8.139.112.109    Tue Apr 30 15:19 - 15:41  (00:21)    
+  root     pts/0        8.139.112.97     Tue Apr 30 15:19 - 15:19  (00:00)    
+  root     pts/1        47.96.60.213     Mon Apr 29 16:28 - 22:41  (06:12)    
+  root     pts/0        8.139.112.153    Mon Apr 29 16:28 - 22:29  (06:00)    
+  root     pts/0        47.96.60.217     Mon Apr 29 16:28 - 16:28  (00:00)    
+  root     pts/0        8.139.112.183    Mon Apr 29 16:28 - 16:28  (00:00)    
+  root     pts/3        8.139.112.25     Sun Apr 28 22:35 - 22:35  (00:00)    
+  root     pts/3        8.139.112.77     Sun Apr 28 22:35 - 22:35  (00:00)    
+  root     pts/1        8.139.112.25     Sun Apr 28 22:26 - 04:51  (06:25)    
+  root     pts/1        8.139.112.161    Sun Apr 28 22:26 - 22:26  (00:00)    
+  root     pts/2        8.139.112.147    Sun Apr 28 22:24 - 23:52  (01:28)    
+  root     pts/1        8.139.99.209     Sun Apr 28 22:24 - 22:24  (00:00)    
+  root     pts/1        8.139.99.209     Sun Apr 28 22:24 - 22:24  (00:00)    
+  root     pts/0        8.139.112.83     Sun Apr 28 21:59 - 04:36  (06:36)    
+  root     pts/0        8.139.112.54     Sun Apr 28 21:59 - 21:59  (00:00)    
+  root     pts/2        118.31.243.36    Fri Apr 26 15:07 - 21:17  (06:10)    
+  root     pts/2        118.31.243.249   Fri Apr 26 15:07 - 15:07  (00:00)    
+  root     pts/0        47.96.60.110     Fri Apr 26 11:38 - 17:39  (06:01)    
+  root     pts/1        118.31.243.178   Fri Apr 26 11:38 - 17:40  (06:02)    
+  root     pts/1        118.31.243.222   Fri Apr 26 11:38 - 11:38  (00:00)    
+  root     pts/0        118.31.243.60    Fri Apr 26 11:15 - 11:38  (00:23)    
+  root     pts/0        118.31.243.246   Fri Apr 26 11:15 - 11:15  (00:00)    
+  root     pts/0        47.96.60.109     Sat Apr 20 11:47 - 13:06  (01:19)    
+  root     pts/0        47.96.60.213     Sat Apr 20 11:47 - 11:47  (00:00)    
+  root     pts/0        47.96.60.109     Sat Apr 20 11:44 - 11:44  (00:00)    
+  root     pts/0        47.96.60.218     Sat Apr 20 11:44 - 11:44  (00:00)    
+  root     pts/1        47.96.60.110     Sat Apr 20 11:23 - 13:06  (01:43)    
+  root     pts/1        47.96.60.214     Sat Apr 20 11:23 - 11:23  (00:00)    
+  root     pts/0        118.31.243.176   Sat Apr 20 11:11 - 11:42  (00:30)    
+  root     pts/0        118.31.243.97    Sat Apr 20 11:11 - 11:11  (00:00)    
+  root     pts/0        47.96.60.216     Fri Apr 19 09:33 - 16:04  (06:30)    
+  root     pts/0        47.96.60.213     Fri Apr 19 09:33 - 09:33  (00:00)    
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | grep -v 'root'
+  reboot   system boot  3.10.0-1160.114. Sat Jun 22 23:25 - 17:33 (57+18:07)  
+  reboot   system boot  3.10.0-1160.108. Fri Apr 19 09:29 - 17:33 (122+08:03) 
+  
+  wtmp begins Fri Mar 22 11:34:39 2024
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | grep 'root' | cut -d ' ' -f1
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ grep --color=auto "MANPATH" /etc/man_db.conf
+  # MANDATORY_MANPATH                     manpath_element
+  # MANPATH_MAP           path_element    manpath_element
+  # every automatically generated MANPATH includes these fields
+  #MANDATORY_MANPATH                      /usr/src/pvm3/man
+  MANDATORY_MANPATH                       /usr/man
+  MANDATORY_MANPATH                       /usr/share/man
+  MANDATORY_MANPATH                       /usr/local/share/man
+  # set up PATH to MANPATH mapping
+  #               *PATH*        ->        *MANPATH*
+  MANPATH_MAP     /bin                    /usr/share/man
+  MANPATH_MAP     /usr/bin                /usr/share/man
+  MANPATH_MAP     /sbin                   /usr/share/man
+  MANPATH_MAP     /usr/sbin               /usr/share/man
+  MANPATH_MAP     /usr/local/bin          /usr/local/man
+  MANPATH_MAP     /usr/local/bin          /usr/local/share/man
+  MANPATH_MAP     /usr/local/sbin         /usr/local/man
+  MANPATH_MAP     /usr/local/sbin         /usr/local/share/man
+  MANPATH_MAP     /usr/X11R6/bin          /usr/X11R6/man
+  MANPATH_MAP     /usr/bin/X11            /usr/X11R6/man
+  MANPATH_MAP     /usr/games              /usr/share/man
+  MANPATH_MAP     /opt/bin                /opt/man
+  MANPATH_MAP     /opt/sbin               /opt/man
+  #               *MANPATH*     ->        *CATPATH*
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+  
+  - 排序命令： sort，wc， uniq
+   sort排序
+  
+  |选项|解释|
+  |---|---|
+  |-f|忽略大小写的差异|
+  |-b|忽略最前面的空格符部分|
+  |-M|以月份的名字来排序|
+  |-n|使用 纯数字 进行排序（默认是以文字型态来排序的）|
+  |-r|反向排序|
+  |-u|就是uniq，相同的数据中，仅出现一行代表|
+  |-t|分隔符，预设是 tab 来分隔|
+  |-k|以哪个区间（field）来进行排序|
+
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/passwd | sort
+  adm:x:3:4:adm:/var/adm:/sbin/nologin
+  alex:x:1001:1002::/home/alex:/bin/bash
+  arod:x:1002:1001::/home/arod:/bin/bash
+  az:x:1000:1000::/home/az:/bin/bash
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  dbus:x:81:81:System message bus:/:/sbin/nologin
+  ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+  games:x:12:100:games:/usr/games:/sbin/nologin
+  gitlab-prometheus:x:992:989::/var/opt/gitlab/prometheus:/bin/sh
+  gitlab-psql:x:993:990::/var/opt/gitlab/postgresql:/bin/sh
+  gitlab-redis:x:994:991::/var/opt/gitlab/redis:/bin/false
+  gitlab-www:x:996:993::/var/opt/gitlab/nginx:/bin/false
+  git:x:995:992::/var/opt/gitlab:/bin/sh
+  halt:x:7:0:halt:/sbin:/sbin/halt
+  lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+  mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+  nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin
+  nginx:x:997:995:Nginx web server:/var/lib/nginx:/sbin/nologin
+  nobody:x:99:99:Nobody:/:/sbin/nologin
+  nscd:x:28:28:NSCD Daemon:/:/sbin/nologin
+  operator:x:11:0:operator:/root:/sbin/nologin
+  polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+  postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+  root:x:0:0:root:/root:/bin/bash
+  rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+  rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+  shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+  sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+  sync:x:5:0:sync:/sbin:/bin/sync
+  systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+  tcpdump:x:72:72::/:/sbin/nologin
+
+  
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/passwd
+  root:x:0:0:root:/root:/bin/bash
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  adm:x:3:4:adm:/var/adm:/sbin/nologin
+  lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+  sync:x:5:0:sync:/sbin:/bin/sync
+  shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+  halt:x:7:0:halt:/sbin:/sbin/halt
+  mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+  operator:x:11:0:operator:/root:/sbin/nologin
+  games:x:12:100:games:/usr/games:/sbin/nologin
+  ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+  nobody:x:99:99:Nobody:/:/sbin/nologin
+  systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+  dbus:x:81:81:System message bus:/:/sbin/nologin
+  polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+  sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+  postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+  chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+  nscd:x:28:28:NSCD Daemon:/:/sbin/nologin
+  tcpdump:x:72:72::/:/sbin/nologin
+  rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+  rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+  nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin
+  nginx:x:997:995:Nginx web server:/var/lib/nginx:/sbin/nologin
+  gitlab-www:x:996:993::/var/opt/gitlab/nginx:/bin/false
+  git:x:995:992::/var/opt/gitlab:/bin/sh
+  gitlab-redis:x:994:991::/var/opt/gitlab/redis:/bin/false
+  gitlab-psql:x:993:990::/var/opt/gitlab/postgresql:/bin/sh
+  gitlab-prometheus:x:992:989::/var/opt/gitlab/prometheus:/bin/sh
+  az:x:1000:1000::/home/az:/bin/bash
+  alex:x:1001:1002::/home/alex:/bin/bash
+  arod:x:1002:1001::/home/arod:/bin/bash
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/passwd | sort -t ':' -k 3
+  root:x:0:0:root:/root:/bin/bash
+  az:x:1000:1000::/home/az:/bin/bash
+  alex:x:1001:1002::/home/alex:/bin/bash
+  arod:x:1002:1001::/home/arod:/bin/bash
+  operator:x:11:0:operator:/root:/sbin/nologin
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  games:x:12:100:games:/usr/games:/sbin/nologin
+  ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+  systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  nscd:x:28:28:NSCD Daemon:/:/sbin/nologin
+  rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+  rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+  adm:x:3:4:adm:/var/adm:/sbin/nologin
+  lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+  sync:x:5:0:sync:/sbin:/bin/sync
+  shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+  nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin
+  halt:x:7:0:halt:/sbin:/sbin/halt
+  tcpdump:x:72:72::/:/sbin/nologin
+  sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+  mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+  dbus:x:81:81:System message bus:/:/sbin/nologin
+  postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+  gitlab-prometheus:x:992:989::/var/opt/gitlab/prometheus:/bin/sh
+  gitlab-psql:x:993:990::/var/opt/gitlab/postgresql:/bin/sh
+  gitlab-redis:x:994:991::/var/opt/gitlab/redis:/bin/false
+  git:x:995:992::/var/opt/gitlab:/bin/sh
+  gitlab-www:x:996:993::/var/opt/gitlab/nginx:/bin/false
+  nginx:x:997:995:Nginx web server:/var/lib/nginx:/sbin/nologin
+  chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+  polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+  nobody:x:99:99:Nobody:/:/sbin/nologin
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+
+  # 上面是以文字型态排序的，若要使用数字排序，则要使用 -n 来告知 sort 以数字来排序
+
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/passwd | sort -t ':' -k 3 -n
+  root:x:0:0:root:/root:/bin/bash
+  bin:x:1:1:bin:/bin:/sbin/nologin
+  daemon:x:2:2:daemon:/sbin:/sbin/nologin
+  adm:x:3:4:adm:/var/adm:/sbin/nologin
+  lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+  sync:x:5:0:sync:/sbin:/bin/sync
+  shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+  halt:x:7:0:halt:/sbin:/sbin/halt
+  mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+  operator:x:11:0:operator:/root:/sbin/nologin
+  games:x:12:100:games:/usr/games:/sbin/nologin
+  ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+  nscd:x:28:28:NSCD Daemon:/:/sbin/nologin
+  rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/sbin/nologin
+  rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+  tcpdump:x:72:72::/:/sbin/nologin
+  sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+  dbus:x:81:81:System message bus:/:/sbin/nologin
+  postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+  nobody:x:99:99:Nobody:/:/sbin/nologin
+  systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+  gitlab-prometheus:x:992:989::/var/opt/gitlab/prometheus:/bin/sh
+  gitlab-psql:x:993:990::/var/opt/gitlab/postgresql:/bin/sh
+  gitlab-redis:x:994:991::/var/opt/gitlab/redis:/bin/false
+  git:x:995:992::/var/opt/gitlab:/bin/sh
+  gitlab-www:x:996:993::/var/opt/gitlab/nginx:/bin/false
+  nginx:x:997:995:Nginx web server:/var/lib/nginx:/sbin/nologin
+  chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+  polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+  az:x:1000:1000::/home/az:/bin/bash
+  alex:x:1001:1002::/home/alex:/bin/bash
+  arod:x:1002:1001::/home/arod:/bin/bash
+  nfsnobody:x:65534:65534:Anonymous NFS User:/var/lib/nfs:/sbin/nologin
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+  
+  uniq 重复的资料仅列一行显示
+
+  |选项|解释|
+  |---|---|
+  |-i|忽略大小写字符的不同|
+  |-c|进行计数|
+  
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | cut -d ' ' -f1 | sort | uniq
+
+  reboot
+  root
+  wtmp
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | cut -d ' ' -f1 | sort | uniq -c
+        1 
+        2 reboot
+       59 root
+        1 wtmp
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+
+  wc 文件中有多少字？ 多少行？ 多少字符？
+
+  |选项|解释|
+  |---|---|
+  |-l|仅列出行|
+  |-w|仅列出多少字（英文单字）|
+  |-m|多少字符|
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat /etc/man_db.conf | wc
+      131     723    5171
+  #   行      字数   字符数
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+
+  # last 会输出空白行， wtmp， unknown， reboot 等无关账号登入的信息。故使用grep取出非空行，去除无关账号，再计算行数。
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | grep [a-zA-Z] | grep -v 'wtmp' | grep -v 'reboot' | grep -v 'unknow' | wc -l
+  59
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+
+  ```
+  
+  - 双向重导向： tee
+  会同时将数据流分送到文件去与屏幕（screen）；而输出到屏幕的，其实就是stdout。
+  
+  |选项|解释|
+  |---|---|
+  |-a|以累加的方式，将数据加入file当中|
+  ```shell
+  # 将 ls 的数据存一份到 ~/homefile中，同时屏幕上也有输出信息
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ls -l /home/ | tee ~/homefile | more
+  total 12
+  drwx------ 2 alex alex    4096 Jul 26 16:31 alex
+  drwx------ 2 arod project 4096 Jul 26 16:31 arod
+  drwx------ 2 az   az      4096 Aug 19 18:06 az
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat ~/homefile
+  total 12
+  drwx------ 2 alex alex    4096 Jul 26 16:31 alex
+  drwx------ 2 arod project 4096 Jul 26 16:31 arod
+  drwx------ 2 az   az      4096 Aug 19 18:06 az
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+
+
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ last | tee last.list | cut -d ' ' -f1
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  reboot
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  root
+  reboot
+  
+  wtmp
+
+
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ cat last.list
+  root     pts/2        36.142.32.177    Thu Aug  8 11:37 - 13:55  (02:18)    
+  root     pts/2        36.142.32.177    Wed Aug  7 17:44 - 20:21  (02:36)    
+  root     pts/3        42.91.165.230    Thu Aug  1 22:48 - 01:08  (02:19)    
+  root     pts/2        42.91.165.230    Thu Aug  1 22:42 - 00:54  (02:12)    
+  root     pts/1        42.91.165.230    Thu Aug  1 22:13 - 00:24  (02:11)    
+  root     pts/1        36.142.66.249    Thu Jul 25 15:05 - 17:19  (02:13)    
+  root     pts/1        36.142.43.234    Tue Jul 23 17:03 - 17:03  (00:00)    
+  root     pts/0        36.142.43.234    Tue Jul 23 16:53 - 19:05  (02:11)    
+  root     pts/1        36.142.41.63     Fri Jul 12 16:33 - 18:53  (02:19)    
+  root     pts/0        36.142.41.63     Fri Jul 12 16:07 - 18:49  (02:41)    
+  root     pts/0        36.142.40.246    Wed Jul 10 19:00 - 22:08  (03:07)    
+  root     pts/0        36.142.33.124    Wed Jun 26 17:37 - 20:05  (02:28)    
+  root     pts/1        42.91.175.208    Sun Jun 23 01:34 - 04:05  (02:30)    
+  root     pts/2        8.139.112.56     Sun Jun 23 01:13 - 01:26  (00:12)    
+  root     pts/2        8.139.99.236     Sun Jun 23 01:13 - 01:13  (00:00)    
+  root     pts/1        47.96.60.217     Sat Jun 22 23:58 - 01:26  (01:28)    
+  root     pts/1        47.96.60.109     Sat Jun 22 23:58 - 23:58  (00:00)    
+  root     pts/0        42.91.175.208    Sat Jun 22 23:53 - 03:01  (03:08)    
+  root     pts/0        42.91.175.208    Sat Jun 22 23:32 - 23:32  (00:00)    
+  reboot   system boot  3.10.0-1160.114. Sat Jun 22 23:25 - 18:05 (57+18:40)  
+  root     pts/0        42.91.175.208    Sat Jun 22 22:44 - crash  (00:40)    
+  root     pts/0        47.96.60.216     Sat Jun 22 21:35 - 22:42  (01:06)    
+  root     pts/0        47.96.60.218     Sat Jun 22 21:35 - 21:35  (00:00)    
+  root     pts/0        47.96.60.211     Thu Jun 20 22:22 - 00:00  (01:37)    
+  root     pts/0        47.96.60.218     Thu Jun 20 22:22 - 22:22  (00:00)    
+  root     pts/2        8.139.112.103    Tue Apr 30 15:26 - 15:29  (00:03)    
+  root     pts/1        47.96.60.110     Tue Apr 30 15:26 - 15:26  (00:00)    
+  root     pts/1        47.96.60.216     Tue Apr 30 15:26 - 15:26  (00:00)    
+  root     pts/0        8.139.112.109    Tue Apr 30 15:19 - 15:41  (00:21)    
+  root     pts/0        8.139.112.97     Tue Apr 30 15:19 - 15:19  (00:00)    
+  root     pts/1        47.96.60.213     Mon Apr 29 16:28 - 22:41  (06:12)    
+  root     pts/0        8.139.112.153    Mon Apr 29 16:28 - 22:29  (06:00)    
+  root     pts/0        47.96.60.217     Mon Apr 29 16:28 - 16:28  (00:00)    
+  root     pts/0        8.139.112.183    Mon Apr 29 16:28 - 16:28  (00:00)    
+  root     pts/3        8.139.112.25     Sun Apr 28 22:35 - 22:35  (00:00)    
+  root     pts/3        8.139.112.77     Sun Apr 28 22:35 - 22:35  (00:00)    
+  root     pts/1        8.139.112.25     Sun Apr 28 22:26 - 04:51  (06:25)    
+  root     pts/1        8.139.112.161    Sun Apr 28 22:26 - 22:26  (00:00)    
+  root     pts/2        8.139.112.147    Sun Apr 28 22:24 - 23:52  (01:28)    
+  root     pts/1        8.139.99.209     Sun Apr 28 22:24 - 22:24  (00:00)    
+  root     pts/1        8.139.99.209     Sun Apr 28 22:24 - 22:24  (00:00)    
+  root     pts/0        8.139.112.83     Sun Apr 28 21:59 - 04:36  (06:36)    
+  root     pts/0        8.139.112.54     Sun Apr 28 21:59 - 21:59  (00:00)    
+  root     pts/2        118.31.243.36    Fri Apr 26 15:07 - 21:17  (06:10)    
+  root     pts/2        118.31.243.249   Fri Apr 26 15:07 - 15:07  (00:00)    
+  root     pts/0        47.96.60.110     Fri Apr 26 11:38 - 17:39  (06:01)    
+  root     pts/1        118.31.243.178   Fri Apr 26 11:38 - 17:40  (06:02)    
+  root     pts/1        118.31.243.222   Fri Apr 26 11:38 - 11:38  (00:00)    
+  root     pts/0        118.31.243.60    Fri Apr 26 11:15 - 11:38  (00:23)    
+  root     pts/0        118.31.243.246   Fri Apr 26 11:15 - 11:15  (00:00)    
+  root     pts/0        47.96.60.109     Sat Apr 20 11:47 - 13:06  (01:19)    
+  root     pts/0        47.96.60.213     Sat Apr 20 11:47 - 11:47  (00:00)    
+  root     pts/0        47.96.60.109     Sat Apr 20 11:44 - 11:44  (00:00)    
+  root     pts/0        47.96.60.218     Sat Apr 20 11:44 - 11:44  (00:00)    
+  root     pts/1        47.96.60.110     Sat Apr 20 11:23 - 13:06  (01:43)    
+  root     pts/1        47.96.60.214     Sat Apr 20 11:23 - 11:23  (00:00)    
+  root     pts/0        118.31.243.176   Sat Apr 20 11:11 - 11:42  (00:30)    
+  root     pts/0        118.31.243.97    Sat Apr 20 11:11 - 11:11  (00:00)    
+  root     pts/0        47.96.60.216     Fri Apr 19 09:33 - 16:04  (06:30)    
+  root     pts/0        47.96.60.213     Fri Apr 19 09:33 - 09:33  (00:00)    
+  reboot   system boot  3.10.0-1160.108. Fri Apr 19 09:29 - 18:05 (122+08:36) 
+  
+  wtmp begins Fri Mar 22 11:34:39 2024
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
+  - 字符转换命令： tr, col, join, paste, expand
+ 
+  - 分区命令： split
+ 
+  - 参数代换： xargs
+ 
+  - 关于减号 - 用途
   
