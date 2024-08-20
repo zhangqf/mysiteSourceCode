@@ -160,6 +160,23 @@ var=$((运算内容))
 ```
 ### 数值运算：透过bc计算 pi
 
+bc是Linux和类Unix操作系统中的一个命令行计算器程序。他代表 基本计算器 （basic calculate），并提供一个交互式环境来执行数学计算
+bc 中的scale变量控制结果显示的小数位数。默认是0。
+
+4*a(1) 是bc提供的一个计算pi的函数
+
+|选项|解释|
+|---|---|
+|-l或--mathlib|加载数学函数库，提供更多的数学运算支持，如三角函数、指数函数等|
+|-i或--interactive|进入交互模式，可以直接在命令行输入计算表达式并获得结果。只是bc默认值|
+|-w或--warn|启用警告信息输出，如除以零、变量重复定义等|
+|-s或--standard|使用标准的POSIX兼容模式，不加载任何扩展库|
+|-v或--version|显示bc版本信息|
+|-h或--help|显示bc命令的帮助信息|
+|-e"expression"|在命令行直接执行给定的计算表达式，而不进入交互模式|
+|-f"filename"|从指定的文件中读取并执行计算表达式|
+|-q或--quiet|静默模式，不显示版权信息等|
+|-l"library"|加载指定的数学函数库文件|
 ```shell
 #!/bin/bash
 # Program
@@ -188,4 +205,36 @@ Starting calculate pi value. Be patient.
 real    0m0.002s
 user    0m0.001s
 sys     0m0.001s
+```
+## script的执行方式差异（source，sh script， ./script）
+
+不同的script执行方式会造成不一样的结果
+### 利用直接执行的方式来执行script
+不论是绝对路径/相对路径还是${PATH}内，或者是利用bash或sh 来下达脚本，该script都会使用一个新的bash环境来执行脚本内的指令。当子程序完成后，在子程序内的各项变量或动作将会结束而不会传回到父程序中
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ echo ${firstname} ${lastname}
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh showname.sh 
+Please input your first name: zhang
+Please input your last name:qian
+
+Your full name is : zhang qian
+[az@iZbp13op1xah7j3j1x457dZ bin]$ echo ${firstname} ${lastname}
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+```
+
+### 利用source来执行脚本：在父程序中执行
+
+使用source对script的执行方式，会使脚本在父程序中执行，因此各项动作都会在原本的bash内生效。这也是为什么不用注销系统而让某些写入~/.bashrc的设定生效。 是使用`source ~/.bashrc` 而不是`bash ~/.bashrc`   
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ source showname.sh 
+Please input your first name: zhang
+Please input your last name:qian
+
+Your full name is : zhang qian
+[az@iZbp13op1xah7j3j1x457dZ bin]$ echo ${firstname} ${lastname}
+zhang qian
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
 ```
