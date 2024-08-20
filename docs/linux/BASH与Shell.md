@@ -471,12 +471,12 @@ file locks                      (-x) unlimited
 - 变量内容的删除与取代
   |变量设定方式|说明|
   |---|---|
-  |${变量#关键词}|若变量内容从头开始的数据符合 关键词 ，则将符合的最短数据删除|
-  |${变量##关键词}|若变量内容从头开始的数据符合　关键词，　则将符合的最长数据删除|
-  |${变量%关键词}|若变量内容从尾向前的数据符合 关键词， 则将符合的最短数据删除|
-  |${变量%%关键词}|若变量内容从尾向前的数据符合 关键词， 则讲符合的最长数据删除|
-  |${变量/旧字符串/新字符串}|若变量内容符合 旧字符串 则 第一个旧字符串会被新字符串取代|
-  |${变量//旧字符串/新字符串}|若变量内容符合 旧字符串 则 全部的旧字符串会被新字符串取代|
+  |$\{变量#关键词}|若变量内容从头开始的数据符合 关键词 ，则将符合的最短数据删除|
+  |$\{变量##关键词}|若变量内容从头开始的数据符合　关键词，　则将符合的最长数据删除|
+  |$\{变量%关键词}|若变量内容从尾向前的数据符合 关键词， 则将符合的最短数据删除|
+  |$\{变量%%关键词}|若变量内容从尾向前的数据符合 关键词， 则讲符合的最长数据删除|
+  |$\{变量/旧字符串/新字符串}|若变量内容符合 旧字符串 则 第一个旧字符串会被新字符串取代|
+  |$\{变量//旧字符串/新字符串}|若变量内容符合 旧字符串 则 全部的旧字符串会被新字符串取代|
 - 变量的测试与内容替换
   ```shell
   [root@iZbp13op1xah7j3j1x457dZ ~]# echo ${username}
@@ -504,14 +504,14 @@ file locks                      (-x) unlimited
   ```
   |变量设定方式|str没有设定|str为空字符串|str已设定非为空字符串|
   |---|---|---|---|
-  |var=${str-expr}|var=expr|var=|var=$str|
-  |var=${str:expr}|var=expr|var=expr|var=$str|
-  |var=${str+expr}|var=|var=expr|var=expr|
-  |var=${str:+expr}|var=|var=|var=expr|
-  |var=${str=expr}|str=expr var=expr|str不变 var=|str 不变 var=$str|
-  |var=${str:=expr}|str=expr var=expr|str=expr var=expr|str 不变  var=$str|
-  |var=${str?expr}|expr输出至stderr|var=|var=$str|
-  |var=${str:?expr}|expr输出至stderr|expr输出至stdrr|var=$str|
+  |var=$\{str-expr}|var=expr|var=|var=$str|
+  |var=$\{str:expr}|var=expr|var=expr|var=$str|
+  |var=$\{str+expr}|var=|var=expr|var=expr|
+  |var=$\{str:+expr}|var=|var=|var=expr|
+  |var=$\{str=expr}|str=expr var=expr|str不变 var=|str 不变 var=$str|
+  |var=$\{str:=expr}|str=expr var=expr|str=expr var=expr|str 不变  var=$str|
+  |var=$\{str?expr}|expr输出至stderr|var=|var=$str|
+  |var=$\{str:?expr}|expr输出至stderr|expr输出至stdrr|var=$str|
 
 ### 命令别名与历史命令
 - 命令别名设定： alias，unalias
