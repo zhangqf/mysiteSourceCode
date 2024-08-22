@@ -238,3 +238,4 @@ Your full name is : zhang qian
 zhang qian
 [az@iZbp13op1xah7j3j1x457dZ bin]$ 
 ```
+## 善用判断式
