@@ -238,4 +238,147 @@ Your full name is : zhang qian
 zhang qian
 [az@iZbp13op1xah7j3j1x457dZ bin]$ 
 ```
-## 善用判断式
+## 善用判断式  
+### 利用test指令的测试功能
+
+|测试的标志|代表意义|
+|---|---|
+|关于某个档名的 文件类型 判断， test -e filename 表示是否存在||
+|-e|该 档名 是否存在|
+|-f|该 档名 是否存在且为文件（file）|
+|-d|该 文件名 是否存在且为目录（directory）|
+|-b|该 档名 是否存在且为一个block device 装置|
+|-c|该 档名 是否存在且为一个 character device 装置|
+|-S|该 档名 是否存在且为一个 Socket 文件|
+|-p|该 档名 是否存在且为一个FIFO（pipe）文件|
+|-L|该 档名 是否存在且为一个连接档|
+|关于文件的权限侦测，如 test -r filename 表示是否可读||
+|-r|侦测该档名是否存在且具有 可读 的权限|
+|-w|侦测该档名是否存在且具有 可写 的权限|
+|-x|侦测该档名是否存在且具有 可执行 的权限|
+|-u|侦测该文件是否存在且具有 SUID 的属性|
+|-g|侦测该文件名是否存在且具有 SGID 的属性|
+|-k|侦测该文件名是否存在且具有 Sticky bit 的属性|
+|-s|侦测该档名是否存在且为 非空白文件|
+|两个文件之间的比较，如： test file1 -nt file2||
+|-nt|（newer than）判断file1 是否比file2 新|
+|-ot|（older than）判断file1 是否比file2 旧|
+|-ef|判断file1与file2是否为同一文件，可用在判断hard link的判断上。主要意义在判定，两个文件是否均指向同一个inode|
+|关于两个整数之间的判定，如 test n1 -eq n2||
+|-eq|两数值相等（equal）|
+|-ne|两数值不等（not equal）|
+|-gt|n1 大于 n2（greater than）|
+|-lt|n1 小于 n2（less than）|
+|-ge|n1 大于等于 n2 （greater than or equal）|
+|-le|n1 小于等于 n2 （less than or equal）|
+|判断字符串的数据||
+|test -z string|判断字符串是否为0。 若string 为空字符串，则为true|
+|test -n string|判断字符串是否非为0。若string为空字符，则为false。 -n 也可省略|
+|test str1==str2|判断str1是否等于str2，若相等，则回传true|
+|test str1!=str2|判断str1是否不等于str2，若相等，则回传false|
+|多重条件判定 如 test -r filename -a -x filename||
+|-a|and 两状况同时成立。如 test -r file -a -x file，则file 同时具有r与x权限时，才回传true|
+|-o|or 两状况任何一个成立。如 test -r file -o -x file，则file具有r或x权限时，就回传true|
+|!|反相状态，如 test ! -x file，当file 不具有x时，回传true|
+
+
+**判断一个文件或目录是否存在，并判断拥有者对这个文件或目录所拥有的权限，将其输出**
+```shell
+[az@iZbp13op1xah7j3j1x457dZ ~]$ vim file_perm.sh 
+#!/bin/bash
+#Program
+#       User input a filename, program will check the flowing:
+#       1.exist?
+#       2.file/directory
+#       3.file permissions
+#History:
+# 2024/08/23    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+# 让使用者输入档名，并且判断使用者是否真的有输入字符串？
+echo -e "Please input a filename，I will check the filename's type and permission. \n\n"
+read -p "Input a filename:" filename
+test -z ${filename} && echo "You MUST input a filename." && exit 0
+
+#2. 判断文件是否存在，若不存在则显示信息并结束脚本
+
+test ! -e ${filename} && echo "The filename '${filename}' DO NOT exist" && exit 0
+
+#3. 开始判断文件类型与属性
+test -f ${filename} && filetype="regulare file"
+test -d ${filename} && filetype="directory"
+test -r ${filename} && perm="readable"
+test -w ${filename} && perm="${perm} writable"
+test -x ${filaname} && perm="${perm} executable"
+
+#4.开始输出信息
+echo "The filename：${filename} is a ${filetype}"
+echo "And the permisssions for you are: ${perm}"
+
+
+
+
+[az@iZbp13op1xah7j3j1x457dZ ~]$ sh file_perm.sh 
+Please input a filename，I will check the filename's type and permission. 
+
+
+Input a filename:testone
+The filename 'testone' DO NOT exist
+[az@iZbp13op1xah7j3j1x457dZ ~]$ sh file_perm.sh 
+Please input a filename，I will check the filename's type and permission. 
+
+
+Input a filename:printf.txt
+The filename：printf.txt is a regulare file
+And the permisssions for you are: readable writable executable
+[az@iZbp13op1xah7j3j1x457dZ ~]$ 
+
+```
+
+
+### 利用判断符号 []
+
+判断${HOME} 这个变量是否为空
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ ~]$ [ -z "${HOME}" ] ; echo $?
+1
+[az@iZbp13op1xah7j3j1x457dZ ~]$
+
+[az@iZbp13op1xah7j3j1x457dZ ~]$ [ ${name} == "VBird" ]
+bash: [: too many arguments
+[az@iZbp13op1xah7j3j1x457dZ ~]$ [ "${name}" == "VBird" ]
+[az@iZbp13op1xah7j3j1x457dZ ~]$ 
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ ~]$ vim ans_yn.sh
+#!/bin/bash
+#Program
+#       This program shows the user's choice
+#History:
+#2024/08/23     az      First realse
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~bin
+export PATH
+
+read -p "Please Input(Y/N):" yn
+[ "${yn}" == "Y" or "${yn}" == "y" ] && echo "OK, continue" && exit 0
+[ "${yn}" == "N" or "${yn}" == "n" ] && echo "Oh, interrupt!" && exit 0
+
+echo "I don't know what your choice is " && exit 0
+~                                                                                                                         
+~
+
+
+[az@iZbp13op1xah7j3j1x457dZ ~]$ sh ans_yn.sh 
+Please Input(Y/N):n
+Oh, interrupt!
+[az@iZbp13op1xah7j3j1x457dZ ~]$ sh ans_yn.sh 
+Please Input(Y/N):y
+OK, continue
+[az@iZbp13op1xah7j3j1x457dZ ~]$                                                     
+```
+
+### Shell script 的默认变数（$0,$1...）
+
