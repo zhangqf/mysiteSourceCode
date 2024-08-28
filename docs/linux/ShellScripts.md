@@ -382,3 +382,47 @@ OK, continue
 
 ### Shell script 的默认变数（$0,$1...）
 
+```shell
+/path/to/scriptname  opt1  opt2  opt3  opt4
+      $0              $1    $2    $3    $4
+```
+- \$#: 代表后接的参数 个数 ， 上面显示为4个
+- \$@: 代表 "$1" "$2" "$3" "$4"
+- \$*: 代表 "$1 $2 $3 $4"
+
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ ~]$ vim how_paras.sh
+
+#!/bin/bash
+#Program:
+#       Program shows the script name, parameters...
+#History:
+# 2024/08/28    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+echo "The script name is        ===> ${0}"
+echo "Total parameter number is         ===> $#"
+[ "$#" -lt 2 ] && echo "The number of parameter is less than 2. Stop here." && exit 0
+echo "Your whole parameter is   ===>'$@'"
+echo "The 1st parameter         ===>${1}"
+echo "The 2nd parameter         ===>${2}"
+
+
+# 程序的文件名是什么
+# 共有几个参数
+# 若参数的个数小于2则告知使用者参数数量太少
+# 全部的参数内容是什么
+# 第一个参数是什么
+# 第二个参数是什么
+
+[az@iZbp13op1xah7j3j1x457dZ ~]$ sh how_paras.sh theone haha quot
+The script name is      ===> how_paras.sh
+Total parameter number is       ===> 3
+Your whole parameter is ===>'theone haha quot'
+The 1st parameter               ===>theone
+The 2nd parameter               ===>haha
+[az@iZbp13op1xah7j3j1x457dZ ~]$ 
+
+```
