@@ -128,6 +128,7 @@ module.exports = {
           { text: 'BASH与Shell', link: '/linux/BASH与Shell' },
           { text: '正则与文件格式化', link: '/linux/正则与文件格式化' },
           { text: 'Shell Scripts', link: '/linux/ShellScripts' },
+          { text: 'Linux 账号管理与ACL权限设定', link: '/linux/Linux 账号管理与ACL权限设定' },
         ]
       },
       '/vueRender/': {
