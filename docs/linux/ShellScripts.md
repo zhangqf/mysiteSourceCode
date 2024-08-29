@@ -1064,10 +1064,108 @@ ping: $: Name or service not known
 Server 192.168.1.27 is DOWN.   
 ```
 
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim dir_perm.sh
+#!/bin/bash
+#Program
+#       User input dir name. I find the permission of files.
+#History
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
 
+read -p "Please input a directory: " dir
+if [ "${dir}" == "" -o ! -d "${dir}" ]; then
+        echo "The ${dir} is NOT exist in your system".
+        exit 1
+fi
+ 
+filelist=$(ls ${dir})
+for filename in ${filelist}
+do
+        perm=""
+        test -r "${dir}/${filename}" && perm="${perm} readable"
+        test -w "${dir}/${filename}" && perm="${perm} writable" 
+        test -x "${dir}/${filename}" && perm="${perm} executable"
+        echo "The file ${dir}/${filename}'s permission is ${perm}"
+done
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh dir_perm.sh 
+Please input a directory: /bin
+The file /bin/['s permission is  readable executable
+The file /bin/2to3-3's permission is  readable executable
+The file /bin/2to3-3.6's permission is  readable executable
+The file /bin/a2p's permission is  readable executable
+The file /bin/addr2line's permission is  readable executable
+The file /bin/alias's permission is  readable executable
+...
+
+```
 
 ### for...do...done 的数值处理
-### 搭配随机数与数组的实验
+
+```shell
+for ((初始值；限制值；执行步阶))
+do
+        程序段
+done
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim cal_1_100-2.sh
+#!/bin/bash
+#Program
+#       Try do calculate 1+2+...+${your_input}
+#History
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input a number. I will count for 1+2+...+your_input: " nu
+
+s=0
+for(( i=1; i<=${nu}; i=i+1 ))
+do
+        s=$((${s}+${i}))
+done
+echo "The result of '1+2+...+${nu}' is ==> ${s}"
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh cal_1_100-2.sh 
+Please input a number. I will count for 1+2+...+your_input: 4
+The result of '1+2+...+4' is ==> 10
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh cal_1_100-2.sh 
+Please input a number. I will count for 1+2+...+your_input: 100
+The result of '1+2+...+100' is ==> 5050
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
+
 
 ## shell script 的追踪与 debug
 
+|选项|解释|
+|---|---|
+|-n|不要执行script，仅查询语法问题|
+|-v|在执行script前，先将scripts的内容输出到屏幕上|
+|-x|将使用到的script内容显示到屏幕上|
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh -n dir_perm.sh 
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh -x show_animal.sh 
++ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/az/bin
++ export PATH
++ for animal in dog cat elephant
++ echo 'There are dogs ...'
+There are dogs ...
++ for animal in dog cat elephant
++ echo 'There are cats ...'
+There are cats ...
++ for animal in dog cat elephant
++ echo 'There are elephants ...'
+There are elephants ...
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
