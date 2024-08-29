@@ -426,3 +426,648 @@ The 2nd parameter               ===>haha
 [az@iZbp13op1xah7j3j1x457dZ ~]$ 
 
 ```
+- shift： 造成参数变量号码偏移
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ ~]$ vim shift_paras.sh
+#!/bin/bash
+#Program:
+#       Program shows the effect of shift function.
+#History:
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~bin
+export PATH
+
+echo "Total parameter number is ==>$#"
+echo "Your whole parameter is ==> '$@'"
+
+shift  # 进行第一次 一个变量的shift
+echo "Total parameter number is ==> $#"
+echo "Your whole parameter is ==> '$@'"
+
+shift 3 # 进行第二次 三个变量的shift
+
+echo "Total parameter number is ==> $#"
+echo "Your whole parameter is ==> '$@'"
+
+
+
+[az@iZbp13op1xah7j3j1x457dZ ~]$ sh shift_paras.sh one two three four five six
+Total parameter number is ==>6
+Your whole parameter is ==> 'one two three four five six'
+Total parameter number is ==> 5
+Your whole parameter is ==> 'two three four five six'
+Total parameter number is ==> 2
+Your whole parameter is ==> 'five six'
+[az@iZbp13op1xah7j3j1x457dZ ~]$ 
+
+```
+
+## 条件判断
+### if...then
+
+- 单层、判断条件判断
+
+```shell
+if [ 条件判断 ]; then
+        当条件判断成立时，可以进行的指令工作内容
+fi
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim ans_yn-2.sh
+#!/bin/bash
+#Program:
+#       This program shows the user's choice
+#History:
+# 2024/08/29    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input (Y/N):" yn
+if [ "${yn}" == "Y" ] || [ "${yn}" == "y" ];  then
+        echo "OK, continue"
+        exit 0
+fi
+
+if [ "${yn}" == "N" ] || [ "${yn}" == "n" ]; then
+        echo "Oh, interrupt!"
+        exit 0
+fi
+echo "I don't know what your choice is" && exit 0
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh ans_yn-2.sh 
+Please input (Y/N):y
+OK, continue
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh a
+sh: a: No such file or directory
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh ans_yn-2.sh 
+Please input (Y/N):n
+Oh, interrupt!
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+
+```
+  
+- 多重、复杂条件判断
+```shell
+if [ 条件判断 ]; then
+        当条件判断成立时，可以进行指令工作内容
+else
+        当条件判断不成立时，可以进行的指令工作内容
+fi
+
+
+if [ 条件判断 ]; then
+        当条件判断成立时，可以进行指令工作内容
+elif [条件判断 ]; then
+        当条件判断成立时，可以进行的工作内容
+else
+        当条件判断都不成立时，可以进行的指令工作内容
+fi
+
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim ans_yn-3.sh
+#!/bin/bash
+#Program:
+#       This program shows the user's choice
+#History:
+# 2024/08/29    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+read -p "Please input (Y/N):" yn
+if [ "${yn}" == "Y" ] || [ "${yn}" == "y" ];  then
+        echo "OK, continue"
+elif [ "${yn}" == "N" ] || [ "${yn}" == "n" ]; then
+        echo "Oh, interrupt!"
+else
+        echo "I don't know what your choice is"
+
+fi
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh ans_yn-3.sh 
+Please input (Y/N):y
+OK, continue
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh ans_yn-3.sh 
+Please input (Y/N):n
+Oh, interrupt!
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
+
+```shell
+# 判断$1是否为hello，如果是的话，就显示“Hello，How are you？”
+# 如果没有加任何参数，就提示使用者必须要使用的参数下达法
+# 而如果加入的参数不是hello，就提醒使用者仅能使用hello为参数
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim hello-2.sh
+
+#!/bin/bash
+#Program:
+#       Check $1 is equal to "hello"
+#History:
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin/:usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+if [ "${1}" == "hello" ]; then
+        echo "Hello, how are you?"
+elif [ "${1}" == "" ]; then
+        echo "You MUST input parameters, ex> {${0} someword}"
+else
+        echo "The only parameter is 'hello', ex> {${0} hello}"
+fi
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh hello-2.sh 
+You MUST input parameters, ex> {hello-2.sh someword}
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh hello-2.sh  hello
+Hello, how are you?
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh hello-2.sh  world
+The only parameter is 'hello', ex> {hello-2.sh hello}
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+
+# 目前主机有启动的服务
+[az@iZbp13op1xah7j3j1x457dZ bin]$ netstat -tuln
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:46096         0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:8099            0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:9099            0.0.0.0:*               LISTEN     
+tcp6       0      0 :::111                  :::*                    LISTEN     
+tcp6       0      0 :::80                   :::*                    LISTEN     
+tcp6       0      0 ::1:25                  :::*                    LISTEN     
+tcp6       0      0 :::8099                 :::*                    LISTEN     
+tcp6       0      0 :::9099                 :::*                    LISTEN     
+udp        0      0 0.0.0.0:68              0.0.0.0:*                          
+udp        0      0 0.0.0.0:111             0.0.0.0:*                          
+udp        0      0 127.0.0.1:323           0.0.0.0:*                          
+udp        0      0 0.0.0.0:712             0.0.0.0:*                          
+udp6       0      0 :::111                  :::*                               
+udp6       0      0 ::1:323                 :::*                               
+udp6       0      0 :::712                  :::*                               
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+# 12.0.0.1 仅针对本机开发
+# 0.0.0.0 或 ::: 代表对整个Internet 开放
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim netstat.sh
+#!/bin/bash
+#Program:
+#       Using netstat and grep to detect WWW，SSH，FTP and Mail services.
+#History：
+# 2024/08/29    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+
+echo "Now, I will detect your Linux server's services!"
+echo -e "The www, ftp, ssh, and mail（smtp）will be detect ! \n"
+
+testfile=/dev/shm/netstat_checking.txt
+netstat -tuln > ${testfile}
+testing=$(grep ":80 " ${testfile})
+if [ "${testing}" != "" ]; then
+        echo "WWW is running in your system."
+fi
+
+testing=$(grep ":22" ${testfile})
+if [ "${testing}" != "" ]; then
+        echo "SSH is running in your system."
+fi
+
+testing=$(grep ":21 " ${testfile})
+if [ "${test}" != "" ]; then
+        echo "FTP is running in your system."
+fi
+
+testing=$(grep ":25" ${testfile})
+if [ "${testing}" != "" ]; then
+        echo "Mail is running in your system."
+fi
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh netstat.sh 
+Now, I will detect your Linux server's services!
+The www, ftp, ssh, and mail（smtp）will be detect ! 
+
+WWW is running in your system.
+SSH is running in your system.
+Mail is running in your system.
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
+
+
+```shell
+# 先让使用者输入它们的退伍日期
+# 再由现在日期比对退伍日期
+# 由两个日期的比较来显示 还需要几天 才能够退伍的字样
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim cal_retired.sh
+#!/bin/bash
+#Program
+#       You input your demobilization date. I calculate how many days before you demobilize.
+#History:
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+# 告知用户这个程序的用途，并且告知应该如何输入日期格式
+echo "This program will try to calculate :"
+echo "How many days before your demobilization date..."
+read -p "Please input your demobilization date (YYYYMMDD ex>20240829): " date2
+
+# 测试一下，这个输入的内容是否正确。
+date_d=$(echo ${date2} | grep '[0-9]\{8\}') 
+if [ "${date_d}" == "" ]; then
+        echo "You input the wrong date format..."
+        exit 1
+fi
+
+# 开始计算日期
+declare -i date_dem=$(date --date="${date2}" +%s)       # 退伍日期秒数
+declare -i date_now=$(date +%s)                         # 现在日期秒数
+declare -i date_total_s=$((${date_dem}-${date_now}))    # 剩余描述统计
+declare -i date_d=$((${date_total_s}/60/60/24))         # 转为日数
+
+if [ "${date_total_s}" -lt "0" ]; then
+        echo "You had been demobilization before: " $((-l*${date_d})) " ago"
+else
+        declare -i date_h=$(($((${date_total_s}-${date_d}*60*60*24))/60/60))
+        echo "You will demobilize after ${date_d} days and ${date_h} hours."
+fi
+
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh cal_retired.sh 
+This program will try to calculate :
+How many days before your demobilization date...
+Please input your demobilization date (YYYYMMDD ex>20240829): 20241010
+You will demobilize after 41 days and 7 hours.
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+```
+
+### case...esac判断
+
+```shell
+case $变量名称 in      # 关键词case， 还有变数前有钱字号
+  "第一个变量内容")    # 每个变量内容建议用双引号括起来，关键词为小括号
+        程序段
+        ;;        # 每个类别结尾使用两个连续的分号来处理
+  "第二个变量内容")
+        程序段
+        ;;
+  *)          # 最后一个变量内容都会用到* 来代表所有其他值
+        不包含第一个变量内容与第二个变量内容的其他程序执行段
+        exit 1
+        ;;
+esac        # 最终的case 结尾
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim hello-3.sh
+#!/bin/bash
+#Program
+#       Show "Hello" from $1... by using case ... esac
+# History
+# 2024/08/29    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+case ${1} in
+        "hello")
+                echo "Hello, how are you ?"
+                ;;
+        "")
+                echo "You MUST input parameters. ex> {${0} someword}"
+                ;;
+        *)
+                echo "Usage ${0} {hello}"
+                ;;
+esac
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh hello-3.sh 
+You MUST input parameters. ex> {hello-3.sh someword}
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh hello-3.sh hello
+Hello, how are you ?
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh hello-3.sh helloWorld
+Usage hello-3.sh {hello}
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+```
+
+使用 case $变量in 这个语法中，当中的那个 $变量 大致有两种取得的方式
+
+- 直接下达式：利用 script.sh variable 的方式来直接给予 $1 这个变量的内容，这也是在 /etc/init.d 目录下大多数程序的设计方式
+- 交互式： 透过read 这个指令来让用户输入变量的内容
+
+
+### function 
+
+```shell
+funtion fname() {
+        程序段
+}
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim show123-2.sh
+
+#!/bin/bash
+#Program
+#       Use funtion to repeat information
+#History:
+#2024/08/29     az      first release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+function printit() {
+        echo -n "Your choice is " # 加上 -n 可以不断行继续在同一行显示
+}
+
+echo "This program will print your selection !"
+case ${1} in  
+        "one")
+                printit; echo ${1} | tr 'a-z' 'A-Z'
+                ;;  
+        "two")
+                printit; echo ${2} | tr 'a-z' 'A-Z'
+                ;;  
+        "three")
+                printit; echo ${3} | tr 'a-z' 'A-Z'
+                ;;  
+        *)  
+                echo "Usage ${0} {one|two|three}"
+                ;;  
+esac
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh show123-2.sh 
+This program will print your selection !
+Usage show123-2.sh {one|two|three}
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh show123-2.sh one
+This program will print your selection !
+Your choice is ONE
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
+
+## 循环 
+### while do done, until do done(不定循环)
+
+```shell
+while [ condition ]   condition 是判断条件
+do          # do 是循环的开始
+      程序段落
+done        # done是循环的结束
+
+
+# 下面这个与while 相反，当条件成立时，就终止循环，否则就持续进行循环的程序段落
+until [ condition ]
+do
+      程序段落
+done
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim yes_to_stop.sh
+
+#!/bin/bash
+#Program:
+#       Repeat question until user input correct answer.
+#History:
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+while [ "${yn}" != "yes" -a "${yn}" != "YES" ]
+do
+        read -p "Please input yes/YES to stop this program: " yn
+done
+echo "OK! you input the correct answer."
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh yes_to_stop.sh 
+Please input yes/YES to stop this program: bhso
+Please input yes/YES to stop this program: ashf 
+Please input yes/YES to stop this program: oiweo
+Please input yes/YES to stop this program: ahsfow
+Please input yes/YES to stop this program: no
+Please input yes/YES to stop this program: hasd;f
+Please input yes/YES to stop this program: yes
+OK! you input the correct answer.
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim yes_to_stop-2.sh
+#!/bin/bash
+#Program:
+#       Repeat question until user input correct answer.
+#History:
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+until [ "${yn}" == "yes" -o "${yn}" == "YES" ]
+do
+        read -p "Please input yes/YES to stop this program: " yn
+done
+echo "OK! you input the correct answer."
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh yes_to_stop-2.sh 
+Please input yes/YES to stop this program: lsdk
+Please input yes/YES to stop this program: lasdj
+Please input yes/YES to stop this program: a
+Please input yes/YES to stop this program: ye
+Please input yes/YES to stop this program: yes
+OK! you input the correct answer.
+[az@iZbp13op1xah7j3j1x457dZ bin]$ 
+
+```
+
+
+### for...do...done(固定循环)
+相对于while，until的循环方式是必须要 符合某个条件 的状态，而for循环 则是已经知道 要进行几次循环 的状态
+
+```shell
+for var in con1 con2 con3 ...
+do
+      程序段
+done
+```
+
+```shell
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim show_animal.sh
+
+#!/bin/bash
+#Program:
+#       Using for ... loop to print 3 animals
+#History:
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+for animal in dog cat elephant
+do
+        echo "There are ${animal}s ..."
+done
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh show_animal.sh 
+There are dogs ...
+There are cats ...
+There are elephants ...
+[az@iZbp13op1xah7j3j1x457dZ bin]$
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim userid.sh
+#!/bin/bash
+#Program
+#       Use id, finger command to check system account's information.
+#History
+#2024/08/29     az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+users=$(cut -d ':' -f1 /etc/passwd)  # 撷取账号名称
+for username in ${users}
+do
+        id ${username}
+done
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh userid.sh 
+uid=0(root) gid=0(root) groups=0(root)
+uid=1(bin) gid=1(bin) groups=1(bin)
+uid=2(daemon) gid=2(daemon) groups=2(daemon)
+uid=3(adm) gid=4(adm) groups=4(adm)
+uid=4(lp) gid=7(lp) groups=7(lp)
+uid=5(sync) gid=0(root) groups=0(root)
+uid=6(shutdown) gid=0(root) groups=0(root)
+uid=7(halt) gid=0(root) groups=0(root)
+uid=8(mail) gid=12(mail) groups=12(mail)
+uid=11(operator) gid=0(root) groups=0(root)
+uid=12(games) gid=100(users) groups=100(users)
+uid=14(ftp) gid=50(ftp) groups=50(ftp)
+uid=99(nobody) gid=99(nobody) groups=99(nobody)
+uid=192(systemd-network) gid=192(systemd-network) groups=192(systemd-network)
+uid=81(dbus) gid=81(dbus) groups=81(dbus)
+uid=999(polkitd) gid=998(polkitd) groups=998(polkitd)
+uid=74(sshd) gid=74(sshd) groups=74(sshd)
+uid=89(postfix) gid=89(postfix) groups=89(postfix),12(mail)
+uid=998(chrony) gid=996(chrony) groups=996(chrony)
+uid=28(nscd) gid=28(nscd) groups=28(nscd)
+uid=72(tcpdump) gid=72(tcpdump) groups=72(tcpdump)
+uid=32(rpc) gid=32(rpc) groups=32(rpc)
+uid=29(rpcuser) gid=29(rpcuser) groups=29(rpcuser)
+uid=65534(nfsnobody) gid=65534(nfsnobody) groups=65534(nfsnobody)
+uid=997(nginx) gid=995(nginx) groups=995(nginx)
+uid=996(gitlab-www) gid=993(gitlab-www) groups=993(gitlab-www)
+uid=995(git) gid=992(git) groups=992(git)
+uid=994(gitlab-redis) gid=991(gitlab-redis) groups=991(gitlab-redis)
+uid=993(gitlab-psql) gid=990(gitlab-psql) groups=990(gitlab-psql)
+uid=992(gitlab-prometheus) gid=989(gitlab-prometheus) groups=989(gitlab-prometheus)
+uid=1000(az) gid=1000(az) groups=1000(az),0(root)
+uid=1001(alex) gid=1002(alex) groups=1002(alex),1001(project)
+uid=1002(arod) gid=1001(project) groups=1001(project),1003(arod)
+[az@iZbp13op1xah7j3j1x457dZ bin]$
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ vim pingip.sh
+#!/bin/bash
+#Program
+#       Use ping command to check the network's PC state.
+#History
+# 2024/08/29    az      First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+network='192.168.1'
+for sitenu in $(seq 1 100) # seq 为 sequence（连续）的所写之意
+do
+        ping -c 1 -w 1 ${nework}.${sitenu} $> /dev/null && result=0 || result=1
+        if [ "${result}" == 0 ]; then
+                echo "Server ${network}.${sitenu} is UP."
+        else
+                echo "Server ${network}.${sitenu} is DOWN."
+        fi
+done
+~
+
+
+[az@iZbp13op1xah7j3j1x457dZ bin]$ sh pingip.sh 
+ping: $: Name or service not known
+Server 192.168.1.1 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.2 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.3 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.4 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.5 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.6 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.7 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.8 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.9 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.10 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.11 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.12 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.13 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.14 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.15 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.16 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.17 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.18 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.19 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.20 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.21 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.22 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.23 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.24 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.25 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.26 is DOWN.
+ping: $: Name or service not known
+Server 192.168.1.27 is DOWN.   
+```
+
+
+
+### for...do...done 的数值处理
+### 搭配随机数与数组的实验
+
+## shell script 的追踪与 debug
+
