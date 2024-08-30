@@ -141,17 +141,83 @@ linux系统上的用户如果需要登入主机取得shell的环境来工作时�
   3. GID：就是群组的ID。
   4. 此群组支持的账号名称：一个账号可以加入多个群组，那某个账号想要加入此群组时，将改账号填入这个字段即可。如，想要让az也加入到root这个群组，那么在第一行的最后面加上az，如果是多个用户吗，则使用 ， 分隔
 - 有效群组（effective group）与初始群组（initial group）
-
+  每个使用者在他的/etc/passwd里面的第四栏有所谓的GID，这个GID就是所谓的 初始群组（initial group）。也就是说，档用户一登入系统，就立刻拥有这个群组的的相关权限的意思。如，az这个使用者的/etc/passwd与/etc/gshadow相关的内容如下
+  ```shell
+  [root@iZbp13op1xah7j3j1x457dZ ~]# usermod -a -G users az
+  [root@iZbp13op1xah7j3j1x457dZ ~]# grep az /etc/passwd /etc/group /etc/gshadow
+  /etc/passwd:az:x:1000:1000::/home/az:/bin/bash
+  /etc/group:root:x:0:az            # 次要群组设定，安装时指定
+  /etc/group:users:x:100:az            # 次要群组设定，安装时指定
+  /etc/group:az:x:1000:            # 初始群组，所以第四个字段不需要填入账号
+  /etc/gshadow:root:::az            # 次要群组设定
+  /etc/gshadow:users:::az            # 次要群组设定
+  /etc/gshadow:az:!::
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+  上面例子中，az账号同时支持az root users 这三个群组，因此，在读取/写入/执行文件时，针对群组部分，只要时users，root， az这三个群组拥有的功能，az这个账号的使用这都能够拥有。**不过，这是针对已经存在的文件而言，如果今天要建立一个新的文件或者时目录，新文件的群组时az，root，还是users呢** ，这就要检查一下当时有效群组了
 - groups：有效与支持群组的观察
-
+  如果以az这个账号登入，该如何知道所有支持的群组呢。
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ root]$ groups
+  az root users
+  [az@iZbp13op1xah7j3j1x457dZ root]$ 
+  ```
+  上面信息中可以知道az这个用户同时属于az root users这三个群组，第一个输出的群组即为有效群组（effective group）。即当前账号az的有效群组为az。若此时以touch去建立一个新档，那么新建的这个文件拥有者为az，群组为az
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ touch test
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ll test
+  -rw-rw-r-- 1 az az 0 Aug 30 22:14 test
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
+  ```
 - newgrp：有效群组切换
+  变更有效群组，使用newgrp时，想要变更的群组必须是你已经支持的群组。az 可以在az root users这三个群组之间切换有效群组。但是无法切换有效群组为其他群组
+  ```shell
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ groups
+  users root az
+  [az@iZbp13op1xah7j3j1x457dZ ~]$
+  
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ touch test2
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ ll test2
+  -rw-r--r-- 1 az users 0 Aug 30 22:21 test2
+  [az@iZbp13op1xah7j3j1x457dZ ~]$ 
 
+  ```
+  这个指令可以变更当前用户的有效群组，而且是**另外以一个shell来提供这个功能的**，所以，上面的列子来说，az这个使用者目前是以另一个shell登入的，而且新的shell给予az有效GID为users。虽然用户的环境设定不会有影响，但是使用者的 群组权限 将会重新被计算。需要注意，由于是新取得一个shell，因此如果想要回到原本环境中，请输入 exit 来回到原本shell
 - /etc/gshadow
-
-
+  ```
+  [root@iZbp13op1xah7j3j1x457dZ ~]# head -n 4 /etc/gshadow
+  root:::az
+  bin:::
+  daemon:::
+  sys:::
+  [root@iZbp13op1xah7j3j1x457dZ ~]# 
+  ```
+  1. 组名
+  2. 密码栏，开头为！表示无合法密码，所有无群组管理员
+  3. 群组管理员账号
+  4. 有加入该群组支持的所属账号
+     
+  gshadow最大的功能就是建立群组管理员。什么是群组管理员？由于系统上面的账号可能会很多，root可以忙不过来，所以当有使用者想要加入某些群组时，root或许会没有空管理。此时如果能建立群组管理员的话，那么该群组管理员就能够将那个账号加入自己管理的群组中。免去root的操作。
 
 ## 账号管理
 ### 新增与移除使用者： useradd，相关配置文件，passwd，usermod，userdel
+
+-useradd
+
+|选项|解释|
+|---|---|
+|-u|后面接的是UID，是一组数字。直接指定一个特定的UID给这个账号|
+|-g|后面接的那个组名就是我们上面提到的initial group|
+|-G|后面接的组名则是这个账号还可以加入的群组<br>这个选项与参数会修改/etc/group内的相关资料|
+|-M|强制！不要建立用户家目录（系统账号默认值）|
+|-m|强制！要建立用户家目录（一般账号默认值）|
+|-c|这个就是/etc/passwd的第五栏的说明内容|
+|-d|指定某个目录成为家目录，而且不要使用默认值。务必使用绝对路径|
+|-r|建立一个系统的账号，这个账号的UID会有限制（参考/etc/login.defs）|
+|-s|后面接一个shell，若没有指定则预设是/bin/bash|
+|-e|后面接一个日期，格式为 YYYY-MM-DD 此项目可写入shadow 第八个字段，即账号失效日的设定项目|
+|-f|后面接shadow的第七个字段项目，指定密码是否会失效。0为立刻失效，-1为永远不失效（密码只会过期而强制登入时重新设定）|
+
 ### 用户功能
 ### 新增与移除群组
 ### 账号管理实例
