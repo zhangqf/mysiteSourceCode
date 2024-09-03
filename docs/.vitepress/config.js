@@ -86,7 +86,7 @@ module.exports = {
           { text: 'vue', link: '/vue' },
           { text: '浏览器', link: '/browse' },
           { text: 'vue渲染器', link: '/vueRender' },
-
+          { text: 'webpack', link: '/webpack' },
         ]
       }
     ],
