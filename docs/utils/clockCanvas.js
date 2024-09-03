@@ -75,7 +75,7 @@ ClockCanvas.prototype = {
     ctx.font = '18px "微软雅黑"';
     ctx.fillStyle = "#96202099";
     ctx.textBaseline = "center";
-    ctx.fillText("MADE IN QING", -w / 4 + 30, h / 4);
+    ctx.fillText("MADE IN QIAN", -w / 4 + 30, h / 4);
     ctx.closePath()
     let time = new Date()
     let hour = time.getHours() % 12
