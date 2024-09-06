@@ -144,7 +144,7 @@ module.exports = {
         text: 'webpack',
         items: [
           { text: 'webpack', link: '/webpack/' },
-          { text: 'webpack的理解'， link: '/webpack/webpack的理解'}
+          { text: 'webpack的理解', link: '/webpack/webpack的理解'}
         ]
       }
     },
