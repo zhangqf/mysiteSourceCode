@@ -87,6 +87,7 @@ module.exports = {
           { text: '浏览器', link: '/browse' },
           { text: 'vue渲染器', link: '/vueRender' },
           { text: 'webpack', link: '/webpack' },
+          { text: 'git', link: '/git' },
         ]
       }
     ],
@@ -144,6 +145,13 @@ module.exports = {
         text: 'webpack',
         items: [
           { text: 'webpack', link: '/webpack/' },
+          { text: 'webpack的理解', link: '/webpack/webpack的理解'}
+        ]
+      },
+      '/git/': {
+        text: 'git',
+        items: [
+          { text: 'git', link: '/git/' },
           { text: 'webpack的理解', link: '/webpack/webpack的理解'}
         ]
       }
