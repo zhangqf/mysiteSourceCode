@@ -88,6 +88,7 @@ module.exports = {
           { text: 'vue渲染器', link: '/vueRender' },
           { text: 'webpack', link: '/webpack' },
           { text: 'git', link: '/git' },
+          { text: 'vue3', link: '/vue3面试题' },
         ]
       }
     ],
@@ -153,6 +154,12 @@ module.exports = {
         items: [
           { text: 'git', link: '/git/' },
           { text: 'webpack的理解', link: '/webpack/webpack的理解'}
+        ]
+      },
+      '/vue3/': {
+        text: 'vue3面试题',
+        items: [
+          { text: 'vue3', link: '/vue3面试题/' }
         ]
       }
     },
