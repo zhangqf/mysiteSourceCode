@@ -49,12 +49,19 @@
 将2中的两个生命周期更名 beforeDestory ===> beforeUnmount、 destroyed ===> unmounted
 vue3也提供了Composition API形式的生命周期钩子，与2中的钩子对应
 beforeCreate ===> setup()
+
 created ===> setup()
+
 beforeMount ===> onBeforeMount
+
 Mounted ===> onMounted
+
 beforeUpdate ===> onBeforeUpdate
+
 updated ===> onUpdated
+
 beforeUnmount ===> onBeforeUnmount
+
 unmounted ===> onUnmounted
 
 ## vue3常用的Composition API有哪些
@@ -77,10 +84,12 @@ setup不能是一个async函数，因为返回值不再是return的对象，而�
 vue2、vue3 diff算法实现差异主要体现在：处理完首尾节点后，对剩余节点的处理方式
 vue2是通过对旧节点列表建立一个｛key,oldVnode｝的映射表，然后遍历新节点列表的剩余节点，根据newVnode.key在旧映射表中寻找可复用的节点，然后打补丁并且移动到正确位置
 ![](./images/屏幕截图 2024-09-13 173307.png)
+
+![](images/屏幕截图 2024-09-13 173307.png)
+
 vue3则是建立一个存储新节点数组中的剩余节点在旧节点数组上的索引的映射关系数组，建立完成这个数组后也即找到了可复用的节点，然后通过这个数组计算得到最长递增子序列，这个序列中的节点保持不动，然后将新节点数组中的剩余节点移动到正确位置
 
 
-![屏幕截图 2024-09-13 173307](https://github.com/user-attachments/assets/9234c8f4-d1b2-49e2-89ee-1b1028a05db2)
 
 
 
