@@ -39,6 +39,10 @@ features:
     title: 经典书籍
     details: 心经 金刚经 坛经
     link: /scriptures
+  - icon: 🔱
+    title: vite
+    details: vite
+    link: /vite
 ---
 <style>
 
