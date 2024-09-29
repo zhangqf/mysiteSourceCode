@@ -111,3 +111,99 @@ const viteConfig = {
 
 
 **环境的处理**
+
+vite.config.js
+```js
+import { defineConfig } from 'vite'
+import viteBaseConfig from './vite.base.config'
+import viteProdConfig from './vite.prod.config'
+import viteDevConfig from './vite.dev.config'
+
+
+// 策略模式
+
+const envResolver = {
+	'build': () => Object.assign({}, viteBaseConfig,viteProdConfig),
+	'server': () => Object.assign({}, viteBaseConfig, viteDevConfig)
+}
+export default defineConfig(({command}) => {
+	return envResolver[command]()
+})
+```
+
+**vite 环境变量配置**
+
+> 环境变量：会根据当前的代码环境产生的值变化的变量就叫环境变量
+
+1. 开发环境
+2. 测试环境
+3. 预发布环境
+4. 灰度环境
+5. 生成环境
+
+使用第三方库 `dotenv`, 自动读取.evn文件，并解析这个文件中的对应的环境变量，将其注入到process对象下，但是vite考虑到和其他配置的一些冲突问题，vite不会直接注入到process对象下
+
+
+涉及到vite.config.js中的一些配置:
+root
+envDir:用来配置当前环境变量的文件地址
+
+```js
+export default defineConfig(({command,mode}) => {
+	const env = loadEnv(mode,process.cwd(),'')
+	console.log(env)
+	return envResolver[command]()
+})
+```
+
+在客户端中，vite会将环境变量注入到`import.meta.env`中。
+
+vite为了防止我们将隐私性的变量直接送进import.meta.env中，它做了一层拦截，如果环境变量不是以`VITE` 开头的，就不会注入到到客户端中，如果想要更改这个前缀，可以使用`envPrefix`配置
+
+
+为什么 `vite.config.js`可以书写成esm形式，这是因为vite他在读取这个vite.config.js时候会先node去解析文件语法，如果发现是esm规范会直接将esm规范进行替换变成commonjs规范
+
+
+**vite处理css**
+
+vite 天生就支持对css文件的直接处理
+
+1. vite在读取到js文件中引用到.css文件
+2. 直接去使用fs模块去读取css中文件内容
+3. 直接创建一个style标签，将css中文件内容直接copy到style标签里
+4. 将style标签插入到index.html的head中
+5. 将该css文件中的内容直接替换为js脚本（方便热更新或css模块化），同时设置Content-Type为js，从而让浏览器以js脚本来执行该css后缀的文件
+
+
+**vite.config.js中css配置**
+
+在vite.config.js中配置css属性控制整个vite对css处理行为
+
+- localConvention：改变key的显示方式
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
