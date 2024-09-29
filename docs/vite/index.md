@@ -82,7 +82,7 @@ vite会找到对应的依赖，然后调用esbuild，将其他规范代码转换
 
 #### vite 配置文件
 
-**语法提示**
+##### 语法提示
 
 
 - 引入 `defineConfig`  使用如下方法，配置选项时，会有语法提示
@@ -110,7 +110,7 @@ const viteConfig = {
 ```
 
 
-**环境的处理**
+##### 环境的处理
 
 vite.config.js
 ```js
@@ -131,7 +131,7 @@ export default defineConfig(({command}) => {
 })
 ```
 
-**vite 环境变量配置**
+##### vite 环境变量配置
 
 > 环境变量：会根据当前的代码环境产生的值变化的变量就叫环境变量
 
@@ -164,7 +164,7 @@ vite为了防止我们将隐私性的变量直接送进import.meta.env中，它�
 为什么 `vite.config.js`可以书写成esm形式，这是因为vite他在读取这个vite.config.js时候会先node去解析文件语法，如果发现是esm规范会直接将esm规范进行替换变成commonjs规范
 
 
-**vite处理css**
+##### vite处理css
 
 vite 天生就支持对css文件的直接处理
 
@@ -175,24 +175,47 @@ vite 天生就支持对css文件的直接处理
 5. 将该css文件中的内容直接替换为js脚本（方便热更新或css模块化），同时设置Content-Type为js，从而让浏览器以js脚本来执行该css后缀的文件
 
 
-**vite.config.js中css配置**
+##### vite.config.js中css配置
 
 在vite.config.js中配置css属性控制整个vite对css处理行为
 
-- localConvention：改变key的显示方式
+![](./images/145105.png)
+
+- localConvention：改变key的显示方式(驼峰 下划线 中划线)
+- scopeBehaviour: 配置当前模块化行为是模块化还是全局化（有hash就是开启了模块化的一个标志，它可以保证产生不同的hash值来控制样式类名不被覆盖）
+- generateScopedName: 生成类名的规则
+- hashPrefix: hash会根据类名 + 文件名 + 文件内容 进行生成，如果想要生成hash更加独特一点，可以配置hashPrefix，配置的这个字符串会参与到最终的hash生成
+- globalModulePaths: 不参与css模块化的路径
+
+
+##### vite配置文件中css配置流程（preprocessorOption）
+
+![](./images/151514.png)
+
+```js
+ preprocessorOptions:{
+      less: { // 整个的配置对象都会最终给到less的执行参数中去（lessc --math=‘always’）
+        math: 'always',
+        globalVars: {},
+      }
+  }
+```
+
+
+##### postcss
+
+![](./images/155740.png)
+
+
+**对css的属性使用降级**
+
+**前缀补全** 
+
+使用见 ![test-postcss](https://github.com/zhangqf/learnVite/tree/master/test-postcss) 项目
 
 
 
-
-
-
-
-
-
-
-
-
-
+##### vite 加载静态资源
 
 
 
