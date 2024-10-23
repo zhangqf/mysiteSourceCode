@@ -171,7 +171,7 @@ module.exports = {
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
     ],
     footer: {
-      message: 'Released under the MIT License.',
+      message: '<a href="https://beian.miit.gov.cn/" target="_blank">陇ICP备2024014026号</a>',
       copyright: 'Copyright © 2024 Qian'
     },
     editLink: {
