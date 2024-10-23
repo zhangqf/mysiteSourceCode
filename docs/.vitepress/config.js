@@ -17,7 +17,8 @@ module.exports = {
     plugins: [SearchPlugin(options)] 
   },
   head: [
-    ['meta', {name: '谦的后花园', content: '技术博客关于编程和软件开发的最新技术文章'}]
+    ['meta', {name: '谦的后花园', content: '技术博客关于编程和软件开发的最新技术文章'}]，
+    ['link', {res: 'icon', href: './favicon.ico'}]
   ],
   search: {
     provider: 'local'
