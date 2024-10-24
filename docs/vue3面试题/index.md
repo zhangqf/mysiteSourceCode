@@ -23,7 +23,7 @@
 - 初次渲染快55%,更新渲染快133%
 - 内存减少了一半
 ### 源码的升级
--使用proxy替代Object.defineProperty实现响应式
+- 使用proxy替代Object.defineProperty实现响应式
 - 重写了虚拟DOM的实现和Tree-shaking
 
 ### vue3内置支持Typescript
