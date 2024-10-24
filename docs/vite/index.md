@@ -216,7 +216,7 @@ vite 天生就支持对css文件的直接处理
 
 **前缀补全** 
 
-使用见 ![test-postcss](https://github.com/zhangqf/learnVite/tree/master/test-postcss) 项目
+使用见 [test-postcss](https://github.com/zhangqf/learnVite/tree/master/test-postcss) 项目
 
 
 
