@@ -172,19 +172,7 @@ module.exports = {
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
     ],
     footer: {
-      message: '<a href="https://beian.miit.gov.cn/" target="_blank">陇ICP备2024014026号</a>
-        <a href="https://beian.mps.gov.cn/#/query/webSearch?code=62010502001808" rel="noreferrer" target="_blank">
-          <img 
-            style="
-              display: inline-block;
-              vertical-align: top;
-              margin: 0 12px 0 20px;
-              width: 20px;
-              height: 20px;
-              line-height: 20px;" 
-            src="/head_logo.png"/>
-          <span>甘公网安备62010502001808<span>
-        </a>',
+      message: '<a href="https://beian.miit.gov.cn/" target="_blank">陇ICP备2024014026号</a><a href="https://beian.mps.gov.cn/#/query/webSearch?code=62010502001808" rel="noreferrer" target="_blank"><img style="display: inline-block;vertical-align: top;margin: 0 12px 0 20px;width: 20px;height: 20px;line-height: 20px;"src="/head_logo.png"/><span>甘公网安备62010502001808<span></a>',
       copyright: 'Copyright © 2024 Qian'
     },
     editLink: {
