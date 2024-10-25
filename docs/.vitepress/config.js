@@ -89,7 +89,7 @@ module.exports = {
         items: [
           { text: 'vue', link: '/vue' },
           { text: '浏览器', link: '/browse' },
-          { text: 'vue渲染器', link: '/vueRender' },
+          // { text: 'vue渲染器', link: '/vueRender' },
           { text: 'webpack', link: '/webpack' },
           { text: 'git', link: '/git' },
           { text: 'vue3', link: '/vue3面试题' },
