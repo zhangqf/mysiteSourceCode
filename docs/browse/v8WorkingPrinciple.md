@@ -257,14 +257,16 @@ console.log(3)
 
 ## 白屏优化（资源获取到后，渲染进程创建一个空白页面，解析白屏）
 主要有：
-- 解析HTMl
+- 解析HTML
 - 下载CSS
 - 下载Javascript
 - 生成CSSOM
 - 执行Javascript
 - 生成布局树
 - 绘制页面
+
 **主要体现在下载CSS文件、下载Javascript文件和执行Javascript**
+  
 解决方法：
 - 通过内联Javascript、内联CSS来移除这两种类型的文件下载，这样获取到HTML文件之后就可以直接开始渲染流程
 - 可以尽量减少文件的大小。通过webpack等工具移除一些不必要的注释，压缩Javascript文件
