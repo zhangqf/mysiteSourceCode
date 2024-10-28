@@ -84,7 +84,7 @@ module.exports = {
     outlineTitle: '本页目录',
     nav: [
       { text: '主页', link: '/' },
-      { text: 'subSite test', link: 'http://abc.zhangqian.cloud/', target: '_self', rel: 'sponsored'},
+      { text: 'subSite test', link: 'http://abc.zhangqian.cloud/', target: '_blank', rel: 'sponsored'},
       {
         text: '笔记',
         items: [
