@@ -26,6 +26,9 @@ hero:
     - theme: brand
       text: linux
       link: /linux
+    - theme: brand
+      text: WebGL
+      link: /WebGL
     # - theme: alt
     #   text: View on GitHub
     #   link: https://github.com/vuejs/vitepress
