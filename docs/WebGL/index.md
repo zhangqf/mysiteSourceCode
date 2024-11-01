@@ -1,5 +1,10 @@
+---
+editLink: false
+outline: deep
+outlineText: "33"
+---
 
-
+# WebGL
 
 ## 最短的WebGL程序
 
@@ -111,5 +116,4 @@ WebGL需要两种着色器：
 
 **WebGL程序包括`运行在浏览器中的Javascript`和`运行在WebGl系统的着色器程序`这两部分**
 
-![效果图](.
-/images/17.34.42.png)
+![效果图](./images/17.34.42.png)
