@@ -192,3 +192,125 @@ vec4(v0, v1, v2, v3)
 
 ### WebGL坐标系统
 WebGL处理的是三维图形，所以它使用三维坐标系统（笛卡尔坐标系），X轴，Y轴，Z轴。在WebGL中，当面向计算机屏幕时，X轴是水平的（向右为正），Y轴是垂直的（向下为正），Z轴是垂直于屏幕的（向外为正）。
+
+
+## 绘制一个点（另一个版本）
+
+### 使用attribute变量
+
+将位置信息从`javascript`程序中传给顶点着色器，有两种方式可以做到这点。attribute变量和uniform变量。至于使用哪个变量取决于需传递的数据本身，
+attribute变量传输的是那些与顶点相关的数据，uniform变量传输的是那些对于所以顶点都相同（或与顶点无关）的数据。
+
+- attribute变量
+
+  attribute变量是一种GLSL ES变量，被用来从外部向顶点着色器内传输数据，只有顶点着色器能使用它
+  
+  使用attribute变量，需要包含以下步骤：
+
+  1. 在顶点着色器中，声明attribute变量
+  2. 将attribute变量赋值个`gl_Position变量
+  3. 向attribute变量传输数据
+  
+  ```js
+  var VSHADER_SOURCE =
+      'attribute vec4 a_Position;\n' +
+      'void main() {\n' +
+          'gl_Position = a_Position;\n' +
+          'gl_PointSize = 10.0;\n' +
+      '}\n'
+  var FSHADER_SOURCE =
+     ' void main() {\n'+
+          'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n'+
+      '}\n'
+  
+  
+  function main() {
+      var canvas = document.getElementById('webgl')
+      var gl = getWebGLContext(canvas)
+      if(!gl) {
+          console.error('Failed to get the rendering context for WebGL')
+          return;
+      }
+  
+      // 初始化着色器
+      if(!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+          console.error('Failed to initialize shaders.')
+          return;
+      }
+      // 获取attribut变量的存储位置
+      var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+  
+      if(a_Position < 0) {
+          console.error('Failed to get the storage location of a_Position')
+          return;
+      }
+  
+      gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0)
+  
+      // 设置canvas背景色
+      gl.clearColor(0.0,0.0,0.0,1.0)
+  
+      // 清空canvas
+      gl.clear(gl.COLOR_BUFFER_BIT);
+  
+      // 绘制一个点
+      gl.drawArrays(gl.POINTS, 0, 1)
+  }
+  ```
+  4. 获取attribut变量的存储位置
+  使用`initShaders()`在WebGL系统中建立了顶点着色器，WebGL就会对着色器进行解析，辨识出着色器具有的attribute变量，每个变量都具有一个存储地址，
+  以便通过存储向变量传输数据。当想要向顶点着色器的`a_Position`变量传输数据时，首先需要向WebGL系统请求该变量的存储地址。使用`gl.getAttribLocation()`
+  来获取`attribute`变量的地址
+  
+  | 参数                | 描述                                    |
+  |-------------------|---------------------------------------|
+  | program           | 指定包含顶点着色器和片元着色器的着色器程序对象               |
+  | name              | 指定想要获取存储地址的attribute变量名称              |
+  | 返回值               | 描述                                    |
+  | 大于等于0             | attribute变量的存储地址                      |
+  | -1                | 指定的attribute变量不存在，或者命名具有gl_或webgl_前缀  |
+  | 错误                | 描述                                    |
+  | INVALID_OPERATION | 程序对象未能成功连接                            |
+  | INVALID_VALUE     | name参数的长度大于attribute变量名的最大长度（默认256字节） |
+
+  5. 向attribute变量赋值
+  一旦将`attribute`变量的存储地址保存在`Javascript`变量`a_Position`中，下面就需要使用该变量来向着色器传入值。使用`gl.vertexAttrib3f()`函数来完成这一步
+  
+  | 参数                | 描述                                 |
+  |-------------------|------------------------------------|
+  | location          | 指定将要修改的attribute变量的储存位置            |
+  | v0                | 指定填充attribute变量第一个分量的值             |
+  | v1                | 指定填充attribute变量第二个分量的值             |
+  | v2                | 指定填充attribute变量第三个分量的值             |
+  | 返回值               | 无                                  |
+  | 错误                | 描述                                 |
+  | INVALID_OPERATION | 没有当前的program对象                     |
+  | INVALID_VALUE     | location大于等于attribute变量的最大数目（默认为8） |
+
+
+### `gl.vertexAttrib3f()`的同族函数
+
+`gl.vertexAttrib3f()`是一系列同族函数中的一个，该系列函数的任务就是从`javascript`向顶点着色器中的`attribute`变量传值。`gl.vertexAttrib1f()`传输1个单精度值（v0），
+`gl.vertexAttrib2f()`传输2个值，`gl.vertexAttrib4f()`传输4个值。
+
+
+`gl.vertexAttrib1f(location, v0)`
+
+`gl.vertexAttrib2f(location, v0, v1)`
+
+`gl.vertexAttrib3f(location, v0, v1, v2)`
+
+`gl.vertexAttrib4f(location, v0, v1, v2, v3)`
+
+将数据传输个`location`参数指定的`attribute`变量。如果仅传输一个值，那么这个值会被填充到第一个分量中，第二个分量，第三个分量将被设为 0.0，第4个分量将被设为 1.0。
+
+| 参数            | 描述                                |
+|---------------|-----------------------------------|
+| location      | 指定attribute变量的存储位置                |
+| v0,v1,v2,v3   | 指定传输给attribute变量的四个分量的值           |
+| 返回值           | 无                                 |
+| 错误            | 描述                                |
+| INVALID_VALUE | location大于等于attribute变量的最大数目（默认8） |
+
+
+![效果图](../images/17.34.42.png)
