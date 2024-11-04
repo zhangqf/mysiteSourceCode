@@ -313,4 +313,4 @@ attribute变量传输的是那些与顶点相关的数据，uniform变量传输�
 | INVALID_VALUE | location大于等于attribute变量的最大数目（默认8） |
 
 
-![效果图](../images/17.34.42.png)
+![效果图](./images/17.34.42.png)
