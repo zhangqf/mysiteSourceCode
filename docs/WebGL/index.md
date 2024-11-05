@@ -314,3 +314,171 @@ attribute变量传输的是那些与顶点相关的数据，uniform变量传输�
 
 
 ![效果图](./images/17.34.42.png)
+
+
+- uniform变量
+
+>从`javascript`中向顶点着色器的`attribute`变量传数据。 只有顶点着色器才能使用`attribute`变量，使用片元着色器时，就需要使用`uniform`变量。或者
+使用`varying`变量。
+
+`uniform`变量用来从`javascript`程序向顶点着色器和片元着色器传输”一致的“（不变的）数据。
+
+
+```js
+var VSHADER_SOURCE =
+    'attribute vec4 a_Position;\n' +
+    'attribute float a_PointSize;\n' +
+    'void main() {\n' +
+        'gl_Position = a_Position;\n' +
+        'gl_PointSize = a_PointSize;\n' +
+    '}\n'
+var FSHADER_SOURCE =
+    'precision mediump float;\n' +
+    'uniform vec4 u_FragColor;\n' +
+   ' void main() {\n'+
+        'gl_FragColor = u_FragColor;\n'+
+    '}\n'
+
+
+function main() {
+    var canvas = document.getElementById('webgl')
+    var gl = getWebGLContext(canvas)
+    if(!gl) {
+        console.error('Failed to get the rendering context for WebGL')
+        return;
+    }
+
+    // 初始化着色器
+    if(!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+        console.error('Failed to initialize shaders.')
+        return;
+    }
+    // 获取attribut变量的存储位置
+    var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+
+    if(a_Position < 0) {
+        console.error('Failed to get the storage location of a_Position')
+        return;
+    }
+    var a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
+
+    var u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
+
+    gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0)
+
+    gl.vertexAttrib1f(a_PointSize, 20.0)
+
+    canvas.onmousedown = function(event) {click(event, gl ,canvas, a_Position, u_FragColor)}
+
+    // 设置canvas背景色
+    gl.clearColor(0.0,0.0,0.0,1.0)
+
+    // 清空canvas
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // 绘制一个点
+    gl.drawArrays(gl.POINTS, 0, 1)
+}
+
+var g_points = []
+var g_colors = []
+function click(event, gl ,canvas, a_Position, u_FragColor) {
+    var x = event.clientX
+    var y = event.clientY
+    var rect = event.target.getBoundingClientRect()
+    x = ((x - rect.left) - canvas.height/2) / (canvas.height/2);
+    y = (canvas.width/2 - (y - rect.top)) / (canvas.width/2);
+
+    g_points.push([x,y]);
+
+    if(x >= 0.0 && y >= 0.0) {
+        g_colors.push([1.0, 0.0, 0.0, 1.0])
+    } else if(x < 0.0 && y < 0.0) {
+        g_colors.push([0.0, 1.0, 0.0, 1.0])
+    }else {
+        g_colors.push([1.0, 1.0, 1.0, 1.0])
+    }
+
+    gl.clear(gl.COLOR_BUFFER_BIT);  // 绘制点后，颜色缓冲区就被WebGL重置为默认的颜色（0.0， 0.0， 0.0， 0.0）
+    var len = g_points.length;
+    for(var j = 0; j < len; j++) {
+        var xy = g_points[j];
+        var rgba = g_colors[j];
+        gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0);
+
+        gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3] );
+        gl.drawArrays(gl.POINTS, 0, 1)
+    }
+}
+
+```
+
+![效果图](./images/172631.png)
+
+
+**精度限定词 (precision qualifier)** 指定变量的范围（最大值与最小值）和精度
+
+1. 获取`uniform`变量的存储地址
+
+    **gl.getUniformLocation(program, name)**
+    
+    | 参数                | 描述                                  |
+    |-------------------|-------------------------------------|
+    | program           | 指定包含顶点着色器和片元着色器的程序对象                |
+    | name              | 指定想要获取其存储位置的uniform变量的名称            |
+  
+    | 返回值       | 描述                                  |
+    |-----------|-------------------------------------|
+    | non-null  | 指定uniform变量的位置                      |
+    | null      | 指定的uniform变量不存在，或者其命名具有gl_或webgl_前缀 |
+    
+    | 错误                 | 描述                                  |
+    |--------------------|-------------------------------------|
+    | INVALID_OPERATION  | 程序对象未能成功连接                          |
+    | INVALID_VALUE      | name参数的长度大于uniform变量名的最大长度（默认256字节） |
+
+2. 向uniform变量赋值
+  
+    **gl.uniform4f(location, v0, v1, v2, v3)**
+    
+    | 参数       | 描述                    |
+    |----------|-----------------------|
+    | location | 指定将要修改的uniform变量的存储位置 |
+    | v0       | 指定填充uniform变量的第一个分量的值 |
+    | v1       | 指定填充uniform变量的第二个分量的值 |
+    | v2       | 指定填充uniform变量的第三个分量的值 |
+    | v3       | 指定填充uniform变量的第四个分量的值 |
+    | 返回值      | 无                     |        
+
+   | 错误                 | 描述                                 |
+   |--------------------|------------------------------------|
+   | INVALID_OPERATION  | 没有当前program对象，或者location是非法的变量存储位置 |
+
+
+### `gl.uniform4f()同族函数`
+
+`gl.uniform1f(location, v0)`
+
+`gl.uniform1f(location, v0, v1)`
+
+`gl.uniform1f(location, v0, v1, v2)`
+
+`gl.uniform1f(location, v0, v1, v2, v3)`
+
+| 参数             | 描述                   |
+|----------------|----------------------|
+| location       | 指定uniform变量的存储位置     |
+| v0, v1, v2, v3 | 指定传输给uniform变量四个分量的值 |
+| 返回值            | 无                    |
+
+| 错误                | 描述                                 |
+|-------------------|------------------------------------|
+| INVALID_OPERATION | 没有当前program对象，或者location是非法的变量存储位置 |
+
+
+
+
+**主要介绍了着色器的相关知识，它是WebGL绘制图像的基石。这里的着色器只能处理二维的点，但是WebGL核心函数以及着色器的知识，同样使用于更复杂的情形，如三维绘图。**
+
+**顶点着色器进行的是逐顶点的操作，片元着色器进行的是逐片元的操作**
+
