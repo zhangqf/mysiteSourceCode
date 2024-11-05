@@ -166,6 +166,13 @@ module.exports = {
         items: [
           { text: 'vue3', link: '/vue3面试题/' }
         ]
+      },
+      'WebGL': {
+        text: 'WebGL',
+        items: [
+          { text: '第一章', link: '/WebGL/' },
+          { text: '第二章', link: '/WebGL/Chapter2'}
+        ]
       }
     },
 
