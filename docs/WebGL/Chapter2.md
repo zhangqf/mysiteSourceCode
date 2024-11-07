@@ -9,6 +9,7 @@ outlineText: "33"
 已经了解了如何获取`WebGL上下文`，清空`<canvas>`为2D/3D绘图作准备，探究了顶点着色器与片元着色器的功能与特征，以及使用着色器进行绘图的方法。
 
 本章学习内容：
+
 1. 三角形在三维图形学中的重要地位，以及WebGL如何绘制三角形
 2. 使用多个三角形绘制其他类型的基本图形
 3. 利用简单的方程对三角形做基本地变换，如移动、旋转和缩放
@@ -20,8 +21,7 @@ outlineText: "33"
 
 上一章中的方式只能绘制一个点。对于那些由多个顶点组成的图形，比如三角形、矩形和立方体来说，我们需要一次性地将图形的顶点全部传出顶点着色器，然后才能把图形画出来。
 
-
-WebGL提供了提供了一种很方便的机制，记缓冲区对象（buffer object），他可以一次性地向着色器传入多个顶点的数据。缓冲区对象是`WebGL`系统中的一块内存区域，
+WebGL提供了提供了一种很方便的机制，即缓冲区对象（buffer object），他可以一次性地向着色器传入多个顶点的数据。缓冲区对象是`WebGL`系统中的一块内存区域，
 我们可以一次性地向缓冲区对象中填充大量的顶点数，然后将这些数据保存在其中供`顶点着色器`使用。
 
 ```js
@@ -112,6 +112,7 @@ function initVertexBuffers(gl) { // [!code ++]
 }
 
 ```
+
 流程：
 
 1. 获取WebGL绘图上下文
@@ -121,11 +122,9 @@ function initVertexBuffers(gl) { // [!code ++]
 5. 清空`<canvas>`
 6. 绘制
 
-
 `initVertexBuffers()`函数的任务是创建顶点缓冲区对象，并将多个顶点的数据保存在缓冲区中，然后将缓冲区传入给顶点着色器。
 
 `gl.drawArrays(gl.POINTS, 0, n)`, 这里的n为要画的顶点数，因为在`initVertexBuffers()`函数中利用缓冲区对象向顶点着色器传输了多个顶点数据，所以需要通过第3个参数告诉`gl.drawArrays()`函数需要绘制多少个顶点。
-
 
 ### 使用缓冲区对象
 
@@ -137,8 +136,8 @@ function initVertexBuffers(gl) { // [!code ++]
 4. 将缓冲区对象分配给一个attribute变量（gl.vertexAttribPointer()）
 5. 开启attribute变量（gl.enableVertexAttribArray()）
 
-
 #### 创建缓冲区对象 （gl.createBuffer()）
+
 使用`gl.createBuffer()`方法来创建缓冲区对象
 
 ![原理图](./images/createBuffer.png)
@@ -156,7 +155,6 @@ function initVertexBuffers(gl) { // [!code ++]
 | buffer | 待删除的缓冲区对象 |
 | 返回值    | 无         |
 | 错误     | 无         |
-
 
 #### 绑定缓冲区 （gl.bindBuffer()）
 
@@ -177,7 +175,6 @@ gl.bindBuffer(target, buffer)
 | 错误           | 描述                           |
 |--------------|------------------------------|
 | INVALID_ENUM | target不是上述值之一，这时将保持原有的绑定情况不变 |
-
 
 #### 向缓冲区对象中写入数据（gl.bufferData()）
 
@@ -201,7 +198,6 @@ gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
 | gl.STATIC_DRAW  | 只会向缓冲区对象中写入一次数据，但需要绘制很多次；表示缓冲区的数据不会或几乎不会改变。在数据上传后，绘制操作会频繁使用这些数据，但不会对它们进行修改 |
 | gl.STREAM_DRAW  | 只会向缓冲区对象中写入一次数据，然后绘制若干次；表示缓冲区的数据会快速改变，通常在每次绘制之前都会更新                        |
 | gl.DYNAMIC_DRAW | 会向缓冲区对象中多次写入数据，并绘制很多次；表示缓冲区的数据会频繁改变，但不一定在每次绘制时都更新。适合在多个绘制调用之间修改数据的情况       |
-
 
 ### 类型化数组
 
@@ -232,7 +228,6 @@ WebGL使用的各种类型化数组
 | length             | 数组的长度                        |
 | BYTES_PER_ELEMENT  | 数组中每个元素所占的字节数                |
 
-
 **创建类型化数组的唯一方法就是使用`new`运算符**
 
 ```js
@@ -245,7 +240,6 @@ var vertices = new Float32Array(4)
 ```
 
 **以上就是建立和使用缓冲区的前三个步骤（在WebGL系统中创建缓冲区， 绑定缓冲区对象到目标，向缓冲区对象中写入数据）**
-
 
 ### 将缓冲区对象分配给attribute变量（gl.vertexAttribPointer()）
 
@@ -280,7 +274,6 @@ gl.vertexAttribPointer()方法解决了这个问题，他可以将整个缓冲�
 
 ![原理图](./images/bufferObjectToAttribute.png)
 
-
 ### 开启attribute变量（gl.enableVertexAttribArray()）
 
 为了是顶点着色器能够访问缓冲区内的数据，需要使用`gl.enableVertexAttribArray()`方法来开启`attribute`变量
@@ -305,7 +298,6 @@ gl.vertexAttribPointer()方法解决了这个问题，他可以将整个缓冲�
 | 错误            | 描述                                  |
 | INVALID_VALUE | location 大于等于attribute变量的最大数量（默认为8） |
 
-
 ### 绘制点
 
 `gl.drawArrays(mode, first, count)`
@@ -315,8 +307,6 @@ gl.vertexAttribPointer()方法解决了这个问题，他可以将整个缓冲�
 | mode  | 指定绘制的方式，可以接收以下常量符号：gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN |
 | first | 指定从哪个顶点开始绘制（整型数）                                                                                                      |
 | count | 指定绘制需要用到多少个顶点（整型数）                                                                                                    |
-
-
 
 **`gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)`完整流程图**
 
@@ -420,7 +410,6 @@ function initVertexBuffers(gl) {
 
 ![效果图](./images/triangles.png)
 
-
 `gl.drawArrays(gl.TRIANGLES, 0, n)`
 
 gl.drawArrays()方法的第一个参数 mode 改为gl.TRIANGLES, 就相当于告诉WebGL， 从缓冲区中的第1个顶点开始，使顶点着色器执行3次，用这3个顶点绘制出一个三角形
@@ -429,7 +418,7 @@ gl.drawArrays() 即强大又灵活，通过给第一个参数指定不同的值�
 
 **WebGL可以绘制的基本图形**
 
-| 基本图形  |        参数mode        | 描述                                                                                                                      |                
+| 基本图形  |        参数mode        | 描述                                                                                                                      |
 |:------|:--------------------:|:------------------------------------------------------------------------------------------------------------------------|
 | 点     |      gl.POINTS       | 一系列点，绘制在v0、v1、v2...处                                                                                                    |
 | 线段    |       gl.LINES       | 一系列单独的线段，绘制在（v0, v1）、（v2， v3）、（v4，v5）...处，<br/> 如果点的个数是奇数，最好一个将被忽略                                                      |
@@ -439,9 +428,7 @@ gl.drawArrays() 即强大又灵活，通过给第一个参数指定不同的值�
 | 三角带   |  gl.TRIANGLES_STRIP  | 一系列条带状的三角形，前三个点构成了第一个三角形，从第2个点开始的三个点<br/>‘成了第2个三角形，以此类推。这些三角形被绘制在（v0，v1，v2）、（v2，v1，v3）、<br/>（v2，v3、v4）...处              |
 | 三角扇   |   gl.TRIANGLES_FAN   | 一系列三角形组成的类似与扇形的图形。前三个点构成了第一个三角形，接下来的<br/>一个点和前一个三角形的最后一条边组成接下来的一个三角形。这些三角形被绘制<br/>在（v0，v1，v2）、（v0，v2，v3）、（v0、v3、v4）...处 |
 
-
 ![示例图](./images/gl.drawArraysMode.png)
-
 
 修改例中的`gl.drawArrays(gl.LINES, 0, n)`
 
@@ -454,7 +441,6 @@ gl.drawArrays() 即强大又灵活，通过给第一个参数指定不同的值�
 修改例中的`gl.drawArrays(gl.LINE_LOOP, 0, n)`
 
 ![效果图](./images/line_loop.png)
-
 
 ## Rectangle
 
@@ -554,14 +540,11 @@ function initVertexBuffers(gl) {
 
 ![效果图](./images/Rectangle.png)
 
-
 `gl.drawArrays(gl.TRIANGLE_FAN, 0, n)`
 
 ![效果图](./images/Triangle_fan.png)
 
-
 ### 移动、旋转和缩放
-
 
 ```js
 const VSHADER_SOURCE =
@@ -664,7 +647,6 @@ function initVertexBuffers(gl) {
 ```
 
 ![效果图](./images/translation.png)
-
 
 ```js
 
@@ -775,4 +757,5 @@ function initVertexBuffers(gl) {
 }
 
 ```
+
 ![效果图](./images/rotate.png)
