@@ -171,7 +171,8 @@ module.exports = {
         text: 'WebGL',
         items: [
           { text: '第一章', link: '/WebGL/' },
-          { text: '第二章', link: '/WebGL/Chapter2'}
+          { text: '第二章', link: '/WebGL/Chapter2'},
+          { text: '第三章', link: '/WebGL/Chapter3'}
         ]
       }
     },
