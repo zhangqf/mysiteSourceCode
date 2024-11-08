@@ -205,3 +205,173 @@ function initVertexBuffers(gl) {
 | Matrix4.scale(x,y,z)           | 将Matrix4实例乘以一个缩放变换矩阵（该缩放矩阵在三个轴上的缩放因子分别为x，y和z），所得的结果还储存在Matrix4中                           |
 | Matrix4.set(m)                 | 将Matrix4实例设置为m，m必须也是一个Matrix4实例                                                           |
 | Matrix4.elements               | 类型化数组（Float32Array）包含了Matrix4 实例的矩阵元素                                                     |
+
+**单位阵在矩阵乘法中的行为，就像数字1在乘法中的行为一样。将一个矩阵乘以单位阵，得到的结果和原矩阵完全相同。在单位阵中，对角线上的元素为1.0，其余的元素为0.0**
+
+包含set前缀的方法会根据参数计算处变换矩阵，然后将变换矩阵写入到自身中；不含set前缀的方法，会先根据参数计算出变换矩阵，然后将自身与刚刚计算得到的变换矩阵相乘，然后把最终得到的结果再写入到Matrix4对象中
+
+## 复合变换
+平移 旋转
+
+### 先平移后旋转
+
+平移后的坐标 = 平移矩阵 * 原始坐标
+
+旋转后的坐标 = 旋转矩阵 * 平移后的坐标
+
+即：
+
+平移后旋转的坐标 = 旋转矩阵 * （平移矩阵 * 原始坐标） = （旋转矩阵 * 平移矩阵） * 原始坐标
+
+在`javascript`中,计算 `旋转矩阵` * `平移矩阵`，将得到的矩阵传入顶点着色器。这样就可以把多个变换复合起来。一个模型可能经过了多次变换
+将这些变换全部复合成一个等效的变换，就得到了`模型变换(model transformation)` 或称`建模变换(modeling transformation)`,相应地，模型变换
+的矩阵称为`模型矩阵(model matrix)`
+
+```js
+const VSHADER_SOURCE =
+    'attribute vec4 a_Position;\n' +
+    'uniform mat4 u_xformMatrix;\n' + // [!code --]
+    'uniform mat4 u_ModelMatrix;\n' + // [!code ++]
+    'void main() {\n' +
+    'gl_Position = u_xformMatrix * a_Position;\n' + // [!code --]
+    'gl_Position = u_ModelMatrix * a_Position;\n' + // [!code ++]
+    // 'gl_PointSize = 10.0;\n' +
+    '}\n'
+const FSHADER_SOURCE =
+    ' void main() {\n' +
+    'gl_FragColor = vec4(1.0, 1.0, 0.0,1.0);\n' +
+    '}\n'
+
+
+var ANGLE = 90.0
+
+function main() {
+    var canvas = document.getElementById('webgl')
+    var gl = getWebGLContext(canvas)
+    if (!gl) {
+        console.error('Failed to get the rendering context for WebGL')
+        return;
+    }
+
+    // 初始化着色器
+    if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+        console.error('Failed to initialize shaders.')
+        return;
+    }
+
+    // 设置顶点着色器
+    var n = initVertexBuffers(gl);
+
+    if (n < 0) {
+        console.error('Failed to set the positions of the vertices')
+        return;
+    }
+
+    var u_xformMatrix = gl.getUniformLocation(gl.program, 'u_xformMatrix') // [!code --]
+    
+    var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix') // [!code ++]
+
+    var modelMatrix = new Matrix4()
+
+    xformMatrix.setRotate(ANGLE, 0, 0, 1) // [!code --]
+
+    gl.uniformMatrix4fv(u_xformMatrix, false, xformMatrix.elements) // [!code --]
+
+    var Tx = 0.5 // [!code ++]
+
+
+    modelMatrix.setRotate(ANGLE, 0, 0, 1) // [!code ++]
+    modelMatrix.translate(Tx, 0.5, 1) // [!code ++]
+
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements) // [!code ++]
+
+
+
+    // // 获取attribut变量的存储位置
+    var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+    //
+    // var u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
+    if (a_Position < 0) {
+        console.error('Failed to get the storage location of a_Position')
+        return;
+    }
+    //
+    // canvas.onmousedown = function (ev) {click(ev, gl, canvas, a_Position, u_FragColor)}
+
+
+    // gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0)
+
+    // 设置canvas背景色
+    gl.clearColor(0.0, 0.0, 0.0, 1.0)
+
+    // 清空canvas
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // 绘制三个点
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, n)
+
+}
+
+function initVertexBuffers(gl) {
+    var vertices = new Float32Array([
+        -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5
+    ])
+    var n = 4 // 点的个数
+
+    // 创建缓冲区对象
+    var vertexBuffer = gl.createBuffer();
+    if (!vertexBuffer) {
+        console.error('Failed to create the buffer object')
+        return -1;
+    }
+
+    // 将缓冲区对象绑定到目标
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+
+    // 向缓冲区对象中写入数据
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+
+    // 将缓冲区对象分配给a_Position变量
+    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
+
+    // 连接a_Position变量与分配给它的缓冲对象
+    gl.enableVertexAttribArray(a_Position)
+    return n
+}
+```
+
+modelMatrix.setRotate(ANGLE, 0, 0, 1) // 设置模型矩阵为旋转矩阵
+modelMatrix.translate(Tx, 0, 0) // 将模型矩阵乘以平移矩阵
+
+**先平移后旋转的顺序与构造模型矩阵 旋转矩阵 * 平移矩阵 的顺序是相反的，这是因为变换矩阵最终要与三角形的三个顶点的原始坐标矢量相乘**
+
+
+**平移旋转**
+
+```js
+// 平移旋转
+    modelMatrix.setRotate(ANGLE, 0, 0, 1)
+    modelMatrix.translate(Tx, 0.5, 1)
+```
+
+![效果图](./images/translateAndRotate.png)
+
+
+**旋转平移**
+```js
+// 旋转平移
+    modelMatrix.setTranslate(Tx, 0.5, 1)
+    modelMatrix.rotate(ANGLE, 0, 0, 1)
+```
+
+![效果图](./images/rotateAndTranslate.png)
+
+
+**平移个旋转的次序不一样 导致的结果页不一样**
+
+
+## 动画
+
+将矩阵变换运用到动画图形中去
