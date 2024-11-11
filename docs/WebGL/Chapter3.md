@@ -375,3 +375,214 @@ modelMatrix.translate(Tx, 0, 0) // 将模型矩阵乘以平移矩阵
 ## 动画
 
 将矩阵变换运用到动画图形中去
+
+
+### 动画基础
+
+为了让一个三角形转动起来，需要做到是：不断擦除和重绘三角形，并且在每次重绘时轻微地改变角度
+
+
+```js
+const VSHADER_SOURCE =
+    'attribute vec4 a_Position;\n' +
+    'uniform mat4 u_ModelMatrix;\n' +
+    'void main() {\n' +
+    'gl_Position = u_ModelMatrix * a_Position;\n' +
+    // 'gl_PointSize = 10.0;\n' +
+    '}\n'
+const FSHADER_SOURCE =
+    ' void main() {\n' +
+    'gl_FragColor = vec4(1.0, 1.0, 0.0,1.0);\n' +
+    '}\n'
+
+
+var ANGLE = 90.0
+
+var ANGLE_STEP = 45.0 // [!code ++]
+
+function main() {
+    var canvas = document.getElementById('webgl')
+    var gl = getWebGLContext(canvas)
+    if (!gl) {
+        console.error('Failed to get the rendering context for WebGL')
+        return;
+    }
+
+    // 初始化着色器
+    if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+        console.error('Failed to initialize shaders.')
+        return;
+    }
+
+    // 设置顶点着色器
+    var n = initVertexBuffers(gl);
+
+
+
+    if (n < 0) {
+        console.error('Failed to set the positions of the vertices')
+        return;
+    }
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0) // [!code ++]
+
+    var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
+
+    var currentAngle = 0.0 // [!code ++]
+
+    var modelMatrix = new Matrix4()
+
+    var tick = function () { // [!code ++]
+        currentAngle = animate(currentAngle) // 更新旋转角 // [!code ++]
+        draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) // [!code ++]
+
+        requestAnimationFrame(tick) // [!code ++]
+
+    } // [!code ++]
+    tick() // [!code ++]
+    var Tx = 0.5
+
+    // 平移旋转
+    modelMatrix.setRotate(ANGLE, 0, 0, 1)
+    modelMatrix.translate(Tx, 0.5, 1)
+
+    // 旋转平移
+    modelMatrix.setTranslate(Tx, 0.5, 1)
+    modelMatrix.rotate(ANGLE, 0, 0, 1)
+
+
+
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
+
+
+
+    // 获取attribut变量的存储位置
+    var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+    //
+    // var u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
+    if (a_Position < 0) {
+        console.error('Failed to get the storage location of a_Position')
+        return;
+    }
+
+    canvas.onmousedown = function (ev) {click(ev, gl, canvas, a_Position, u_FragColor)}
+
+
+    gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0)
+
+    // 设置canvas背景色
+    gl.clearColor(0.0, 0.0, 0.0, 1.0)
+
+    // 清空canvas
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // 绘制三个点
+    gl.drawArrays(gl.TRIANGLES, 0, n)
+
+}
+
+function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) { // [!code ++]
+    // 设置旋转矩阵 // [!code ++]
+    modelMatrix.setRotate(currentAngle, 0, 0, 1) // [!code ++]
+    // 将旋转矩阵传输给顶点着色器 // [!code ++]
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements) // [!code ++]
+
+    // 清除 canvas // [!code ++]
+    gl.clear(gl.COLOR_BUFFER_BIT) // [!code ++]
+
+    // 绘制三角形 // [!code ++]
+
+    gl.drawArrays(gl.TRIANGLES, 0, n) // [!code ++]
+} // [!code ++]
+
+var g_last = Date.now() // [!code ++]
+
+function animate(angle) { // [!code ++]
+    var now = Date.now() // [!code ++]
+
+    var elapsed = now - g_last; // [!code ++]
+
+    g_last = now // [!code ++]
+
+    var newAngle = angle + (ANGLE_STEP * elapsed) / 1000.0 // [!code ++]
+
+    return newAngle %= 360 // [!code ++]
+} // [!code ++]
+
+function initVertexBuffers(gl) {
+    var vertices = new Float32Array([
+        -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5
+    ])
+    var n = 4 // 点的个数
+
+    // 创建缓冲区对象
+    var vertexBuffer = gl.createBuffer();
+    if (!vertexBuffer) {
+        console.error('Failed to create the buffer object')
+        return -1;
+    }
+
+    // 将缓冲区对象绑定到目标
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+
+    // 向缓冲区对象中写入数据
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+
+    // 将缓冲区对象分配给a_Position变量
+    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
+
+    // 连接a_Position变量与分配给它的缓冲对象
+    gl.enableVertexAttribArray(a_Position)
+    return n
+}
+
+```
+
+![效果图](./images/xxt.gif)
+
+**为了是三角形动起来，需要反复进行两步操作**
+
+1. 更新三角形的当前角度 currentTriangle
+2. 调用绘制函数，根据当前角度绘制三角形
+
+### 请求再次被调用(requestAnimationFrame())
+
+如果想要Javascript重复执行某个特定的任务，可以使用`setInterval()`函数
+
+`setInterval(func, delay)`
+| 参数    | 描述             |
+|-------|----------------|
+| func  | 指定需要多次调用的函数    |
+| delay | 指定时间间隔（以毫秒为单位） |
+| 返回值   | Time id        |
+
+现代浏览器都支持多个标签页，每个标签页具有单独的Javascript运行环境，但是自`setInterval()`函数诞生之初，浏览器还没有开始支持多标签页。所以在现代浏览器中，
+不管是标签页是否被激活，其中的`setInterval()`函数都会反复调用func，如果标签页比较多，就会增加浏览器的负荷(现在浏览器有优化了，失活时间太长，它调用的次数会被减少)。所有后来，浏览器又引入了`requestAnimation()`方法，
+该方法只有当标签页处于激活状态时才会生效。`requestAnimationFrame()`是新引入的方法。
+
+**requestAnimationFrame()**
+当调用`requestAnimationFrame()`函数时，即是在告诉浏览器在将来的某个时间调用作为第一个参数的函数。
+
+`requestAnimationFrame(func)`
+
+| 参数   | 描述                                        |
+|------|-------------------------------------------|
+| func | 指定将来某个时刻调用的函数。函数将会接收一个time参数，用来表示此次调用的时间戳 |
+| 返回值  | Request id                                |
+
+
+这个函数的好处是可以避免在未激活的标签页上运行动画。
+
+但是无法指定重复调用的间隔；函数func会在浏览器需要网页的某个元素重绘时被调用。此外还需要注意，在浏览器成功地调用了一次func后，想要再次被调用，就必须要再次发起请求，因为前一次请求已经结束。（也就是说，requestAnimationFrame更像setTimeOut而不是setInterval，
+不会因为你发起一次请求，就会不停地循环调用func）。在调用函数后，需要发出下次调用的请求，因为上一次关于调用的请求在调用完成之后就结束了使命。
+
+`cancelAnimationFrame()`
+
+取消由`requestAnimationFrame()`发起的请求
+
+| 参数        | 描述                            |
+|-----------|-------------------------------|
+| requestID | 指定requestAnimationFrame()的返回值 |
+| 返回值       | 无                             |
