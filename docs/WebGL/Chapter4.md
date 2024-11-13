@@ -375,9 +375,16 @@ function initVertexBuffers(gl) {
 
 ```
 
+![效果图](./images/varyingVariable.png)
+
 **下面者三句 必须要 至于为什么要这个精度限定，还没找到答案， 但是没有这三局，初始化着色器会失败（这个问题找了半天）**
 ```js
 '#ifdef GL_ES\n' +
 'precision mediump float;\n' + //精度限定，中精度
 '#endif\n' 
 ```
+
+
+修改参数为`gl.TRIANGLES`
+
+![效果图](./images/varyingTriangle.png)
