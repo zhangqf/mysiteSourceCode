@@ -831,18 +831,18 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    `gl.pixelStorei(pname, param)`
 
    | 参数                                | 描述                           |
-       |-----------------------------------|------------------------------|
+   |-----------------------------------|------------------------------|
    | pname                             | 可以是以下二者之一                    |
    | gl.UNPACK_FLIP_Y_WEBGL            | 对图像进行Y轴反转。默认值为false          |
    | gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL | 将图像RGB颜色值的每一个分量乘以A。默认值为false |
    | param                             | 指定非0（true）或0（false）。必须为整数    |
 
    | 返回值 | 描述 |
-       |-----|----|
+   |-----|----|
    | 无   |    |
 
    | 错误           | 描述          |
-       |--------------|-------------|
+   |--------------|-------------|
    | INVALID_ENUM | pname不是合法的值 |
 
 2. **激活纹理单位（gl.activeTexture()）**
@@ -855,15 +855,15 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    `gl.activeTexture(texUnit)` 开启0号纹理单元
 
    | 参数      | 描述                                                               |
-       |---------|------------------------------------------------------------------|
+   |---------|------------------------------------------------------------------|
    | texUnit | 指定准备激活的纹理单元：gl.TEXTURE0、gl.TEXTURE1...gl.TEXTURE7。最后的数字表示纹理单元的编号 |
 
    | 返回值 | 描述 |
-       |-----|----|
+   |-----|----|
    | 无   |    |
 
    | 错误           | 描述           |
-       |--------------|--------------|
+   |--------------|--------------|
    | INVALID_ENUM | texUnit的值不合法 |
 
    ![原理图](./images/activeTexture.png)
@@ -873,23 +873,23 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    接下来，还需要告诉WebGL系统纹理对象使用的是哪种类型的纹理。在对纹理对象进行操作之前，我们需要绑定纹理对象，这一点与缓冲区很像：在对缓冲区对象进行操作之前，也需要绑定缓冲区对象。WebGL支持两种类型的纹理
 
    | 纹理类型                | 描述    |
-       |---------------------|-------|
+   |---------------------|-------|
    | gl.TEXTURE_2D       | 二维纹理  |
    | gl.TEXTURE_CUBE_MAP | 立方体纹理 |
 
    `gl.bindTexture(target, texture)`
 
    | 参数      | 描述                                  |
-       |---------|-------------------------------------|
+   |---------|-------------------------------------|
    | target  | gl.TEXTURE_2D 或 gl.TEXTURE_CUBE_MAP |
    | texture | 表示绑定的纹理单元                           |
 
    | 返回值 | 描述 |
-       |-----|----|
+   |-----|----|
    | 无   |    |
 
    | 错误           | 描述           |
-       |--------------|--------------|
+   |--------------|--------------|
    | INVALID_ENUM | target不是合法的值 |
 
    此方法完成了两个任务：开启纹理对象，以及纹理对象绑定到纹理单元上。
@@ -902,17 +902,17 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    `gl.texParameteri(target, pname, param)`
 
    | 参数      | 描述                                |
-      |---------|-----------------------------------|
+   |---------|-----------------------------------|
    | target  | gl.TEXTURE_2D或gl.TEXTURE_CUBE_MAP |
    | pname   | 纹理参数                              |
    | param   | 纹理参数值                             |
 
    | 返回值 | 描述 |
-       |-----|----|
+   |-----|----|
    | 无   |    |
 
    | 错误                | 描述            |
-       |-------------------|---------------|
+   |-------------------|---------------|
    | INVALID_ENUM      | target不是合法的值  |
    | INVALID_OPERATION | 当前目标上没有绑定纹理对象 |
 
@@ -926,7 +926,7 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    **纹理参数及它们的默认值**
 
    | 纹理参数                  | 描述     | 默认值                      |
-      |-----------------------|--------|--------------------------|
+   |-----------------------|--------|--------------------------|
    | gl.TEXTURE_MAG_FILTER | 纹理方大   | gl.LINEAR                |
    | gl.TEXTURE_MIN_FILTER | 纹理缩小   | gl.NEAREST_MIPMAP_LINEAR |
    | gl.TEXTURE_WRAP_S     | 纹理水平填充 | gl.REPEAT                |
@@ -935,14 +935,14 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    **可以赋值给`gl.TEXTURE_MAG_FILTER` 和 `gl.TEXTURE_MIN_FILTER` 的非金字塔纹理类型常量**
 
    | 值          | 描述                                                                  |
-       |------------|---------------------------------------------------------------------|
+   |------------|---------------------------------------------------------------------|
    | gl.NEAREST | 使用原纹理上距离映射后像素（新像素）中心最近的那个像素的颜色值，作为新像素的值（使用曼哈顿距离）                    |
    | gl.LINEAR  | 使用距离新像素中心最近的四个像素的颜色值的加权平均，作为新像素的值（与gl.NEAREST相比，该方法的图像质量更好，当会有较大的开销 |
 
    **可以赋值给`gl.TEXTURE_WRAP_S` 和 `gl.TEXTURE_WRAP_T`的常量**
 
    | 值                  | 描述         |
-       |--------------------|------------|
+   |--------------------|------------|
    | gl.REPEAT          | 平铺式的重复纹理   |
    | gl.MIRRORED_REPEAT | 镜像对称式的重复纹理 |
    | gl.CLAMP_TO_EDGE   | 使用纹理图像边缘值  |
@@ -954,7 +954,7 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    `gl.texImage(target, level, internalformat, format, type, image)`
 
    | 参数             | 描述                                |
-       |----------------|-----------------------------------|
+   |----------------|-----------------------------------|
    | target         | gl.TEXTURE_2D或gl.TEXTURE_CUBE_MAP |
    | level          | 传入0（实际上，该参数是为金字塔纹理准备的）            |
    | internalformat | 图像的内部格式                           |
@@ -963,11 +963,11 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    | image          | 包含纹理图像的Image对象                    |
 
    | 返回值 | 描述 |
-       |-----|----|
+   |-----|----|
    | 无   |    |
 
    | 错误                | 描述             |
-       |-------------------|----------------|
+   |-------------------|----------------|
    | INVALID_ENUM      | target不是合法的值   |
    | INVALID_OPERATION | 当前目标上没有绑定的纹理对象 |
 
@@ -976,7 +976,7 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    **图像内部格式**
 
    | 格式                 | 描述                   |
-       |--------------------|----------------------|
+   |--------------------|----------------------|
    | gl.RGB             | 红、绿、蓝                |
    | gl.RGBA            | 红、绿、蓝、透明度            | 
    | gl.ALPHA           | (0.0, 0.0, 0.0, 透明度) |
@@ -988,7 +988,7 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    type参数指定了纹理数据类型。通常我们使用`gl.UNSIGNED_BYTE`数据类型。当然也可以使用其他数据类型。
 
    | 格式                        | 描述                            |
-       |---------------------------|-------------------------------|
+   |---------------------------|-------------------------------|
    | gl.UNSIGNED_BYTE          | 无符号整型，每个颜色分量占据1字节             |
    | gl.UNSIGNED_SHORT_5_6_5   | RGB: 每个分量分别占据5、6、5比特          |
    | gl.UNSIGNED_SHORT_4_4_4_4 | RGBA: 每个分量分别占据4，4，4，4比特       |
@@ -1012,7 +1012,7 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    **专用于纹理的数据类型**
 
    | 类型          | 描述                             |
-       |-------------|--------------------------------|
+   |-------------|--------------------------------|
    | sampler2D   | 绑定到gl.TEXTURE_2D上的纹理数据类型       |
    | samplerCube | 绑定到gl.TEXTURE_CUBE_MAP上的纹理数据类型 |
 
@@ -1038,7 +1038,7 @@ function loadTexture(gl, n, texture, u_Sampler, image) {
    `vec4 texture2D(sampler2d smapler, vec2 coord)`
 
    | 参数      | 描述       |
-       |---------|----------|
+   |---------|----------|
    | sampler | 指定纹理单元编号 |
    | coord   | 指定纹理坐标   |
 
