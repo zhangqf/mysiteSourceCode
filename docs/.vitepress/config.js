@@ -175,7 +175,7 @@ module.exports = {
           { text: '第三章 高级变换与动画基础', link: '/WebGL/Chapter3'},
           { text: '第四章 颜色和纹理', link: '/WebGL/Chapter4'},
           { text: '第五章 OpenGL ES 着色器语言', link: '/WebGL/Chapter5'},
-          { text: '第六章 进入三维世界', link: '/WebGL/Chapter5'},
+          { text: '第六章 进入三维世界', link: '/WebGL/Chapter6'},
         ]
       }
     },
