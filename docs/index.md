@@ -17,7 +17,7 @@ hero:
     我是神仙。南山空谷书一卷，
     疯也痴癫，狂也痴癫。
   image:
-    src: /images/farmland.jpg
+    src: /images/_DSC2642.JPG
     alt: VitePress
   actions:
     - theme: brand
