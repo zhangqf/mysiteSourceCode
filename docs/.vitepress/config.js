@@ -16,9 +16,15 @@ module.exports = {
   vite: { 
     plugins: [SearchPlugin(options)] 
   },
+  markdown: {
+    math: true
+  },
   head: [
     ['meta', {name: '谦的后花园', content: '技术博客关于编程和软件开发的最新技术文章'}],
-    ['link', {res: 'icon', href: '/favicon.ico'}]
+    ['link', {res: 'icon', href: '/favicon.ico'}],
+    ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css', integrity: 'sha384-DyZg8I8h4P1z3kZTAf8cM9Y5hGZ1S1h/8hR9t5dQ2MdP31fYcA2b5fv4vD9JmC9H', crossorigin: 'anonymous' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js', integrity: 'sha384-DyZg8I8h4P1z3kZTAf8cM9Y5hGZ1S1h/8hR9t5dQ2MdP31fYcA2b5fv4vD9JmC9H', crossorigin: 'anonymous' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js', integrity: 'sha384-XXXX', crossorigin: 'anonymous' }]
   ],
   search: {
     provider: 'local'
@@ -176,6 +182,7 @@ module.exports = {
           { text: '第四章 颜色和纹理', link: '/WebGL/Chapter4'},
           { text: '第五章 OpenGL ES 着色器语言', link: '/WebGL/Chapter5'},
           { text: '第六章 进入三维世界', link: '/WebGL/Chapter6'},
+          { text: '第七章 光照', link: '/WebGL/Chapter7'},
         ]
       }
     },
