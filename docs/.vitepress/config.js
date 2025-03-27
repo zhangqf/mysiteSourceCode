@@ -13,15 +13,15 @@ var options = {
   ...flexSearchIndexOptions,
 };
 module.exports = {
-  vite: { 
-    plugins: [SearchPlugin(options)] 
+  vite: {
+    plugins: [SearchPlugin(options)]
   },
   markdown: {
     math: true
   },
   head: [
-    ['meta', {name: '谦的后花园', content: '技术博客关于编程和软件开发的最新技术文章'}],
-    ['link', {res: 'icon', href: '/favicon.ico'}],
+    ['meta', { name: '谦的后花园', content: '技术博客关于编程和软件开发的最新技术文章' }],
+    ['link', { res: 'icon', href: '/favicon.ico' }],
     ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css', integrity: 'sha384-DyZg8I8h4P1z3kZTAf8cM9Y5hGZ1S1h/8hR9t5dQ2MdP31fYcA2b5fv4vD9JmC9H', crossorigin: 'anonymous' }],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js', integrity: 'sha384-DyZg8I8h4P1z3kZTAf8cM9Y5hGZ1S1h/8hR9t5dQ2MdP31fYcA2b5fv4vD9JmC9H', crossorigin: 'anonymous' }],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js', integrity: 'sha384-XXXX', crossorigin: 'anonymous' }]
@@ -90,16 +90,16 @@ module.exports = {
     outlineTitle: '本页目录',
     nav: [
       { text: '主页', link: '/' },
-      { text: 'subSite test', link: 'http://abc.zhangqian.cloud/', target: '_blank', rel: 'sponsored'},
+      { text: 'subSite test', link: 'http://abc.zhangqian.cloud/', target: '_blank', rel: 'sponsored' },
       {
         text: '笔记',
         items: [
-          { text: 'vue', link: '/vue/vuedocs/index' },
+          { text: 'vue3学习笔记', link: '/vue/vuedocs/index' },
           { text: '浏览器', link: '/browse' },
           // { text: 'vue渲染器', link: '/vueRender' },
           { text: 'webpack', link: '/webpack' },
           { text: 'git', link: '/git' },
-          { text: 'vue3', link: '/vue3面试题' },
+          { text: 'vue3面试题', link: '/vue3面试题' },
         ]
       }
     ],
@@ -157,32 +157,33 @@ module.exports = {
         text: 'webpack',
         items: [
           { text: 'webpack', link: '/webpack/' },
-          { text: 'webpack的理解', link: '/webpack/webpack的理解'}
+          { text: 'webpack的理解', link: '/webpack/webpack的理解' }
         ]
       },
       '/git/': {
         text: 'git',
         items: [
           { text: 'git', link: '/git/' },
-          { text: 'webpack的理解', link: '/webpack/webpack的理解'}
+          { text: 'webpack的理解', link: '/webpack/webpack的理解' }
         ]
       },
-      '/vue3/': {
+      '/vue3面试题/': {
         text: 'vue3面试题',
         items: [
-          { text: 'vue3', link: '/vue3面试题/' }
+          { text: 'vue3面试题1', link: '/vue3面试题/' },
+          { text: 'vue3面试题2', link: '/vue3面试题/vue3面试题2' },
         ]
       },
       'WebGL': {
         text: 'WebGL',
         items: [
           { text: '第一章 WebGL', link: '/WebGL/' },
-          { text: '第二章 绘制和变换三角形', link: '/WebGL/Chapter2'},
-          { text: '第三章 高级变换与动画基础', link: '/WebGL/Chapter3'},
-          { text: '第四章 颜色和纹理', link: '/WebGL/Chapter4'},
-          { text: '第五章 OpenGL ES 着色器语言', link: '/WebGL/Chapter5'},
-          { text: '第六章 进入三维世界', link: '/WebGL/Chapter6'},
-          { text: '第七章 光照', link: '/WebGL/Chapter7'},
+          { text: '第二章 绘制和变换三角形', link: '/WebGL/Chapter2' },
+          { text: '第三章 高级变换与动画基础', link: '/WebGL/Chapter3' },
+          { text: '第四章 颜色和纹理', link: '/WebGL/Chapter4' },
+          { text: '第五章 OpenGL ES 着色器语言', link: '/WebGL/Chapter5' },
+          { text: '第六章 进入三维世界', link: '/WebGL/Chapter6' },
+          { text: '第七章 光照', link: '/WebGL/Chapter7' },
         ]
       }
     },
