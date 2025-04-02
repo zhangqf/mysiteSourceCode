@@ -100,6 +100,7 @@ module.exports = {
           { text: 'webpack', link: '/webpack' },
           { text: 'git', link: '/git' },
           { text: 'vue3面试题', link: '/vue3面试题' },
+          { text: 'TypeScript', link: '/TypeScript' },
         ]
       }
     ],
