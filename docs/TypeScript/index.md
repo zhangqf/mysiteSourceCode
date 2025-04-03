@@ -776,3 +776,476 @@ const arr2 = parseInput(5)
 
   - 限制重载数量
   过多的重载会降低可读性，建议不超过5个
+
+## 类
+
+```ts
+class Cat {
+  constructor(name: string) {
+    this.name = name
+  }
+  name: string
+  run() { }
+}
+
+console.log(Dog1.prototype)
+
+const dog = new Dog1("平安")
+console.log(dog)
+```
+
+类成员的属性都是实例属性，不是原型属性。类成员的方法都是实例方法。
+
+### 类的继承
+
+```ts
+class Husk extends Dog1 {
+  constructor(name: string, color: string) {
+    super(name)
+    this.color = color
+  }
+  color: string
+}
+
+```
+
+### 类的成员修饰符
+
+```ts
+class Dog1 {
+  constructor(name: string) {
+    this.name = name
+  }
+  public name: string
+  run() { }
+  private pri() {}
+}
+
+console.log(Dog1.prototype)
+
+const dog = new Dog1("平安")
+console.log(dog)
+
+class Husk extends Dog1 {
+  constructor(name: string, color: string) {
+    super(name)
+    this.color = color
+  }
+  color: string
+}
+```
+
+- public : 公有成员。 默认都是这个修饰符
+- private: 私有成员。只能在类中访问，实例和他的子类都不可被访问。给构造函数添加这个修饰符，表示这个类，既不能被实例化，也不能被继承。
+- protected: 受保护成员。只能在类或子类中方问。不能在实例中调用。给构造函数添加这个修饰符。表示这类，只能被继承，不能被实例化。
+- readonly: 只读属性。一定要被初始化。
+- static: 类的静态成员。只能通过类名来调用，而不能通过实例调用。也可以被子类继承。
+
+## 抽象类和多态
+
+抽象类是只能被继承不能被实例化的类
+
+`抽象类可以抽离出事物的共性,有利于代码的复用和扩展`
+
+`多态，是指在父类中定义一个抽象方法，在多个子类中对这个方法有不同的实现，在程序运行时，会根据不同的对象进行不同的操作，这样就出现了运行时的绑定`
+
+```ts
+class Pig extends Animals {
+  constructor(name: string) {
+    super()
+    this.name = name
+  }
+  name: string
+  sleep(): void {
+    console.log(this.name + " of pig is sleeping")
+  }
+}
+
+let pig = new Pig('yangyang')
+
+pig.sleep()
+
+let animal: Animals[] = [pig, cat]
+
+animal.forEach(i => {
+  i.sleep()
+})
+```
+
+### this类型
+
+```ts
+class WorkFlow {
+  step1(){
+    return this
+  }
+  step2(){
+    return this
+  }
+}
+
+new WorkFlow().step1().step2()
+
+class MyFlow extends WorkFlow {
+  next() {
+    return this
+  }
+}
+
+new MyFlow().next().step1().next().step2()
+```
+
+## 类和接口的关系
+
+- 类实现接口的时候，必须实现接口中声明的所有属性
+
+- 接口只能约束类的公有成员
+
+- 接口也不能约束类的构造函数
+
+```ts
+interface Human {
+  name: string;
+  eat(): void;
+}
+
+class Asian implements Human {
+  constructor(name: string) {
+    this.name = name
+  }
+  name: string
+  eat() {
+  }
+}
+```
+
+### 接口的继承
+
+- 接口继承多个接口
+
+```ts
+interface Man extends Human {
+  run():void
+}
+
+interface Child {
+  cry():void
+}
+
+interface Boy extends Man, Child {}
+
+let boy:Boy = {
+  run() {
+    
+  },
+  name: '',
+  eat() {
+    
+  },
+  cry(){}
+}
+
+```
+
+- 接口继承类
+
+相当于接口把类的成员抽象了出来
+  
+`接口抽离类的成员的时候，不仅抽离了类的公共成员，也抽离了类的私有成员，受保护的成员`
+
+```ts
+class Auto {
+  state = 1
+}
+
+interface AutoInterface extends Auto {
+
+}
+
+class GG implements AutoInterface {
+  state = 1
+}
+
+
+class Bus extends Auto implements AutoInterface {
+  
+}
+```
+
+|特性|接口(interface)|类(class)|
+|---|---|---|
+|实现|仅定义结构，无实现|包含属性和方法的具体实现|
+|实例化|❌ 不可实例化|✅ 可通过`new`实例化|
+|编译后存在性|❌ 编译后不存在|✅ 保留为JS代码|
+|访问修饰符|仅`public`|支持`public`、`private`、`protected`|
+|继承|多继承(`extends`多个接口)|单继承(`extends`一个类)|
+|静态成员|❌ 不支持|✅ 支持|
+|类型检查重点|结构兼容性|实例类型（可能受私有成员影响）|
+
+**注意：**
+
+- 访问修饰符（`public`、`private`、`protected`）:控制成员的**可见性**（谁能访问）
+- 静态修饰符（`static`）:控制成员的**归属层级** (属于类本身还是实例对象)
+
+|特性|静态成员（`static`）|实例成员（`无static`）|
+|---|---|---|
+|归属层级|属于类本身（通过`类名.成员`访问）|属于实例对象（通过`对象.成员`访问|
+|内存分配|类加载时分配，全局唯一|实例化时分配，每个对象独立|
+|生命周期|与类共存亡|与对象共存亡|
+|访问限制|可单独配合`public`/`private`使用|可单独配合`public`/`private`使用|
+
+## 泛型
+
+不预先确定的数据类型，具体的类型在使用的时候才能确定
+
+- 泛型函数
+
+```ts
+function log(value: string | number): string|number {
+  console.log(value)
+  return value
+}
+
+// 改造后
+function log<T>(value: T): T {
+  console.log(value)
+  return value
+}
+
+log<string[]>(['value'])
+
+log(['a'])
+
+log<string>('value')
+
+log('a')
+
+log<number>(500)
+
+log(500)
+
+log<number[]>([500,300,59])
+```
+
+- 泛型函数类型
+
+```ts
+type Log = <T>(value:T)=>T
+
+let myLog:Log = log
+```
+
+- 泛型接口
+
+```ts
+// 等价于类型别名定义的方式, 这里的泛型仅仅约束了一个函数
+interface Log {
+  <T>(value: T):T
+}
+let mylog:Log = log
+
+
+// 泛型约束了接口的其他成员
+interface Log<T> {
+  (value: T):T
+}
+// 泛型接口约束了整个接口后，在实现的时候必须指定一个类型
+let mylog:Log<number> = log
+
+// 泛型接口定义时指定默认类型
+interface Log<T = string> {
+  (value: T):T
+}
+
+let mylog:Log = log
+```
+
+## 泛型类和泛型约束
+
+### 泛型类
+
+`泛型不能应用于类的静态成员`
+
+```ts
+class Log<T> {
+  run(value: T) {
+    console.log(value)
+    return value
+  }
+}
+
+let log1 = new Log()
+
+let log2 = new Log<number>()
+
+// 参数可以是任意类型的值
+log1.run('go go go')
+log1.run(1212)
+log1.run({})
+
+// 只能是number
+log2.run(23)
+```
+
+### 泛型约束
+
+```ts
+interface Length {
+  length:number
+}
+
+function log<T extends Length>(value: T): T {
+  console.log(value, value.length)
+  return value
+}
+
+// 参数为有length属性的值
+log([])
+
+log('s')
+
+log({length:4})
+```
+
+### 泛型的好处
+
+- 函数和类可以轻松地支持多种类型，增强程序的扩展性
+- 不必写多条函数重载，冗长的联合类型声明，增强代码可读性
+- 灵活控制类型之间的约束
+
+## 泛型（Generics）、联合类型（Union Types）和函数重载（Function Overloads）三者的关系
+
+### 泛型（Generics）
+
+- 设计目的
+泛型的核心是**类型参数化**，允许在定义函数、接口或类时**不指定具体类型**，而是通过参数动态传递类型。
+泛型的核心价值是**保持类型一致性**（如输入和输出类型一致）
+- 适用场景
+  - 需要**处理多种类型但逻辑相同的**情况
+  - 需要**保留类型信息**（如返回值的类型与输入值一致）
+
+```ts
+function identify<T>(arg:T):T{
+  return arg
+}
+
+const num = identify(2) // 自动推断为number
+const str = identify<string>('hello') //类型为 string
+```
+
+### 联合类型（Union Types）
+
+- 设计目的
+联合类型的核心是**类型灵活性**，允许一个变量或参数是**多种类型中的一种**。它的价值在于**处理不确定性**（如一个参数可能是`string`或`number`）
+- 适用场景
+  - 需要**接受多种类型输入**，但逻辑可能不同（需要类型守卫处理）
+  - 需要**明确限定类型范围**（如`string`|`number`）
+
+```ts
+
+function printValue(value:string|number):string|number {
+  if(typeof value === 'string') {
+    return value.toUpperCase()
+  } else {
+    return value * 4
+  }
+}
+```
+
+### 函数重载（Function Overloads）
+
+- 设计目的
+函数重载的核心是**精确描述函数的多态行为**，通过多个类型签名明确不同参数类型和返回值类型的对应关系。它的价值在于**提升类型提示的准确性**（如根据参数类型推断返回值类型）
+- 适用场景
+  - 需要**根据参数类型返回不同类型**（如`parseInt`返回`number`,`JSON.parse`返回泛型）
+  - 需要**处理不同参数数量和类型组合**
+
+```ts
+function parse(input: string): number;
+function parse(input: string[]): number[];
+function parse(input: string | string[]): number | number[] {
+  if (typeof input === 'string') {
+    return parseFloat(input)
+  } else {
+    return input.map(Number)
+  }
+}
+
+const num = parse("3.29")
+console.log(num)
+
+const arr = parse(['1', '4'])
+
+console.log(arr)
+```
+
+### 三者对比
+
+|特性|核心能力|经典场景|类型一致性|
+|---|---|---|---|
+|泛型|类型参数化|逻辑相同，类型可变|✅ 输入输出一致|
+|联合类型|类型灵活性|输入类型不确定，需分支处理|❌ 类型可能变化|
+|函数重载|多态行为精确描述|不同参数类型对应不同返回值类型|✅ 明确映射关系|
+
+- 泛型 联合类型
+  - 泛型解决的是**类型一致性问题**
+  - 联合类型解决的是**类型多样性问题**
+- 泛型 函数重载
+  - 泛型适用于**类型参数化的逻辑复用**
+  - 函数重载适用于**不同参数类型对应不同的返回类型的精确描述**
+- 联合类型 函数重载
+  - 联合类型允许**单个函数处理多种输入类型**，但需要类型守卫
+  - 函数重载通过多个签名**显式声明类型映射**，提升代码可读性和类型推断能力
+
+## 类型守卫
+
+类型守卫是一种通过条件判断来缩小变量类型范围的技术，它让TypeScript编译器能够在特点代码块中更精确地推断变量的类型。类型守卫常用于处理联合类型或未知类型的场景，以提高代码的类型安全性
+
+### 类型守卫的核心作用
+
+- **缩小类型范围**：将宽泛的类型（如`string` `number`）缩小到具体类型（`string`）
+- **避免运行时错误**：通过静态类型检查提前发现潜在的类型错误
+- **启用类型专属方法**：在特定分支中安全调用类型专属的方法
+
+### 常见类型守卫方式
+
+1.**`typeof` 类型守卫：** 判断基本类型（`string`、`number`、`boolean`）
+2.**`instanceof` 类型守卫：** 判断对象是否为某个类的实例
+3.**`in`操作符守卫：** 判断对象是否包含某个属性
+4.**字面量类型守卫：** 用于联合类型中的字面量
+
+```ts
+
+type Result = { status: 'success'; data:string} | {status:'error';code:number}
+
+function handleResult(result:Result){
+  if(result.status === 'success') {
+    console.log(result.data)
+  } else {
+    console.log(result.code)
+  }
+}
+```
+
+5.**自定义类型守卫（类型谓词）**
+
+通过函数返回`arg is Type` 明确类型断言：
+
+```ts
+function isString(value:unknown):value is string {
+  return typeof value === 'string'
+}
+
+function process(input: string | number) {
+  if(isString(input)) {
+    console.log(input.trim())
+  } else {
+    console.log(input.toFixed(2))
+  }
+}
+```
+
+### 类型守卫与类型断言
+
+类型守卫是通过逻辑判断让Typescript自动推断类型，安全可靠
+类型断言是强制告诉Typescript变量的类型，绕过类型检查，有风险
