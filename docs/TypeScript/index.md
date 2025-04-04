@@ -1209,41 +1209,39 @@ console.log(arr)
 
 ### 常见类型守卫方式
 
-1.**`typeof` 类型守卫：** 判断基本类型（`string`、`number`、`boolean`）
-2.**`instanceof` 类型守卫：** 判断对象是否为某个类的实例
-3.**`in`操作符守卫：** 判断对象是否包含某个属性
-4.**字面量类型守卫：** 用于联合类型中的字面量
+1. **`typeof` 类型守卫：** 判断基本类型（`string`、`number`、`boolean`）
+2. **`instanceof` 类型守卫：** 判断对象是否为某个类的实例
+3. **`in`操作符守卫：** 判断对象是否包含某个属性
+4. **字面量类型守卫：** 用于联合类型中的字面量
 
-```ts
+    ```ts
 
-type Result = { status: 'success'; data:string} | {status:'error';code:number}
+    type Result = { status: 'success'; data:string} | {status:'error';code:number}
 
-function handleResult(result:Result){
-  if(result.status === 'success') {
-    console.log(result.data)
-  } else {
-    console.log(result.code)
-  }
-}
-```
+    function handleResult(result:Result){
+      if(result.status === 'success') {
+        console.log(result.data)
+      } else {
+        console.log(result.code)
+      }
+    }
+    ```
 
-5.**自定义类型守卫（类型谓词）**
+5. **自定义类型守卫（类型谓词）：** 通过函数返回`arg is Type` 明确类型断言：
 
-通过函数返回`arg is Type` 明确类型断言：
+    ```ts
+    function isString(value:unknown):value is string {
+      return typeof value === 'string'
+    }
 
-```ts
-function isString(value:unknown):value is string {
-  return typeof value === 'string'
-}
-
-function process(input: string | number) {
-  if(isString(input)) {
-    console.log(input.trim())
-  } else {
-    console.log(input.toFixed(2))
-  }
-}
-```
+    function process(input: string | number) {
+      if(isString(input)) {
+        console.log(input.trim())
+      } else {
+        console.log(input.toFixed(2))
+      }
+    }
+    ```
 
 ### 类型守卫与类型断言
 
